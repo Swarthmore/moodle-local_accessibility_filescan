@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/accessibility_check/db" VERSION="20200218" COMMENT="XMLDB file for Moodle local/accessibility_check"
+<XMLDB PATH="local/a11y_check/db" VERSION="20200218" COMMENT="XMLDB file for Moodle local/a11y_check"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="accessibility_check_scan" COMMENT="Scan results for the accessibility check tool.">
+    <TABLE NAME="local_a11y_check" COMMENT="Scan results for the accessibility check tool.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="checktype" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The type of scan"/>
@@ -19,7 +19,7 @@
         <INDEX NAME="scan_checktype" UNIQUE="false" FIELDS="checktype"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="accessibility_check_type_pdf" COMMENT="PDF check results">
+    <TABLE NAME="local_a11y_check_type_pdf" COMMENT="PDF check results">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="scanid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -31,13 +31,13 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="pdf_scan_id" TYPE="foreign-unique" FIELDS="scanid" REFTABLE="accessibility_check_scan" REFFIELDS="id"/>
+        <KEY NAME="pdf_scan_id" TYPE="foreign-unique" FIELDS="scanid" REFTABLE="local_a11y_check_scan" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="pdf_contenthash" UNIQUE="true" FIELDS="contenthash"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="changeme" COMMENT="Default comment for the table, please edit me">
+    <TABLE NAME="local_a11y_check_courses" COMMENT="Default comment for the table, please edit me">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="scanid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -45,7 +45,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="course_scan_id" TYPE="foreign-unique" FIELDS="scanid" REFTABLE="accessibility_check_scan" REFFIELDS="id"/>
+        <KEY NAME="course_scan_id" TYPE="foreign-unique" FIELDS="scanid" REFTABLE="local_a11y_check_scan" REFFIELDS="id"/>
         <KEY NAME="course_course_id" TYPE="foreign-unique" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
       </KEYS>
     </TABLE>

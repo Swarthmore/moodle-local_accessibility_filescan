@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Language file for local_accessibility_check
+ * Language file for local/a11y_check
  *
- * @package   local_accessibility_check
+ * @package   local/a11y_check
  * @copyright 2020 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
