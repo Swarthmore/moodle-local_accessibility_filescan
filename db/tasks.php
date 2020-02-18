@@ -15,14 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Language file for local_a11y_check
+ * local_a11y_check task definitions
  *
  * @package   local_a11y_check
  * @copyright 2020 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
-$string['pdf:find_files_task'] = 'Find unscanned PDF files';
-$string['pluginname'] = 'Accessibility Check';
+$tasks = array(
+    array(
+        'classname' => 'local_a11y_check\task\find_pdf_files',
+        'blocking' => 0,
+        'minute' => '*/5',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0
+    ),
+);
