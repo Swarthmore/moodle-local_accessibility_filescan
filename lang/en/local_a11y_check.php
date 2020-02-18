@@ -26,3 +26,31 @@ defined('MOODLE_INTERNAL') || die;
 
 $string['pdf:find_files_task'] = 'Find unscanned PDF files';
 $string['pluginname'] = 'Accessibility Check';
+
+// Reserved for settinga
+$string['settings:api_url'] = '';
+$string['settings:api_url_desc'] = '';
+
+$string['settings:api_token'] = '';
+$string['settings:api_token_desc'] = '';
+
+$string['settings:files_per_cron'] = '';
+$string['settings:files_per_cron_desc'] = '';
+
+$string['settings:max_file_size_mb'] = '';
+$string['settings:max_file_size_mb_desc'] = '';
+
+$string['settings:max_retries'] = '';
+$string['settings:max_retries_desc'] = '';
+
+$string['settings:text_check_help'] = '';
+$string['settings:text_check_help_desc'] = '';
+
+$string['settings:title_check_help'] = '';
+$string['settings:title_check_help_desc'] = '';
+
+$string['settings:lang_check_help'] = '';
+$string['settings:lang_check_help_desc'] = '';
+
+$string['settings:outline_check_help'] = '';
+$string['settings:outline_check_help_desc'] = '';
