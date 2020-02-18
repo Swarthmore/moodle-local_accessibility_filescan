@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * local library functions local_a11y_check
+ * local_a11y_check upgrade code.
  *
  * @package   local_a11y_check
  * @copyright 2020 Swarthmore College
@@ -24,16 +24,27 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// Types of checks.
-define('LOCAL_A11Y_CHECK_TYPE_UNDEFINED', 0);
-define('LOCAL_A11Y_CHECK_TYPE_PDF', 1);
+/**
+ * Upgrade function for plugin.
+ *
+ * @param int $oldversion The old version of the plugin
+ * @return bool A status indicating success or failure
+ */
+function xmldb_local_a11y_check_upgrade($oldversion) {
+    if ($oldversion < 2020021800) {
 
-// Status types for scan checks.
-define('LOCAL_A11Y_CHECK_STATUS_UNCHECKED', 0); // File has not been checked.
-define('LOCAL_A11Y_CHECK_STATUS_PASS', 1);      // File passes all a11y checks.
-define('LOCAL_A11Y_CHECK_STATUS_CHECK', 2);     // File passes some a11y checks.
-define('LOCAL_A11Y_CHECK_STATUS_FAIL', 3);      // File fails all a11y checks.
-define('LOCAL_A11Y_CHECK_STATUS_ERROR', 4);     // Encountered an error on the last check.
+        // Define field statustext to be added to local_a11y_check.
+        $table = new xmldb_table('local_a11y_check');
+        $field = new xmldb_field('statustext', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'status');
 
-// File is intentionally skipped, either from multiple errors, oversize, or some other issue.
-define('LOCAL_A11Y_CHECK_STATUS_IGNORE', 5);
+        // Conditionally launch add field statustext.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // A11y_check savepoint reached.
+        upgrade_plugin_savepoint(true, 2020021800, 'local', 'a11y_check');
+    }
+
+    return true;
+}

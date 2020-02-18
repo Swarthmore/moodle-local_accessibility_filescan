@@ -11,6 +11,7 @@
         <FIELD NAME="faildelay" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="lastchecked" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="When the scan was run"/>
         <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The status of the scan"/>
+        <FIELD NAME="statustext" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Reasons for file being ignored"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

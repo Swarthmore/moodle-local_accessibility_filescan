@@ -67,9 +67,12 @@ class pdf {
     public function create_scan_record(string $contenthash) {
         global $DB;
 
+        // Set status.
+        $status = LOCAL_A11Y_CHECK_TYPE_PDF;
+
         // Create the primary scan record.
         $scanrecord              = new stdClass;
-        $scanrecord->checktype   = LOCAL_A11Y_CHECK_TYPE_PDF;
+        $scanrecord->checktype   = $status;
         $scanrecord->faildelay   = 0;
         $scanrecord->lastchecked = 0;
         $scanrecord->status      = LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
