@@ -26,16 +26,16 @@
 defined('MOODLE_INTERNAL') || die;
   
   // check capabilities here
-  $can_edit_config = true;
+  $canEditConfig = true;
 
-  if ($can_edit_config) {
+  if ($canEditConfig) {
 
     $settings->add(new admin_setting_configtext('local_a11y_check/api_url',
         get_string('settings:api_url', 'local_a11y_check'),
         get_string('settings:api_url_desc', 'local_a11y_check'),
         '', PARAM_TEXT, 128));
   
-      $settings->add(new admin_setting_configtext('local_a11y_check/api_token',
+    $settings->add(new admin_setting_configtext('local_a11y_check/api_token',
         get_string('settings:api_key', 'local_a11y_check'),
         get_string('settings:api_key_desc', 'local_a11y_check'),
         '', PARAM_TEXT, 128));
@@ -82,5 +82,4 @@ defined('MOODLE_INTERNAL') || die;
         'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
         PARAM_URL,
         60));
-
-  }
+}
