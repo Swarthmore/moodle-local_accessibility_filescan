@@ -22,11 +22,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_a11y_check;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../locallib.php');
-
-namespace local_a11y_check;
 
 /**
  * PDF helper functions local_a11y_check
@@ -38,7 +38,8 @@ namespace local_a11y_check;
 class pdf {
     /**
      * Get all unscanned PDF files.
-     * 
+     * @param int $limit The number of files to process at a time.
+     *
      * @return array
      */
     public function get_unscanned_pdf_files($limit = 1000) {
@@ -46,10 +47,10 @@ class pdf {
 
         $sql = 'SELECT distinct f.contenthash
         FROM {files} f INNER JOIN {context} c ON c.id=f.contextid LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
-            WHERE c.contextlevel = 70 
-            AND f.filesize <> 0 
+            WHERE c.contextlevel = 70
+            AND f.filesize <> 0
             AND f.mimetype = "application/pdf"
-            AND f.component <> "assignfeedback_editpdf" 
+            AND f.component <> "assignfeedback_editpdf"
             AND f.filearea <> "stamps"
             ORDER BY f.id DESC';
 
@@ -60,7 +61,7 @@ class pdf {
     /**
      * Create the scan and result record for a single PDF.
      * @param string $contenthash The contenthash for a PDF
-     * 
+     *
      * @return boolean
      */
     public function create_scan_record(string $contenthash) {
@@ -73,7 +74,7 @@ class pdf {
         $scanrecord->lastchecked = 0;
         $scanrecord->status      = LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
         $scanid                  = $DB->insert_record('local_a11y_check', $scanrecord);
-   
+
         if (!$scanid) {
             return false;
         }
@@ -83,12 +84,12 @@ class pdf {
         $scanresult->scanid      = $scanid;
         $scanresult->contenthash = $contenthash;
         $scanresultid            = $DB->insert_record('local_a11y_check_type_pdf', $scanresult);
-    
+
         if (!$scanresultid) {
             $DB->delete_records('local_a11y_check', array('id' => $scanid));
             return false;
         }
-    
+
         return true;
     }
 }

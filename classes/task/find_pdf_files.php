@@ -22,9 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 namespace local_a11y_check\task;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Scheduled task to find unscanned PDF files.
@@ -50,7 +50,7 @@ class find_pdf_files extends \core\task\scheduled_task {
         $files = \local_a11y_check\pdf::get_unscanned_pdf_files();
         if (is_array($files) && !empty($files)) {
             $lockfactory = \core\lock\lock_config::get_lock_factory('local_a11y_check_find_pdf_files_task');
-            foreach($files as $file) {
+            foreach ($files as $file) {
                 $lockkey = "contenthash_{$file->contenthash}";
                 $lock = $lockfactory->get_lock($lockkey, 0);
                 if ($lock !== false) {
