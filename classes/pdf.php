@@ -45,6 +45,7 @@ class pdf {
     public static function get_unscanned_pdf_files($limit = 1000) {
         global $DB;
 
+        mtrace("Looking for PDF files to scan for accessibility");
         $sql = "SELECT f.contenthash, MAX(f.filesize) as filesize
             FROM {files} f
                 INNER JOIN {context} c ON c.id=f.contextid
@@ -59,6 +60,11 @@ class pdf {
             ORDER BY MAX(f.id) DESC";
 
         $files = $DB->get_records_sql($sql, null, 0, $limit);
+        if (!$files) {
+            mtrace("No PDF files found");
+        } else {
+            mtrace("Found " . count($files) . " PDF files");
+        }
         return $files;
     }
 
