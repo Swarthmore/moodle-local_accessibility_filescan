@@ -78,7 +78,7 @@ class pdf {
         global $DB;
 
         // Create the primary scan record for the PDF file.
-        $scanrecord              = new stdClass;
+        $scanrecord              = new \stdClass;
         $scanrecord->checktype   = LOCAL_A11Y_CHECK_TYPE_PDF;
         $scanrecord->faildelay   = 0;
         $scanrecord->lastchecked = 0;
