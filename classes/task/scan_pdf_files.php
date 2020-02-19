@@ -27,7 +27,7 @@ namespace local_a11y_check\task;
 
 defined('MOODLE_INTERNAL') || die();
       
-require_once('./PDF_Scan_Handler.php');
+require_once('../PDF_Scan_Handler.php');
 
 /**
  * Scheduled task to find unscanned PDF files.
