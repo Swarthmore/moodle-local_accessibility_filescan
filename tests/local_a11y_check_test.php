@@ -68,7 +68,9 @@ class local_a11y_check_testcase extends advanced_testcase {
         $this->assert_unscanned_files_count(0);
         $this->assert_custom_record_count(1);
 
-        $records = $DB->get_records('local_a11y_check_type_pdf');
+        $records = $DB->get_records_sql("SELECT *
+            FROM {local_a11y_check} ac
+            JOIN {local_a11y_check_type_pdf} actp ON ac.id=actp.scanid");
         $record  = $records[array_keys($records)[0]];
 
         $this->assertEquals(LOCAL_A11Y_CHECK_STATUS_IGNORE, $record->status);
