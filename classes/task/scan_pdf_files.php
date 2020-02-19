@@ -52,8 +52,7 @@ class scan_pdf_files extends \core\task\scheduled_task {
       
       $apiBaseURL = get_config('local_accessibility_check', 'api_url');
       $apiToken = get_config('local_accessibility_check', 'api_token');
-      $defaultMaxFileSize = 9999999999;
-      $maxFilesize = get_config("local_accessibility_check", "max_file_size_mb") ?: $defaultMaxFileSize;
+      $maxFilesize = get_config("local_accessibility_check", "max_file_size_mb");
       
       if (!$apiURL or $apiToken) {
         // TODO: do something other than kill the process
@@ -64,76 +63,77 @@ class scan_pdf_files extends \core\task\scheduled_task {
       $fs = get_files_storage();
 
       if (!is_array($files) || empty($files)) {
-        return false;
+        // TODO: do something other than kill the process
+        die();
       }
 
       $requestHandler = \local_a11y_check\pdf::get_presigned_url($apiBaseURL . '/requesturl', $apiToken);
 
       foreach ($files as $f) {
 
-        $file = $fs->get_file_by_hash($f->pathname);
-        $fileContents = $file->get_content();
-        $fileContentHash = $f->contenthash;
-        $fileSize = $file->get_filesize();
+          $file = $fs->get_file_by_hash($f->pathname);
+          $fileContents = $file->get_content();
+          $fileContentHash = $f->contenthash;
+          $fileSize = $file->get_filesize();
 
-        if ((int) $fileSize > (int) $maxFilesize) {
-          // TODO: Handle files larger than max filesize 
-          continue;
-        }
+          if ((int) $fileSize > (int) $maxFilesize) {
+            // TODO: Handle files larger than max filesize 
+            continue;
+          }
 
-        $credentials = $requestHandler->getPresignedURL('/requesturl');
+          $credentials = $requestHandler->getPresignedURL('/requesturl');
+          
+          if ($credentials->statusCode !== 200) {
+              // TODO: Handle a bad request
+              continue;
+          }
+
+          // TODO: Test if passing the file directly actually works...
+          $putResponse = $requestHandler->putFile($credentials->uploadURL, $credentials->key, $file);
+
+          if ($putResponse->statusCode !== 200) {
+              // TODO: Handle a bad request
+              continue;
+          }
+
+          $scanResponse  = $requestHandler->scanFile('/scan', $credentials->key);
+
+          if ($scanResponse->statusCode !== 200) {
+              // TODO: Handle a bad request
+              return false;
+          }
+
+          // TODO: Handle success response
+          
+          /**
+           * A successful response will look like this
+           * 
+           * {
+           * language: false,
+           * numPages: 1,
+           * metaData: {
+           *   PDFFormatVersion: '1.3',
+           *   IsLinearized: false,
+           *   IsAcroFormPresent: false,
+           *   IsXFAPresent: false,
+           *   IsCollectionPresent: false,
+           *   Producer: 'Mac OS X 10.1.3 Quartz PDFContext',
+           *   CreationDate: "D:20020314180735-05'00'"
+           * },
+           * hasForm: false,
+           * title: false,
+           * hasOutline: false,
+           * hasAttachements: false,
+           * hasText: false,
+           * pageInfo: [ { pageText: '', pageNum: 1 } ],
+           * numPagesChecked: 1
+           * }
+           */
+
+          // For now, just put the scan id and contenthash there
+          \local_a11y_check\pdf::create_scan_record($fileContentHash);
         
-        if ($credentials->statusCode !== 200) {
-          // TODO: Handle a bad request
-          continue;
-        }
-
-        // TODO: Test if passing the file directly actually works...
-        $putResponse = $requestHandler->putFile($credentials->uploadURL, $credentials->key, $file);
-
-        if ($putResponse->statusCode !== 200) {
-          // TODO: Handle a bad request
-          continue;
-        }
-
-        $scanResponse  = $requestHandler->scanFile('/scan', $credentials->key);
-
-        if ($scanResponse->statusCode !== 200) {
-          // TODO: Handle a bad request
-          return false;
-        }
-
-        // TODO: Handle success response
-        
-        /**
-         * A successful response will look like this
-         * 
-         * {
-         * language: false,
-         * numPages: 1,
-         * metaData: {
-         *   PDFFormatVersion: '1.3',
-         *   IsLinearized: false,
-         *   IsAcroFormPresent: false,
-         *   IsXFAPresent: false,
-         *   IsCollectionPresent: false,
-         *   Producer: 'Mac OS X 10.1.3 Quartz PDFContext',
-         *   CreationDate: "D:20020314180735-05'00'"
-         * },
-         * hasForm: false,
-         * title: false,
-         * hasOutline: false,
-         * hasAttachements: false,
-         * hasText: false,
-         * pageInfo: [ { pageText: '', pageNum: 1 } ],
-         * numPagesChecked: 1
-         * }
-         */
-
-        // For now, just put the scan id and contenthash there
-        \local_a11y_check\pdf::create_scan_record($fileContentHash);
-       
-        return true;
+          return true;
         }
     }
 }
