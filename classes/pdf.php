@@ -64,7 +64,7 @@ class pdf {
 
     /**
      * Create the scan and result record for a single PDF.
-     * @param string $contenthash The contenthash for a PDF
+     * @param array $file The partial SQL file record containing contenthash and filesize
      *
      * @return boolean
      */
