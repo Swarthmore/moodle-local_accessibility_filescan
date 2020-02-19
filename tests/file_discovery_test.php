@@ -158,7 +158,7 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
     /**
      * Wrapper for assertEquals against the local_a11y_check table.
      * @param int $count the expected number of records.
-     * 
+     *
      * @return boolean
      */
     protected function assert_custom_record_count($count) {
@@ -168,10 +168,10 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
         return $this->assertEquals($count, count($customrecords));
     }
 
-   /**
+    /**
      * Wrapper for assertEquals against get_unscanned_pdf_files.
      * @param int $count the expected number of records.
-     * 
+     *
      * @return boolean
      */
     protected function assert_unscanned_files_count($count) {
