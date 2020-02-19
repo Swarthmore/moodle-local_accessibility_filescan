@@ -42,16 +42,19 @@ class pdf {
      *
      * @return array
      */
-    public function get_unscanned_pdf_files($limit = 1000) {
+    public static function get_unscanned_pdf_files($limit = 1000) {
         global $DB;
 
-        $sql = 'SELECT distinct f.contenthash
-        FROM {files} f INNER JOIN {context} c ON c.id=f.contextid LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
-            WHERE c.contextlevel = 70
-            AND f.filesize <> 0
-            AND f.mimetype = "application/pdf"
-            AND f.component <> "assignfeedback_editpdf"
-            AND f.filearea <> "stamps"
+        $sql = 'SELECT f.contenthash
+            FROM {files} f
+                INNER JOIN {context} c ON c.id=f.contextid
+                LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
+                WHERE c.contextlevel = 70
+                AND f.filesize <> 0
+                AND f.mimetype = "application/pdf"
+                AND f.component <> "assignfeedback_editpdf"
+                AND f.filearea <> "stamps"
+            GROUP BY f.contenthash
             ORDER BY f.id DESC';
 
         $files = $DB->get_records_sql($sql, null, 0, $limit);
@@ -64,14 +67,14 @@ class pdf {
      *
      * @return boolean
      */
-    public function create_scan_record(string $contenthash) {
+    public static function create_scan_record(string $contenthash) {
         global $DB;
 
         // Set status.
         $status = LOCAL_A11Y_CHECK_TYPE_PDF;
 
         // Create the primary scan record.
-        $scanrecord              = new stdClass;
+        $scanrecord              = new \stdClass;
         $scanrecord->checktype   = $status;
         $scanrecord->faildelay   = 0;
         $scanrecord->lastchecked = 0;
@@ -79,16 +82,18 @@ class pdf {
         $scanid                  = $DB->insert_record('local_a11y_check', $scanrecord);
 
         if (!$scanid) {
+            mtrace("Failed to insert scan record for PDF {$contenthash}");
             return false;
         }
 
         // Create the scan result record.
-        $scanresult              = new stdClass;
+        $scanresult              = new \stdClass;
         $scanresult->scanid      = $scanid;
         $scanresult->contenthash = $contenthash;
         $scanresultid            = $DB->insert_record('local_a11y_check_type_pdf', $scanresult);
 
         if (!$scanresultid) {
+            mtrace("Failed to insert scan result record for PDF {$contenthash}");
             $DB->delete_records('local_a11y_check', array('id' => $scanid));
             return false;
         }
