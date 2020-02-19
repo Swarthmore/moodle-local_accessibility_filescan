@@ -45,7 +45,7 @@ class pdf {
     public static function get_unscanned_pdf_files($limit = 1000) {
         global $DB;
 
-        $sql = "SELECT f.contenthash
+        $sql = "SELECT f.contenthash, MAX(f.filesize) as filesize
             FROM {files} f
                 INNER JOIN {context} c ON c.id=f.contextid
                 LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
@@ -68,18 +68,28 @@ class pdf {
      *
      * @return boolean
      */
-    public static function create_scan_record(string $contenthash) {
+    public static function create_scan_record(array $file) {
         global $DB;
 
-        // Set status.
-        $status = LOCAL_A11Y_CHECK_TYPE_PDF;
-
-        // Create the primary scan record.
-        $scanrecord              = new \stdClass;
-        $scanrecord->checktype   = $status;
+        // Create the primary scan record for the PDF file.
+        $scanrecord              = new stdClass;
+        $scanrecord->checktype   = LOCAL_A11Y_CHECK_TYPE_PDF;
         $scanrecord->faildelay   = 0;
         $scanrecord->lastchecked = 0;
-        $scanrecord->status      = LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
+
+
+        // Determin if PDF is too big to scan
+        // Moodle file sizes are stored as bytes in the database.
+        // Max file size setting is in megabytes (MB)
+        $max_filesize = (int) get_config("local_a11y_check", "max_file_size_mb");
+        if ($file->filesize > $max_filesize*1000000) {
+            // File is too big, ignore
+            $scanrecord->status      = LOCAL_A11Y_CHECK_STATUS_IGNORE;
+            $scanrecord->statustext  = "File too large to scan";
+        } else {
+            $scanrecord->status      = LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
+        }
+        
         $scanid                  = $DB->insert_record('local_a11y_check', $scanrecord);
 
         if (!$scanid) {
@@ -90,7 +100,7 @@ class pdf {
         // Create the scan result record.
         $scanresult              = new \stdClass;
         $scanresult->scanid      = $scanid;
-        $scanresult->contenthash = $contenthash;
+        $scanresult->contenthash = $file->contenthash;
         $scanresultid            = $DB->insert_record('local_a11y_check_type_pdf', $scanresult);
 
         if (!$scanresultid) {
