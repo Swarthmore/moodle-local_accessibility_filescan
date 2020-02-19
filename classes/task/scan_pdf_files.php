@@ -42,7 +42,7 @@ class scan_pdf_files extends \core\task\scheduled_task {
      * @return string the name of the task
      */
     public function get_name() {
-        return get_string('task:scan_pdf_files', 'local_a11y_check');
+        return get_string('settings:scan_pdf_files', 'local_a11y_check');
     }
    
     /**
@@ -129,6 +129,8 @@ class scan_pdf_files extends \core\task\scheduled_task {
            * numPagesChecked: 1
            * }
            */
+
+           $scanResults = json_decode($scanResponse);
 
           // For now, just put the scan id and contenthash there
           \local_a11y_check\pdf::create_scan_record($fileContentHash);
