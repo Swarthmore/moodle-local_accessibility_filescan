@@ -24,15 +24,12 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
 
     public function test_file_discovery() {
         $this->resetAfterTest(true);
-        global $DB;
-
         $this->pdfhelper = new \local_a11y_check\pdf();
         $this->task      = new \local_a11y_check\task\find_pdf_files();
         $this->course    = $this->getDataGenerator()->create_course(array('shortname' => 'testcourse'));
         $this->page      = $this->getDataGenerator()->create_module('page', array('course' => $this->course->id));
 
         $this->add_garbage_files();
-        var_dump($DB->get_records('files'));
 
         $this->add_pdfs(5);
 
