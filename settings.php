@@ -36,8 +36,8 @@ defined('MOODLE_INTERNAL') || die;
         '', PARAM_TEXT, 128));
   
     $settings->add(new admin_setting_configtext('local_a11y_check/api_token',
-        get_string('settings:api_key', 'local_a11y_check'),
-        get_string('settings:api_key_desc', 'local_a11y_check'),
+        get_string('settings:api_token', 'local_a11y_check'),
+        get_string('settings:api_token_desc', 'local_a11y_check'),
         '', PARAM_TEXT, 128));
 
     $settings->add(new admin_setting_configtext('local_a11y_check/files_per_cron',

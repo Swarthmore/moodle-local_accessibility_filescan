@@ -28,6 +28,9 @@ defined('MOODLE_INTERNAL') || die;
 $string['pdf:find_files_task'] = 'Find unscanned PDF files';
 $string['pluginname'] = 'Accessibility Check';
 
+// Tasks
+$string['tasks:scan_pdf_files'] = 'Scan PDF files';
+
 // Reserved for settinga
 $string['settings:api_url'] = '';
 $string['settings:api_url_desc'] = '';
