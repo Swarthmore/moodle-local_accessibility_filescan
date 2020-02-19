@@ -23,11 +23,12 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 namespace local_a11y_check\task;
 
-defined('MOODLE_INTERNAL') || die();
-      
 require_once('../PDF_Scan_Handler.php');
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Scheduled task to find unscanned PDF files.
