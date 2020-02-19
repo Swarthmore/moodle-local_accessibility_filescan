@@ -14,12 +14,34 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * local_a11y_check unit tests
+ *
+ * @package   local_a11y_check
+ * @copyright 2020 Swarthmore College
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * File discovery unit test.
+ *
+ * @package   local_a11y_check
+ * @copyright 2020 Swarthmore College
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
+    /** @var \local_a11y_check\pdf The pdf helper object */
     public $pdfhelper;
+
+    /** @var \local\a11y_check\task\find_pdf_files The task object */
     public $task;
+
+    /** @var \stdClass the test course object */
     public $course;
+
+    /** @var array the generated pdfs */
     public $filesadded;
 
     public function test_file_discovery() {
@@ -54,6 +76,9 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
         $this->assert_custom_record_count(13);
     }
 
+    /**
+     * Create PDFs which should be excluded from the scan.
+     */
     protected function add_garbage_files() {
         $fs = get_file_storage();
 
@@ -107,6 +132,10 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
         $this->filesadded++;
     }
 
+    /**
+     * Create the requested number of pdfs.
+     * @param int $count the number of pdfs to create.
+     */
     protected function add_pdfs($count) {
         $fs = get_file_storage();
 
@@ -126,6 +155,12 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
         }
     }
 
+    /**
+     * Wrapper for assertEquals against the local_a11y_check table.
+     * @param int $count the expected number of records.
+     * 
+     * @return boolean
+     */
     protected function assert_custom_record_count($count) {
         global $DB;
 
@@ -133,8 +168,14 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
         return $this->assertEquals($count, count($customrecords));
     }
 
+   /**
+     * Wrapper for assertEquals against get_unscanned_pdf_files.
+     * @param int $count the expected number of records.
+     * 
+     * @return boolean
+     */
     protected function assert_unscanned_files_count($count) {
         $queryresults = $this->pdfhelper->get_unscanned_pdf_files();
-        $this->assertEquals($count, count($queryresults));
+        return $this->assertEquals($count, count($queryresults));
     }
 }
