@@ -39,7 +39,7 @@ class local_a11y_assert_pdf_evaluation_testcase extends advanced_testcase {
         $passpdf  = json_decode(file_get_contents(dirname(__FILE__) . '/fixtures/record-pass.json'));
         $checkpdf = json_decode(file_get_contents(dirname(__FILE__) . '/fixtures/record-check.json'));
         $failpdf  = json_decode(file_get_contents(dirname(__FILE__) . '/fixtures/record-fail.json'));
-    
+
         // Check evaluation.
         $this->assertEquals(LOCAL_A11Y_CHECK_STATUS_PASS, \local_a11y_check\pdf::evaluate_item_status($passpdf));
         $this->assertEquals(LOCAL_A11Y_CHECK_STATUS_CHECK, \local_a11y_check\pdf::evaluate_item_status($checkpdf));

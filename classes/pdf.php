@@ -120,7 +120,7 @@ class pdf {
     /**
      * Takes the result object and returns the accessibility status.
      * @param \stdClass $result The result object
-     * 
+     *
      * @return int the status
      */
     public static function evaluate_item_status($result) {
