@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -24,7 +23,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
-  
+
 if ($hassiteconfig) {
     $settings = new admin_settingpage('local_a11y_check', get_string('pluginname', 'local_a11y_check'));
     $ADMIN->add('localplugins', $settings);
