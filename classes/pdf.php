@@ -74,7 +74,7 @@ class pdf {
      *
      * @return boolean
      */
-    public static function create_scan_record(array $file) {
+    public static function create_scan_record($file) {
         global $DB;
 
         // Create the primary scan record for the PDF file.
@@ -95,7 +95,7 @@ class pdf {
             $scanrecord->status      = LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
         }
 
-        $scanid                  = $DB->insert_record('local_a11y_check', $scanrecord);
+        $scanid = $DB->insert_record('local_a11y_check', $scanrecord);
 
         if (!$scanid) {
             mtrace("Failed to insert scan record for PDF {$contenthash}");
