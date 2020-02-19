@@ -162,7 +162,7 @@ class pdf {
             'Content-Length: ' . $size
         );
 
-        $opts = array( 
+        $opts = array(
             CURLOPT_PUT => true,
             CURLOPT_INFILE => $file,
             CURLOPT_INFILESIZE => $size,
@@ -213,7 +213,6 @@ class pdf {
         curl_setopt_array($ch, $opts);
         $res = curl_exec($ch);
 
-        // Handle errors
         if (curl_error($ch)) {
             $error = curl_error($ch);
             return false;
