@@ -71,9 +71,6 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
 
         $this->assert_custom_record_count(12);
         $this->assert_unscanned_files_count(0);
-
-        $this->pdfhelper->create_scan_record('thisisafakecontenthash');
-        $this->assert_custom_record_count(13);
     }
 
     /**

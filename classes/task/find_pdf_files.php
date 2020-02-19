@@ -55,7 +55,7 @@ class find_pdf_files extends \core\task\scheduled_task {
             foreach ($files as $file) {
                 $lockkey = "contenthash: {$file->contenthash}";
                 if ($lock = $lockfactory->get_lock($lockkey, $timeout)) {
-                    \local_a11y_check\pdf::create_scan_record($file->contenthash);
+                    \local_a11y_check\pdf::create_scan_record($file);
                     $lock->release();
                 } else {
                     throw new \moodle_exception('locktimeout');
