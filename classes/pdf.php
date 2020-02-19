@@ -107,7 +107,7 @@ class pdf {
      * @params String $url
      * @returns StdClass
      */
-    public static function get_presigned_url(string $url, string $apiKey) {
+    public static function get_presigned_url(string $url, string $apikey) {
 
         $ch = curl_init($url);
 
@@ -119,11 +119,11 @@ class pdf {
 
         $opts = array( 
             CURLOPT_HTTPHEADER => $headers,
-            CURLOPT_RETURNTRANSFER => true, //return the web page
-            CURLOPT_FOLLOWLOCATION => true, // follow redirects
-            CURLOPT_MAXREDIRS => 10, // stop after 10 redirects
-            CURLOPT_CONNECTTIMEOUT => 120, // time out on conect
-            CURLOPT_TIMEOUT => 120, // time out on response
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_CONNECTTIMEOUT => 120,
+            CURLOPT_TIMEOUT => 120,
         );
 
         curl_setopt_array($ch, $opts);
@@ -139,19 +139,19 @@ class pdf {
 
         $json = json_decode($res);
 
-        $returnVals = new stdClass();
-        $returnVals->uploadURL = $json->uploadURL;
-        $returnVals->key = $json->key;
+        $response = new stdClass();
+        $response->uploadURL = $json->uploadURL;
+        $response->key = $json->key;
 
-        return $returnVals;
+        return $response;
     }
 
     /**
      * @description This function will put the file into
      * an AWS S3 bucket
-     * @param String presignedURL
+     * @param String url 
      * @param String key
-     * @param String file_path
+     * @param String file
      * @returns Boolean
      */
     public static function put_file(string $url, string $key, string $file) {
@@ -169,8 +169,8 @@ class pdf {
             CURLOPT_INFILESIZE => $file_size,
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 60, // time out on conect
-            CURLOPT_TIMEOUT => 60, // time out on response
+            CURLOPT_CONNECTTIMEOUT => 60,
+            CURLOPT_TIMEOUT => 60,
         );
 
         curl_setopt_array($ch, $opts);
@@ -189,15 +189,15 @@ class pdf {
 
     /**
      * @description This function will trigger a lambda function in
-    * AWS
-    * @params String $url
-    * @params String $key
-    * @returns StdClass
+     * AWS
+     * @params String $url
+     * @params String $key
+     * @returns StdClass
     */
     public static function scan_file(string $url, string $key) {
         $headers = array(
             'Content-Type: application/json',
-            'x-api-key: ' . $key 
+            'x-api-key: ' . $key
         );
         $body = json_encode(array( 'key' => $key ));
 
@@ -206,20 +206,20 @@ class pdf {
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_POSTFIELDS => $body,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 60, // time out on conect
-            CURLOPT_TIMEOUT => 60, // time out on response
+            CURLOPT_CONNECTTIMEOUT => 60,
+            CURLOPT_TIMEOUT => 60,
         );
 
-        $ch = curl_init($curl_url);
+        $ch = curl_init($url);
 
         curl_setopt_array($ch, $opts);
         $res = curl_exec($ch);
 
         // Handle errors
         if (curl_error($ch)) {
-        $error = curl_error($ch);
-        return false;
-    }
+            $error = curl_error($ch);
+            return false;
+        }
 
         curl_close($ch);
 
