@@ -45,7 +45,7 @@ class pdf {
     public static function get_unscanned_pdf_files($limit = 1000) {
         global $DB;
 
-        $sql = "SELECT f.contenthash
+        $sql = "SELECT f.contenthash, f.id
             FROM {files} f
                 INNER JOIN {context} c ON c.id=f.contextid
                 LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
