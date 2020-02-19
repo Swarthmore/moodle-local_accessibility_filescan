@@ -117,7 +117,7 @@ class pdf {
             'x-api-key: ' . $apikey
         );
 
-        $opts = array( 
+        $opts = array(
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
@@ -129,7 +129,6 @@ class pdf {
         curl_setopt_array($ch, $opts);
         $res = curl_exec($ch);
 
-        // Handle errors
         if (curl_error($ch)) {
             $error = curl_error($ch);
             return false;
@@ -156,17 +155,17 @@ class pdf {
      */
     public static function put_file(string $url, string $key, string $file) {
         $ch = curl_init($url);
-        $file_size = filesize($file);
+        $size = filesize($file);
 
         $headers = array(
             'filename: ' . $key,
-            'Content-Length: ' . $file_size
+            'Content-Length: ' . $size
         );
 
         $opts = array( 
             CURLOPT_PUT => true,
             CURLOPT_INFILE => $file,
-            CURLOPT_INFILESIZE => $file_size,
+            CURLOPT_INFILESIZE => $size,
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => 60,
@@ -176,7 +175,6 @@ class pdf {
         curl_setopt_array($ch, $opts);
         $res = curl_exec($ch);
 
-        // Handle errors
         if (curl_error($ch)) {
             $error = curl_error($ch);
             return false;
@@ -193,7 +191,7 @@ class pdf {
      * @params String $url
      * @params String $key
      * @returns StdClass
-    */
+     */
     public static function scan_file(string $url, string $key) {
         $headers = array(
             'Content-Type: application/json',
