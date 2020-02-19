@@ -26,3 +26,31 @@ defined('MOODLE_INTERNAL') || die;
 
 $string['pdf:find_files_task'] = 'Find unscanned PDF files';
 $string['pluginname'] = 'Accessibility Check';
+
+// Reserved for settings.
+$string['settings:api_url'] = 'External service endpoint';
+$string['settings:api_url_desc'] = 'URL to post files for accessibility scanning (e.g. https://example.edu/filescan)';
+
+$string['settings:api_token'] = 'External service token';
+$string['settings:api_token_desc'] = 'The external service token';
+
+$string['settings:files_per_cron'] = 'Batch size';
+$string['settings:files_per_cron_desc'] = 'Maximum number of files to scan per cron job';
+
+$string['settings:max_file_size_mb'] = 'Maximum file size';
+$string['settings:max_file_size_mb_desc'] = 'The max file size to scan, in megabytes; larger files will be ignored';
+
+$string['settings:max_retries'] = 'Maximum retries';
+$string['settings:max_retries_desc'] = 'Maximum number of times to try scanning a file before giving up';
+
+$string['settings:text_check_help'] = 'Text check help link';
+$string['settings:text_check_help_desc'] = 'Link to help documentation for the text check';
+
+$string['settings:title_check_help'] = 'Title check help link';
+$string['settings:title_check_help_desc'] = 'Link to help documentation for the title check';
+
+$string['settings:lang_check_help'] = 'Language check help link';
+$string['settings:lang_check_help_desc'] = 'Link to help documentation for the language check';
+
+$string['settings:outline_check_help'] = 'Outline check help link';
+$string['settings:outline_check_help_desc'] = 'Link to help documentation for the outline check';
