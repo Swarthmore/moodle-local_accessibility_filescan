@@ -54,6 +54,7 @@ class pdf {
                 AND f.mimetype = "application/pdf"
                 AND f.component <> "assignfeedback_editpdf"
                 AND f.filearea <> "stamps"
+                AND actp.contenthash IS NULL
             GROUP BY f.contenthash
             ORDER BY f.id DESC';
 
