@@ -116,4 +116,20 @@ class pdf {
 
         return true;
     }
+
+    /**
+     * Takes the result object and returns the accessibility status.
+     * @param \stdClass $result The result object
+     *
+     * @return int the status
+     */
+    public static function evaluate_item_status($result) {
+        if ($result->title && $result->hasOutline && $result->hasText && $result->language) {
+            return LOCAL_A11Y_CHECK_STATUS_PASS;
+        } else if ($result->hasText) {
+            return LOCAL_A11Y_CHECK_STATUS_CHECK;
+        } else {
+            return LOCAL_A11Y_CHECK_STATUS_FAIL;
+        }
+    }
 }
