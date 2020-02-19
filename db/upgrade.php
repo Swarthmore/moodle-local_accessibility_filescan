@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for local_a11y_check
+ * local_a11y_check upgrade code.
  *
  * @package   local_a11y_check
  * @copyright 2020 Swarthmore College
@@ -24,8 +24,27 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020021801;
-$plugin->requires  = 2018120300;
-$plugin->component = 'local_a11y_check';
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = 'v0.0.1';
+/**
+ * Upgrade function for plugin.
+ *
+ * @param int $oldversion The old version of the plugin
+ * @return bool A status indicating success or failure
+ */
+function xmldb_local_a11y_check_upgrade($oldversion) {
+    if ($oldversion < 2020021800) {
+
+        // Define field statustext to be added to local_a11y_check.
+        $table = new xmldb_table('local_a11y_check');
+        $field = new xmldb_field('statustext', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'status');
+
+        // Conditionally launch add field statustext.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // A11y_check savepoint reached.
+        upgrade_plugin_savepoint(true, 2020021800, 'local', 'a11y_check');
+    }
+
+    return true;
+}

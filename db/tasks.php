@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for local_a11y_check
+ * local_a11y_check task definitions
  *
  * @package   local_a11y_check
  * @copyright 2020 Swarthmore College
@@ -24,8 +24,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020021801;
-$plugin->requires  = 2018120300;
-$plugin->component = 'local_a11y_check';
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = 'v0.0.1';
+$tasks = array(
+    array(
+        'classname' => 'local_a11y_check\task\find_pdf_files',
+        'blocking' => 0,
+        'minute' => '*/5',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0
+    ),
+);

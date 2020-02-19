@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for local_a11y_check
+ * local library functions local_a11y_check
  *
  * @package   local_a11y_check
  * @copyright 2020 Swarthmore College
@@ -24,8 +24,16 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020021801;
-$plugin->requires  = 2018120300;
-$plugin->component = 'local_a11y_check';
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = 'v0.0.1';
+// Types of checks.
+define('LOCAL_A11Y_CHECK_TYPE_UNDEFINED', 0);
+define('LOCAL_A11Y_CHECK_TYPE_PDF', 1);
+
+// Status types for scan checks.
+define('LOCAL_A11Y_CHECK_STATUS_UNCHECKED', 0); // File has not been checked.
+define('LOCAL_A11Y_CHECK_STATUS_PASS', 1);      // File passes all a11y checks.
+define('LOCAL_A11Y_CHECK_STATUS_CHECK', 2);     // File passes some a11y checks.
+define('LOCAL_A11Y_CHECK_STATUS_FAIL', 3);      // File fails all a11y checks.
+define('LOCAL_A11Y_CHECK_STATUS_ERROR', 4);     // Encountered an error on the last check.
+
+// File is intentionally skipped, either from multiple errors, oversize, or some other issue.
+define('LOCAL_A11Y_CHECK_STATUS_IGNORE', 5);
