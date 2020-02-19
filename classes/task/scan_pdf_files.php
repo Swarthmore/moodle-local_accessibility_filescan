@@ -26,8 +26,6 @@
 
 namespace local_a11y_check\task;
 
-require_once('../PDF_Scan_Handler.php');
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -69,8 +67,7 @@ class scan_pdf_files extends \core\task\scheduled_task {
         return false;
       }
 
-
-      $requestHandler = new PDF_Scan_Handler($apiBaseURL, $apiToken);
+      $requestHandler = \local_a11y_check\pdf::get_presigned_url($apiBaseURL . '/requesturl', $apiToken);
 
       foreach ($files as $f) {
 
@@ -100,8 +97,10 @@ class scan_pdf_files extends \core\task\scheduled_task {
         }
 
         $scanResponse  = $requestHandler->scanFile('/scan', $credentials->key);
+
         if ($scanResponse->statusCode !== 200) {
           // TODO: Handle a bad request
+          return false;
         }
 
         // TODO: Handle success response
@@ -133,7 +132,8 @@ class scan_pdf_files extends \core\task\scheduled_task {
 
         // For now, just put the scan id and contenthash there
         \local_a11y_check\pdf::create_scan_record($fileContentHash);
-        
+       
+        return true;
         }
     }
 }

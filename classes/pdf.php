@@ -101,4 +101,131 @@ class pdf {
 
         return true;
     }
+
+    /**
+     * @description This function will GET the presigned URL from AWS that will allow us to post the file
+     * @params String $url
+     * @returns StdClass
+     */
+    public static function get_presigned_url(string $url, string $apiKey) {
+
+        $ch = curl_init($url);
+
+        $headers = array(
+            'Content-Type: application/json',
+            'Connection: Keep-Alive',
+            'x-api-key: ' . $apikey
+        );
+
+        $opts = array( 
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_RETURNTRANSFER => true, //return the web page
+            CURLOPT_FOLLOWLOCATION => true, // follow redirects
+            CURLOPT_MAXREDIRS => 10, // stop after 10 redirects
+            CURLOPT_CONNECTTIMEOUT => 120, // time out on conect
+            CURLOPT_TIMEOUT => 120, // time out on response
+        );
+
+        curl_setopt_array($ch, $opts);
+        $res = curl_exec($ch);
+
+        // Handle errors
+        if (curl_error($ch)) {
+            $error = curl_error($ch);
+            return false;
+        }
+
+        curl_close($ch);
+
+        $json = json_decode($res);
+
+        $returnVals = new stdClass();
+        $returnVals->uploadURL = $json->uploadURL;
+        $returnVals->key = $json->key;
+
+        return $returnVals;
+    }
+
+    /**
+     * @description This function will put the file into
+     * an AWS S3 bucket
+     * @param String presignedURL
+     * @param String key
+     * @param String file_path
+     * @returns Boolean
+     */
+    public static function put_file(string $url, string $key, string $file) {
+        $ch = curl_init($url);
+        $file_size = filesize($file);
+
+        $headers = array(
+            'filename: ' . $key,
+            'Content-Length: ' . $file_size
+        );
+
+        $opts = array( 
+            CURLOPT_PUT => true,
+            CURLOPT_INFILE => $file,
+            CURLOPT_INFILESIZE => $file_size,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 60, // time out on conect
+            CURLOPT_TIMEOUT => 60, // time out on response
+        );
+
+        curl_setopt_array($ch, $opts);
+        $res = curl_exec($ch);
+
+        // Handle errors
+        if (curl_error($ch)) {
+            $error = curl_error($ch);
+            return false;
+        }
+
+        curl_close($ch);
+
+        return true;
+    }
+
+    /**
+     * @description This function will trigger a lambda function in
+    * AWS
+    * @params String $url
+    * @params String $key
+    * @returns StdClass
+    */
+    public static function scan_file(string $url, string $key) {
+        $headers = array(
+            'Content-Type: application/json',
+            'x-api-key: ' . $key 
+        );
+        $body = json_encode(array( 'key' => $key ));
+
+        $opts = array(
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_POSTFIELDS => $body,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 60, // time out on conect
+            CURLOPT_TIMEOUT => 60, // time out on response
+        );
+
+        $ch = curl_init($curl_url);
+
+        curl_setopt_array($ch, $opts);
+        $res = curl_exec($ch);
+
+        // Handle errors
+        if (curl_error($ch)) {
+        $error = curl_error($ch);
+        return false;
+    }
+
+        curl_close($ch);
+
+        $json = json_decode($res);
+
+        return $json;
+    }
+
 }
