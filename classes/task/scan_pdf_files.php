@@ -42,7 +42,7 @@ class scan_pdf_files extends \core\task\scheduled_task {
      * @return string the name of the task
      */
     public function get_name() {
-        return get_string('settings:scan_pdf_files', 'local_a11y_check');
+        return get_string('pdf:scan_files_task', 'local_a11y_check');
     }
 
     /**
@@ -50,26 +50,52 @@ class scan_pdf_files extends \core\task\scheduled_task {
      */
     public function execute() {
 
-        $apiBaseURL = get_config('local_accessibility_check', 'api_url');
-        $apiToken = get_config('local_accessibility_check', 'api_token');
-        $maxFilesize = get_config("local_accessibility_check", "max_file_size_mb");
+        $pluginConfig = get_config('local_a11y_check');
 
-        if (!$apiURL or $apiToken) {
-            // TODO: do something other than kill the process
+        $apiBaseURL= $pluginConfig->api_url;
+        $apiToken = $pluginConfig->api_token;
+        $maxFilesize = $pluginConfig->max_file_size_mb;
+
+        if (!apiBaseURL) {
+            mtrace("API Base URL setting is missing!");
             die();
         }
 
-        $files = \local_a11y_check\pdf::get_unscanned_pdf_files();
-        $fs = get_files_storage();
-
-        if (!is_array($files) || empty($files)) {
-            // TODO: do something other than kill the process
+        if (!apiToken) {
+            mtrace("API token setting is missing!");
             die();
         }
 
-        $requestHandler = \local_a11y_check\pdf::get_presigned_url($apiBaseURL . '/requesturl', $apiToken);
+        $files = \local_a11y_check\pdf::get_pdf_files();
+        $fs = get_file_storage();
 
-        foreach ($files as $f) {
+        if (!is_array($files) || count($files) <= 0) {
+            die();
+        }
+        
+        $requestHandler = new \local_a11y_check\lambdascan($apiBaseURL . '/requesturl', $apiToken);
+
+        // just deal with the first file before looping through all
+        // of them
+        $first = array_values($files)[0];
+        $contenthash = $first->contenthash;
+        $file = $fs->get_file_by_hash($first->pathnamehash);
+
+        var_dump($file);
+
+        /* $contents = $file->get_content();
+
+        var_dump($contents);
+
+        $size = $file->get_filesize();
+
+        var_dump(size);
+            
+        $credentials = $requestHandler->getPresignedURL('/requesturl');
+
+        var_dump($credentials);  */
+
+        /* foreach ($files as $f) {
 
             $file = $fs->get_file_by_hash($f->pathname);
             $fileContents = $file->get_content();
@@ -77,14 +103,14 @@ class scan_pdf_files extends \core\task\scheduled_task {
             $fileSize = $file->get_filesize();
 
             if ((int) $fileSize > (int) $maxFilesize) {
-                // TODO: Handle files larger than max filesize
+                mtrace('Cannot scan file as it exceeds the max filesize setting.');   
                 continue;
             }
 
             $credentials = $requestHandler->getPresignedURL('/requesturl');
 
             if ($credentials->statusCode !== 200) {
-                // TODO: Handle a bad request
+                mtrace('Received a non-200 response from lambda.');
                 continue;
             }
 
@@ -92,23 +118,26 @@ class scan_pdf_files extends \core\task\scheduled_task {
             $putResponse = $requestHandler->putFile($credentials->uploadURL, $credentials->key, $file);
 
             if ($putResponse->statusCode !== 200) {
-                // TODO: Handle a bad request
+                mtrace('Received a non-200 response from lambda.');
                 continue;
             }
 
             $scanResponse  = $requestHandler->scanFile('/scan', $credentials->key);
 
             if ($scanResponse->statusCode !== 200) {
-                // TODO: Handle a bad request
+                mtrace('Received a non-200 response from lambda.');
                 return false;
             }
 
             $scanResults = json_decode($scanResponse);
 
+            mtrace($scanResponse);
+            mtrace($scanResults);
+
             // For now, just put the scan id and contenthash there
             \local_a11y_check\pdf::create_scan_record($fileContentHash);
 
             return true;
-        }
+        } */
     }
 }

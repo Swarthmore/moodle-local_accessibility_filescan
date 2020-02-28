@@ -47,7 +47,7 @@ class pdf {
         global $DB;
 
         mtrace("Looking for PDF files to scan for accessibility");
-        $sql = "SELECT f.contenthash, MAX(f.filesize) as filesize
+        $sql = "SELECT f.contenthash, f.pathnamehash as pathnamehash, MAX(f.filesize) as filesize
             FROM {files} f
                 INNER JOIN {context} c ON c.id=f.contextid
                 LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
@@ -67,6 +67,32 @@ class pdf {
             mtrace("Found " . count($files) . " PDF files");
         }
         return $files;
+    }
+
+    /**
+     * Get files that have been scanned, but do not have anything in the
+     * mdl_local_a11y_check_type_pdf table
+     * 
+     * @return array
+     */
+    public static function get_pdf_files($limit = 10000) {
+      
+      global $DB;
+
+      $sql = "SELECT f.contenthash as contenthash, f.pathnamehash as pathnamehash
+        FROM {local_a11y_check_type_pdf} f
+        INNER JOIN {local_a11y_check} c ON c.id = f.scanid
+      ";
+
+      $files = $DB->get_records_sql($sql, null, 0, $limit);
+
+      if (!files) {
+        mtrace("No PDF files found");
+      } else {
+        mtrace("Found " . count($files) . " PDF files");
+      }
+
+      return $files;
     }
 
     /**
