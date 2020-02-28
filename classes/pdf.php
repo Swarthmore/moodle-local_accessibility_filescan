@@ -130,10 +130,11 @@ class pdf {
         }
 
         // Create the scan result record.
-        $scanresult              = new \stdClass;
-        $scanresult->scanid      = $scanid;
-        $scanresult->contenthash = $file->contenthash;
-        $scanresultid            = $DB->insert_record('local_a11y_check_type_pdf', $scanresult);
+        $scanresult               = new \stdClass;
+        $scanresult->scanid       = $scanid;
+        $scanresult->contenthash  = $file->contenthash;
+        $scanresult->pathnamehash = $file->pathnamehash;
+        $scanresultid             = $DB->insert_record('local_a11y_check_type_pdf', $scanresult);
 
         if (!$scanresultid) {
             mtrace("Failed to insert scan result record for PDF {$contenthash}");
