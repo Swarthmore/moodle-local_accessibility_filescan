@@ -37,7 +37,7 @@ class lambdascan {
   }
 
   private function handleError($error) {
-    throw new Exception($error, 1);
+    var_dump($error);
   }
 
   /**
@@ -53,16 +53,15 @@ class lambdascan {
     $headers = [
       'Content-Type: application/json',
       'Connection: Keep-Alive',
-      'x-api-key: ' . $this->apikey
     ];
 
     $opts = [
       CURLOPT_HTTPHEADER => $headers,
-      CURLOPT_RETURNTRANSFER => true, //return the web page
-      CURLOPT_FOLLOWLOCATION => true, // follow redirects
-      CURLOPT_MAXREDIRS => 10, // stop after 10 redirects
-      CURLOPT_CONNECTTIMEOUT => 120, // time out on conect
-      CURLOPT_TIMEOUT => 120, // time out on response
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_MAXREDIRS => 10,
+      CURLOPT_CONNECTTIMEOUT => 120,
+      CURLOPT_TIMEOUT => 120
     ];
 
     curl_setopt_array($ch, $opts);
@@ -72,31 +71,31 @@ class lambdascan {
     if (curl_error($ch)) {
       $error = curl_error($ch);
       $this->handleError($error);
+      curl_close($ch);
+      return;
     }
-    
-    curl_close($ch);
 
     $json = json_decode($res);
-
-    $returnVals = new stdClass();
+    
+    $returnVals = new \stdClass();
     $returnVals->uploadURL = $json->uploadURL;
     $returnVals->key = $json->key;
 
     return $returnVals;
   }
-
   /**
-   * @description This function will put the file into 
+   * @description This function will put the file into
    * an AWS S3 bucket
    * @param String presignedURL
    * @param String key
-   * @param String file_path
-   * @returns Boolean 
+   * @param Resource fh
+   * @returns Boolean
    */
-  public function putFile($url, $key, $file_path) {
+  public function putFile($url, $key, $fh) {
     $ch = curl_init($url);
-    $fh = fopen($file_path, 'r'); 
-    $file_size = filesize($file_path);
+
+    $fstats = fstat($fh);
+    $file_size = $fstats["size"];
 
     $headers = [
       'filename: ' . $key,
@@ -106,7 +105,7 @@ class lambdascan {
     $opts = [
       CURLOPT_PUT => true,
       CURLOPT_INFILE => $fh,
-      CURLOPT_INFILESIZE => $file_size, 
+      CURLOPT_INFILESIZE => $file_size,
       CURLOPT_HTTPHEADER => $headers,
       CURLOPT_RETURNTRANSFER => true,
       CURLOPT_CONNECTTIMEOUT => 60, // time out on conect
@@ -121,7 +120,7 @@ class lambdascan {
       $error = curl_error($ch);
       $this->handleError($error);
     }
-    
+
     curl_close($ch);
 
     return true;
@@ -129,16 +128,15 @@ class lambdascan {
 
   /**
   * @description This function will trigger a lambda function in
-  * AWS  
+  * AWS
   * @params String $url
   * @params String $key
-  * @returns StdClass 
+  * @returns StdClass
   */
   public function scanFile($url, $key) {
     $curl_url = $this->apiBaseURL . $url;
     $headers = [
-      'Content-Type: application/json',
-      'x-api-key: ' . $this->apikey
+      'Content-Type: application/json'
     ];
     $body = json_encode([ 'key' => $key ]);
 
@@ -152,20 +150,20 @@ class lambdascan {
     ];
 
     $ch = curl_init($curl_url);
-    
+
     curl_setopt_array($ch, $opts);
     $res = curl_exec($ch);
-  
+
     // Handle errors
     if (curl_error($ch)) {
       $error = curl_error($ch);
       $this->handleError($error);
     }
-    
+
     curl_close($ch);
 
     $json = json_decode($res);
- 
+
     return $json;
   }
 

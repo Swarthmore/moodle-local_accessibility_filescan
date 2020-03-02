@@ -86,13 +86,38 @@ class pdf {
 
       $files = $DB->get_records_sql($sql, null, 0, $limit);
 
-      if (!files) {
+      if (!$files) {
         mtrace("No PDF files found");
       } else {
         mtrace("Found " . count($files) . " PDF files");
       }
 
       return $files;
+    }
+
+    /**
+     * Updates the scan record for file 
+     *
+     * @notes 
+     * the payload should have these properties
+     * it should be a class..  TODO
+     * $payload->hastext
+     * $payload->hastitle
+     * $payload->haslanguage
+     * $payload->hasoutline
+     */
+    public static function update_scan_record($contenthash, $payload) {
+      global $DB;
+     
+      // TODO: this should probably use $DB->update_record() 
+      $table = "mdl_local_a11y_check_type_pdf";
+      $sql = "UPDATE {$table} 
+              SET hastext={$payload->hastext},hastitle={$payload->hastitle},haslanguage={$payload->haslanguage},hasoutline={$payload->hasoutline}
+              WHERE contenthash = '{$contenthash}'
+      ";
+      $DB->execute($sql);
+
+      return true;
     }
 
     /**

@@ -56,12 +56,12 @@ class scan_pdf_files extends \core\task\scheduled_task {
         $apiToken = $pluginConfig->api_token;
         $maxFilesize = $pluginConfig->max_file_size_mb;
 
-        if (!apiBaseURL) {
+        if (!$apiBaseURL) {
             mtrace("API Base URL setting is missing!");
             die();
         }
 
-        if (!apiToken) {
+        if (!$apiToken) {
             mtrace("API token setting is missing!");
             die();
         }
@@ -73,71 +73,38 @@ class scan_pdf_files extends \core\task\scheduled_task {
             die();
         }
         
-        $requestHandler = new \local_a11y_check\lambdascan($apiBaseURL . '/requesturl', $apiToken);
+        $requestHandler = new \local_a11y_check\lambdascan($apiBaseURL, $apiToken);
 
-        // just deal with the first file before looping through all
-        // of them
-        $first = array_values($files)[0];
-        $contenthash = $first->contenthash;
-        $file = $fs->get_file_by_hash($first->pathnamehash);
+        // Get the credentials
+        $credentials = $requestHandler->getPresignedURL('/test/requesturl');
 
-        var_dump($file);
-
-        /* $contents = $file->get_content();
-
-        var_dump($contents);
-
-        $size = $file->get_filesize();
-
-        var_dump(size);
-            
-        $credentials = $requestHandler->getPresignedURL('/requesturl');
-
-        var_dump($credentials);  */
-
-        /* foreach ($files as $f) {
-
-            $file = $fs->get_file_by_hash($f->pathname);
-            $fileContents = $file->get_content();
-            $fileContentHash = $f->contenthash;
-            $fileSize = $file->get_filesize();
-
-            if ((int) $fileSize > (int) $maxFilesize) {
-                mtrace('Cannot scan file as it exceeds the max filesize setting.');   
-                continue;
+        foreach ($files as $ref) {
+          
+          $file = $fs->get_file_by_hash($ref->pathnamehash);
+          $contenthash = $ref->contenthash;
+          $scanid = $ref->scanid;
+          $fh = $file->get_content_file_handle();
+          $put_response = $requestHandler->putFile($credentials->uploadURL, $credentials->key, $fh);
+          $scan_response = $requestHandler->scanFile('/test/scan', $credentials->key);
+          
+          // to whoever sees this monstrosity of an error check, i am sorry 
+          if (property_exists($scan_response, "message")) {
+            if ($scan_response->message === "Internal server error") {
+              mtrace("Skipping file");
+              continue;
             }
+          }
 
-            $credentials = $requestHandler->getPresignedURL('/requesturl');
+          $payload = new \stdClass();
+          $payload->hastext = $scan_response->hasText ? 1 : 0;
+          $payload->hastitle = $scan_response->title ? 1 : 0;
+          $payload->haslanguage = $scan_response->language ? 1 : 0;
+          $payload->hasoutline = $scan_response->hasOutline ? 1 : 0;
 
-            if ($credentials->statusCode !== 200) {
-                mtrace('Received a non-200 response from lambda.');
-                continue;
-            }
+          // update the results
+          $updated_record = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
 
-            // TODO: Test if passing the file directly actually works...
-            $putResponse = $requestHandler->putFile($credentials->uploadURL, $credentials->key, $file);
-
-            if ($putResponse->statusCode !== 200) {
-                mtrace('Received a non-200 response from lambda.');
-                continue;
-            }
-
-            $scanResponse  = $requestHandler->scanFile('/scan', $credentials->key);
-
-            if ($scanResponse->statusCode !== 200) {
-                mtrace('Received a non-200 response from lambda.');
-                return false;
-            }
-
-            $scanResults = json_decode($scanResponse);
-
-            mtrace($scanResponse);
-            mtrace($scanResults);
-
-            // For now, just put the scan id and contenthash there
-            \local_a11y_check\pdf::create_scan_record($fileContentHash);
-
-            return true;
-        } */
+        }
+    
     }
 }
