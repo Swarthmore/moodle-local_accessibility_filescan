@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -43,13 +42,13 @@ class lambdascan {
     /**
      * @description This function will GET the presigned URL from AWS that will allow us to post the file
      * @param String $url
-     * @return StdClass 
+     * @return StdClass
      */
     public function getpresignedurl($url) {
 
         $curlurl = $this->apiBaseURL . $url;
         $ch = curl_init($curlurl);
-        
+
         $headers = [
             'Content-Type: application/json',
             'Connection: Keep-Alive',
@@ -66,7 +65,7 @@ class lambdascan {
 
         curl_setopt_array($ch, $opts);
         $res = curl_exec($ch);
-        
+
         if (curl_error($ch)) {
             $error = curl_error($ch);
             $this->handleerror($error);
@@ -75,7 +74,7 @@ class lambdascan {
         }
 
         $json = json_decode($res);
-        
+
         $returnvals = new \stdClass();
         $returnvals ->uploadURL = $json->uploadURL;
         $returnvals ->key = $json->key;
@@ -131,7 +130,7 @@ class lambdascan {
      * @param String $key
      * @return StdClass
      */
-    public function scanFile($url, $key) {
+    public function scanfile($url, $key) {
         $curlurl = $this->apiBaseURL . $url;
         $headers = [
             'Content-Type: application/json'
