@@ -15,9 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * one line description of file
  * @package local_a11y_check
  * @copyright 2020 Swarthmore College
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_a11y_check;
@@ -29,7 +30,7 @@ require_once(dirname(__FILE__) . '/../locallib.php');
 /**
  * This class Manage a file scan request to AWS lambda
  * @copyright 2020 Swarthmore College
- * @license
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class lambdascan {
 
