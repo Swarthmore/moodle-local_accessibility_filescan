@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -54,7 +53,7 @@ class scan_pdf_files extends \core\task\scheduled_task {
 
         $apibaseurl = $pluginconfig->api_url;
         $apitoken = $pluginconfig->api_token;
-        $maxFilesize = $pluginconfig->max_file_size_mb;
+        $maxfilesize = $pluginconfig->max_file_size_mb;
 
         if (!$apibaseurl) {
             mtrace("API Base URL setting is missing!");
@@ -87,10 +86,10 @@ class scan_pdf_files extends \core\task\scheduled_task {
             $scanresponse = $requesthandler->scanFile('/test/scan', $credentials->key);
 
             if (property_exists($scanresponse, "message")) {
-              if ($scanresponse->message === "Internal server error") {
-                mtrace("Skipping file");
-                continue;
-              }
+                if ($scanresponse->message === "Internal server error") {
+                    mtrace("Skipping file");
+                    continue;
+                }
             }
 
             $payload = new \stdClass();
@@ -102,6 +101,6 @@ class scan_pdf_files extends \core\task\scheduled_task {
             $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
 
         }
-    
+
     }
 }
