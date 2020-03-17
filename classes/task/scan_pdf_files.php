@@ -74,7 +74,7 @@ class scan_pdf_files extends \core\task\scheduled_task {
 
         $requesthandler = new \local_a11y_check\lambdascan($apibaseurl, $apitoken);
 
-        $credentials = $requesthandler->getPresignedURL('/test/requesturl');
+        $credentials = $requesthandler->getpresignedurl('/test/requesturl');
 
         foreach ($files as $ref) {
 
@@ -82,8 +82,8 @@ class scan_pdf_files extends \core\task\scheduled_task {
             $contenthash = $ref->contenthash;
             $scanid = $ref->scanid;
             $fh = $file->get_content_file_handle();
-            $putresponse = $requesthandler->putFile($credentials->uploadURL, $credentials->key, $fh);
-            $scanresponse = $requesthandler->scanFile('/test/scan', $credentials->key);
+            $putresponse = $requesthandler->putfile($credentials->uploadURL, $credentials->key, $fh);
+            $scanresponse = $requesthandler->scanfile('/test/scan', $credentials->key);
 
             if (property_exists($scanresponse, "message")) {
                 if ($scanresponse->message === "Internal server error") {

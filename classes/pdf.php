@@ -108,9 +108,8 @@ class pdf {
     public static function update_scan_record($contenthash, $payload) {
         global $DB;
 
-        // TODO: this should probably use $DB->update_record() 
         $table = "mdl_local_a11y_check_type_pdf";
-        $sql = "UPDATE {$table} 
+        $sql = "UPDATE {$table}
             SET hastext={$payload->hastext},hastitle={$payload->hastitle},haslanguage={$payload->haslanguage},hasoutline={$payload->hasoutline}
             WHERE contenthash = '{$contenthash}'
         ";
