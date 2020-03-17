@@ -50,18 +50,18 @@ class scan_pdf_files extends \core\task\scheduled_task {
      */
     public function execute() {
 
-        $pluginConfig = get_config('local_a11y_check');
+        $pluginconfig = get_config('local_a11y_check');
 
-        $apiBaseURL= $pluginConfig->api_url;
-        $apiToken = $pluginConfig->api_token;
-        $maxFilesize = $pluginConfig->max_file_size_mb;
+        $apibaseurl = $pluginconfig->api_url;
+        $apitoken = $pluginconfig->api_token;
+        $maxFilesize = $pluginconfig->max_file_size_mb;
 
-        if (!$apiBaseURL) {
+        if (!$apibaseurl) {
             mtrace("API Base URL setting is missing!");
             die();
         }
 
-        if (!$apiToken) {
+        if (!$apitoken) {
             mtrace("API token setting is missing!");
             die();
         }
@@ -72,37 +72,34 @@ class scan_pdf_files extends \core\task\scheduled_task {
         if (!is_array($files) || count($files) <= 0) {
             die();
         }
-        
-        $requestHandler = new \local_a11y_check\lambdascan($apiBaseURL, $apiToken);
 
-        // Get the credentials
-        $credentials = $requestHandler->getPresignedURL('/test/requesturl');
+        $requesthandler = new \local_a11y_check\lambdascan($apibaseurl, $apitoken);
+
+        $credentials = $requesthandler->getPresignedURL('/test/requesturl');
 
         foreach ($files as $ref) {
-          
-          $file = $fs->get_file_by_hash($ref->pathnamehash);
-          $contenthash = $ref->contenthash;
-          $scanid = $ref->scanid;
-          $fh = $file->get_content_file_handle();
-          $put_response = $requestHandler->putFile($credentials->uploadURL, $credentials->key, $fh);
-          $scan_response = $requestHandler->scanFile('/test/scan', $credentials->key);
-          
-          // to whoever sees this monstrosity of an error check, i am sorry 
-          if (property_exists($scan_response, "message")) {
-            if ($scan_response->message === "Internal server error") {
-              mtrace("Skipping file");
-              continue;
+
+            $file = $fs->get_file_by_hash($ref->pathnamehash);
+            $contenthash = $ref->contenthash;
+            $scanid = $ref->scanid;
+            $fh = $file->get_content_file_handle();
+            $putresponse = $requesthandler->putFile($credentials->uploadURL, $credentials->key, $fh);
+            $scanresponse = $requesthandler->scanFile('/test/scan', $credentials->key);
+
+            if (property_exists($scanresponse, "message")) {
+              if ($scanresponse->message === "Internal server error") {
+                mtrace("Skipping file");
+                continue;
+              }
             }
-          }
 
-          $payload = new \stdClass();
-          $payload->hastext = $scan_response->hasText ? 1 : 0;
-          $payload->hastitle = $scan_response->title ? 1 : 0;
-          $payload->haslanguage = $scan_response->language ? 1 : 0;
-          $payload->hasoutline = $scan_response->hasOutline ? 1 : 0;
+            $payload = new \stdClass();
+            $payload->hastext = $scanresponse->hasText ? 1 : 0;
+            $payload->hastitle = $scanresponse->title ? 1 : 0;
+            $payload->haslanguage = $scanresponse->language ? 1 : 0;
+            $payload->hasoutline = $scanresponse->hasOutline ? 1 : 0;
 
-          // update the results
-          $updated_record = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
+            $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
 
         }
     
