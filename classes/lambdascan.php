@@ -14,14 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Manage a file scan request to AWS lambda
- *
- * @package local_a11y_check
- * @copyright 2020 Swarthmore College
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace local_a11y_check;
 
 defined('MOODLE_INTERNAL') || die();
@@ -29,7 +21,11 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(__FILE__) . '/../locallib.php');
 
 /**
- * The lambdascan class interacts with an AWS lambda function
+ * Manage a file scan request to AWS lambda
+ *
+ * @package local_a11y_check
+ * @copyright 2020 Swarthmore College
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class lambdascan {
 
@@ -45,6 +41,7 @@ class lambdascan {
 
     /**
      * Handles errors
+     * @param * $error
      */
     private function handleerror($error) {
         var_dump($error);
@@ -95,7 +92,7 @@ class lambdascan {
 
     /**
      * This function will put the file into an s3 bucket
-     * @param String url 
+     * @param String url
      * @param String key
      * @param Resource fh
      * @return Boolean
