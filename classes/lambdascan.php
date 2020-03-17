@@ -40,7 +40,7 @@ class lambdascan {
     }
 
     /**
-     * @description This function will GET the presigned URL from AWS that will allow us to post the file
+     * This function will GET the presigned URL from AWS that will allow us to post the file
      * @param String $url
      * @return StdClass
      */
@@ -83,7 +83,7 @@ class lambdascan {
     }
 
     /**
-     * @description This function will put the file into
+     * This function will put the file into
      * an AWS S3 bucket
      * @param String presignedURL
      * @param String key
@@ -125,7 +125,7 @@ class lambdascan {
     }
 
     /**
-     * @description This function will trigger a lambda function
+     * This function will trigger a lambda function
      * @param String $url
      * @param String $key
      * @return StdClass

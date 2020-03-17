@@ -97,7 +97,6 @@ class pdf {
     /**
      * Updates the scan record for file
      *
-     * @notes
      * the payload should have these properties
      * it should be a class..  TODO
      * $payload->hastext
