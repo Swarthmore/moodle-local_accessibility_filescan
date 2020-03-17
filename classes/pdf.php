@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -72,33 +71,33 @@ class pdf {
     /**
      * Get files that have been scanned, but do not have anything in the
      * mdl_local_a11y_check_type_pdf table
-     * 
+     *
      * @return array
      */
     public static function get_pdf_files($limit = 10000) {
-      
-      global $DB;
 
-      $sql = "SELECT f.contenthash as contenthash, f.pathnamehash as pathnamehash
-        FROM {local_a11y_check_type_pdf} f
-        INNER JOIN {local_a11y_check} c ON c.id = f.scanid
-      ";
+        global $DB;
 
-      $files = $DB->get_records_sql($sql, null, 0, $limit);
+        $sql = "SELECT f.contenthash as contenthash, f.pathnamehash as pathnamehash
+            FROM {local_a11y_check_type_pdf} f
+            INNER JOIN {local_a11y_check} c ON c.id = f.scanid
+        ";
 
-      if (!$files) {
-        mtrace("No PDF files found");
-      } else {
-        mtrace("Found " . count($files) . " PDF files");
-      }
+        $files = $DB->get_records_sql($sql, null, 0, $limit);
 
-      return $files;
+        if (!$files) {
+            mtrace("No PDF files found");
+        } else {
+            mtrace("Found " . count($files) . " PDF files");
+        }
+
+        return $files;
     }
 
     /**
-     * Updates the scan record for file 
+     * Updates the scan record for file
      *
-     * @notes 
+     * @notes
      * the payload should have these properties
      * it should be a class..  TODO
      * $payload->hastext
@@ -107,17 +106,17 @@ class pdf {
      * $payload->hasoutline
      */
     public static function update_scan_record($contenthash, $payload) {
-      global $DB;
-     
-      // TODO: this should probably use $DB->update_record() 
-      $table = "mdl_local_a11y_check_type_pdf";
-      $sql = "UPDATE {$table} 
-              SET hastext={$payload->hastext},hastitle={$payload->hastitle},haslanguage={$payload->haslanguage},hasoutline={$payload->hasoutline}
-              WHERE contenthash = '{$contenthash}'
-      ";
-      $DB->execute($sql);
+        global $DB;
 
-      return true;
+        // TODO: this should probably use $DB->update_record() 
+        $table = "mdl_local_a11y_check_type_pdf";
+        $sql = "UPDATE {$table} 
+            SET hastext={$payload->hastext},hastitle={$payload->hastitle},haslanguage={$payload->haslanguage},hasoutline={$payload->hasoutline}
+            WHERE contenthash = '{$contenthash}'
+        ";
+        $DB->execute($sql);
+
+        return true;
     }
 
     /**
