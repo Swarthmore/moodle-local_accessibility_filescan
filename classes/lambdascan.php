@@ -31,24 +31,24 @@ require_once(dirname(__FILE__) . '/../locallib.php');
 
 class lambdascan {
 
-    function __construct($apiBaseURL, $apikey) {
-        $this->apiBaseURL = $apiBaseURL;
+    protected function __construct($apibaseurl, $apikey) {
+        $this->apiBaseURL = $apibaseurl;
         $this->apikey = $apikey;
     }
 
-    private function handleError($error) {
+    private function handleerror($error) {
         var_dump($error);
     }
 
     /**
      * @description This function will GET the presigned URL from AWS that will allow us to post the file
-     * @params String $url
-     * @returns StdClass 
+     * @param String $url
+     * @return StdClass 
      */
-    public function getPresignedURL($url) {
+    public function getpresignedurl($url) {
 
-        $curl_url = $this->apiBaseURL . $url;
-        $ch = curl_init($curl_url);
+        $curlurl = $this->apiBaseURL . $url;
+        $ch = curl_init($curlurl);
         
         $headers = [
             'Content-Type: application/json',
@@ -69,18 +69,18 @@ class lambdascan {
         
         if (curl_error($ch)) {
             $error = curl_error($ch);
-            $this->handleError($error);
+            $this->handleerror($error);
             curl_close($ch);
             return;
         }
 
         $json = json_decode($res);
         
-        $returnVals = new \stdClass();
-        $returnVals->uploadURL = $json->uploadURL;
-        $returnVals->key = $json->key;
+        $returnvals = new \stdClass();
+        $returnvals ->uploadURL = $json->uploadURL;
+        $returnvals ->key = $json->key;
 
-        return $returnVals;
+        return $returnvals;
     }
 
     /**
@@ -89,23 +89,23 @@ class lambdascan {
      * @param String presignedURL
      * @param String key
      * @param Resource fh
-     * @returns Boolean
+     * @return Boolean
      */
-    public function putFile($url, $key, $fh) {
+    public function putfile($url, $key, $fh) {
         $ch = curl_init($url);
 
         $fstats = fstat($fh);
-        $file_size = $fstats["size"];
+        $filesize = $fstats["size"];
 
         $headers = [
           'filename: ' . $key,
-          'Content-Length: ' . $file_size
+          'Content-Length: ' . $filesize
         ];
 
         $opts = [
             CURLOPT_PUT => true,
             CURLOPT_INFILE => $fh,
-            CURLOPT_INFILESIZE => $file_size,
+            CURLOPT_INFILESIZE => $filesize,
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => 60,
@@ -115,10 +115,9 @@ class lambdascan {
         curl_setopt_array($ch, $opts);
         $res = curl_exec($ch);
 
-        // Handle errors
         if (curl_error($ch)) {
             $error = curl_error($ch);
-            $this->handleError($error);
+            $this->handleerror($error);
         }
 
         curl_close($ch);
@@ -133,7 +132,7 @@ class lambdascan {
      * @return StdClass
      */
     public function scanFile($url, $key) {
-        $curl_url = $this->apiBaseURL . $url;
+        $curlurl = $this->apiBaseURL . $url;
         $headers = [
             'Content-Type: application/json'
         ];
@@ -144,19 +143,18 @@ class lambdascan {
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_POSTFIELDS => $body,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 60, // time out on conect
-            CURLOPT_TIMEOUT => 60, // time out on response
+            CURLOPT_CONNECTTIMEOUT => 60,
+            CURLOPT_TIMEOUT => 60,
         ];
 
-        $ch = curl_init($curl_url);
+        $ch = curl_init($curlurl);
 
         curl_setopt_array($ch, $opts);
         $res = curl_exec($ch);
 
-        // Handle errors
         if (curl_error($ch)) {
             $error = curl_error($ch);
-            $this->handleError($error);
+            $this->handleerror($error);
         }
 
         curl_close($ch);
