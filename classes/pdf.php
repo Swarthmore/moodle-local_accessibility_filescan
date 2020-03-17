@@ -71,7 +71,7 @@ class pdf {
     /**
      * Get files that have been scanned, but do not have anything in the
      * mdl_local_a11y_check_type_pdf table
-     *
+     * @param Number $limit
      * @return array
      */
     public static function get_pdf_files($limit = 10000) {
@@ -96,13 +96,8 @@ class pdf {
 
     /**
      * Updates the scan record for file
-     *
-     * the payload should have these properties
-     * it should be a class..  TODO
-     * $payload->hastext
-     * $payload->hastitle
-     * $payload->haslanguage
-     * $payload->hasoutline
+     * @param String $contenthash
+     * @param Stdclass $payload
      */
     public static function update_scan_record($contenthash, $payload) {
         global $DB;
@@ -119,8 +114,7 @@ class pdf {
 
     /**
      * Create the scan and result record for a single PDF.
-     * @param stdClass $file The partial SQL file record containing contenthash and filesize
-     *
+     * @param \stdClass $file The partial SQL file record containing contenthash and filesize
      * @return boolean
      */
     public static function create_scan_record($file) {
@@ -170,7 +164,6 @@ class pdf {
     /**
      * Takes the result object and returns the accessibility status.
      * @param \stdClass $result The result object
-     *
      * @return int the status
      */
     public static function evaluate_item_status($result) {

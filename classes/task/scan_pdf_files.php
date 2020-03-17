@@ -44,6 +44,9 @@ class scan_pdf_files extends \core\task\scheduled_task {
         return get_string('pdf:scan_files_task', 'local_a11y_check');
     }
 
+    /**
+     * Executes the task
+     */
     public function execute() {
 
         $pluginconfig = get_config('local_a11y_check');

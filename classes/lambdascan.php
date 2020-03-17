@@ -28,13 +28,24 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../locallib.php');
 
+/**
+ * The lambdascan class interacts with an AWS lambda function
+ */
 class lambdascan {
 
+    /**
+     * Creates an instance of the lambdascan class
+     * @param String $apibaseurl - The base url to the your lambda func
+     * @param String $apikey - The api key to access your lamba func
+     */
     protected function __construct($apibaseurl, $apikey) {
         $this->apiBaseURL = $apibaseurl;
         $this->apikey = $apikey;
     }
 
+    /**
+     * Handles errors
+     */
     private function handleerror($error) {
         var_dump($error);
     }
@@ -83,9 +94,8 @@ class lambdascan {
     }
 
     /**
-     * This function will put the file into
-     * an AWS S3 bucket
-     * @param String presignedURL
+     * This function will put the file into an s3 bucket
+     * @param String url 
      * @param String key
      * @param Resource fh
      * @return Boolean
