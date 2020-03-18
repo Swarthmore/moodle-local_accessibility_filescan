@@ -46,16 +46,16 @@ class pdf {
         global $DB;
 
         mtrace("Looking for PDF files to scan for accessibility");
-        $sql = "SELECT f.contenthash, f.pathnamehash as pathnamehash, MAX(f.filesize) as filesize
+        $sql = "SELECT f.contenthash 
             FROM {files} f
-                INNER JOIN {context} c ON c.id=f.contextid
-                LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
-                WHERE c.contextlevel = 70
-                AND f.filesize <> 0
-                AND f.mimetype = 'application/pdf'
-                AND f.component <> 'assignfeedback_editpdf'
-                AND f.filearea <> 'stamps'
-                AND actp.contenthash IS NULL
+            INNER JOIN {context} c ON c.id=f.contextid
+            LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
+            WHERE c.contextlevel = 70
+            AND f.filesize <> 0
+            AND f.mimetype = 'application/pdf'
+            AND f.component <> 'assignfeedback_editpdf'
+            AND f.filearea <> 'stamps'
+            AND actp.contenthash IS NULL
             GROUP BY f.contenthash
             ORDER BY MAX(f.id) DESC";
 
