@@ -46,7 +46,7 @@ class pdf {
         global $DB;
 
         mtrace("Looking for PDF files to scan for accessibility");
-        $sql = "SELECT f.contenthash 
+        $sql = "SELECT f.contenthash
             FROM {files} f
             INNER JOIN {context} c ON c.id=f.contextid
             LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
