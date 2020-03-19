@@ -70,7 +70,7 @@ class pdf {
                 INNER JOIN
                   {context} c on c.id = f.contextid
                 INNER JOIN
-                  mdl_files f ON f.contenthash = Tbl.contenthash
+                  {files} f ON f.contenthash = Tbl.contenthash
                 WHERE
                   c.contextlevel = 70
                 ORDER BY
