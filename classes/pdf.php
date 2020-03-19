@@ -74,7 +74,7 @@ class pdf {
                 WHERE
                   c.contextlevel = 70
                 ORDER BY
-                  MAX(id) DESC";
+                  MAX(f.id) DESC";
 
         $files = $DB->get_records_sql($sql, null, 0, $limit);
         if (!$files) {
