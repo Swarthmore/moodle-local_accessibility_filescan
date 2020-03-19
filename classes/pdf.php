@@ -46,18 +46,35 @@ class pdf {
         global $DB;
 
         mtrace("Looking for PDF files to scan for accessibility");
-        $sql = "SELECT f.contenthash
-            FROM {files} f
-            INNER JOIN {context} c ON c.id=f.contextid
-            LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
-            WHERE c.contextlevel = 70
-            AND f.filesize <> 0
-            AND f.mimetype = 'application/pdf'
-            AND f.component <> 'assignfeedback_editpdf'
-            AND f.filearea <> 'stamps'
-            AND actp.contenthash IS NULL
-            GROUP BY f.contenthash
-            ORDER BY MAX(f.id) DESC";
+
+        $sql = "SELECT 
+                  Tbl.contenthash as contenthash, 
+                  f.contextid as contextid,
+                  f.id as id,
+                  f.pathnamehash as pathnamehash,
+                  f.filesize as filesize
+                FROM (SELECT 
+                        f.contenthash as contenthash
+                      FROM 
+                        {files} f
+                      LEFT OUTER JOIN
+                        {local_a11y_check_type_pdf} actp ON f.contenthash = actp.contenthash
+                      WHERE 
+                        AND f.filesize <> 0
+                        AND f.mimetype = 'application/pdf'
+                        AND f.component <> 'assignfeedback_editpdf'
+                        AND f.filearea <> 'stamps'
+                      GROUP BY 
+                        contenthash
+                ) as Tbl
+                INNER JOIN
+                  {context} c on c.id = f.contextid
+                INNER JOIN
+                  mdl_files f ON f.contenthash = Tbl.contenthash
+                WHERE
+                  c.contextlevel = 70
+                ORDER BY 
+                  MAX(id) DESC";
 
         $files = $DB->get_records_sql($sql, null, 0, $limit);
         if (!$files) {
