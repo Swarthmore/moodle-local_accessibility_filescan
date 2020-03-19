@@ -55,7 +55,7 @@ class pdf {
                   f.filesize as filesize
                 FROM (SELECT
                         f.contenthash as contenthash
-                      FROM 
+                      FROM
                         {files} f
                       LEFT OUTER JOIN
                         {local_a11y_check_type_pdf} actp ON f.contenthash = actp.contenthash
@@ -68,9 +68,9 @@ class pdf {
                         contenthash
                 ) as Tbl
                 INNER JOIN
-                  {context} c on c.id = f.contextid
-                INNER JOIN
                   {files} f ON f.contenthash = Tbl.contenthash
+                INNER JOIN
+                  {context} c on c.id = f.contextid
                 WHERE
                   c.contextlevel = 70
                 ORDER BY
