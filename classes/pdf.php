@@ -72,9 +72,7 @@ class pdf {
                 INNER JOIN
                   {context} c on c.id = f.contextid
                 WHERE
-                  c.contextlevel = 70
-                ORDER BY
-                  MAX(f.id) DESC";
+                  c.contextlevel = 70";
 
         $files = $DB->get_records_sql($sql, null, 0, $limit);
         if (!$files) {
