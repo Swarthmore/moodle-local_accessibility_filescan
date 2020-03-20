@@ -39,7 +39,7 @@ class lambdascan {
      * @param String $apibaseurl - The base url to the your lambda func
      * @param String $apikey - The api key to access your lamba func
      */
-    protected function __construct($apibaseurl, $apikey) {
+    public function __construct($apibaseurl, $apikey) {
         $this->apiBaseURL = $apibaseurl;
         $this->apikey = $apikey;
     }
@@ -89,8 +89,8 @@ class lambdascan {
         $json = json_decode($res);
 
         $returnvals = new \stdClass();
-        $returnvals ->uploadURL = $json->uploadURL;
-        $returnvals ->key = $json->key;
+        $returnvals->uploadurl = $json->uploadURL;
+        $returnvals->key = $json->key;
 
         return $returnvals;
     }

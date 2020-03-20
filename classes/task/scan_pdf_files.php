@@ -74,15 +74,15 @@ class scan_pdf_files extends \core\task\scheduled_task {
 
         $requesthandler = new \local_a11y_check\lambdascan($apibaseurl, $apitoken);
 
-        $credentials = $requesthandler->getpresignedurl('/test/requesturl');
-
         foreach ($files as $ref) {
+
+            $credentials = $requesthandler->getpresignedurl('/test/requesturl');
 
             $file = $fs->get_file_by_hash($ref->pathnamehash);
             $contenthash = $ref->contenthash;
             $scanid = $ref->scanid;
             $fh = $file->get_content_file_handle();
-            $putresponse = $requesthandler->putfile($credentials->uploadURL, $credentials->key, $fh);
+            $putresponse = $requesthandler->putfile($credentials->uploadurl, $credentials->key, $fh);
             $scanresponse = $requesthandler->scanfile('/test/scan', $credentials->key);
 
             if (property_exists($scanresponse, "message")) {

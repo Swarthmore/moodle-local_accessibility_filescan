@@ -46,33 +46,18 @@ class pdf {
         global $DB;
 
         mtrace("Looking for PDF files to scan for accessibility");
-
-        $sql = "SELECT
-                  Tbl.contenthash as contenthash,
-                  f.contextid as contextid,
-                  f.id as id,
-                  f.pathnamehash as pathnamehash,
-                  f.filesize as filesize
-                FROM (SELECT
-                        f.contenthash as contenthash
-                      FROM
-                        {files} f
-                      LEFT OUTER JOIN
-                        {local_a11y_check_type_pdf} actp ON f.contenthash = actp.contenthash
-                      WHERE
-                        f.filesize <> 0
-                        AND f.mimetype = 'application/pdf'
-                        AND f.component <> 'assignfeedback_editpdf'
-                        AND f.filearea <> 'stamps'
-                      GROUP BY
-                        contenthash
-                ) as Tbl
-                INNER JOIN
-                  {files} f ON f.contenthash = Tbl.contenthash
-                INNER JOIN
-                  {context} c on c.id = f.contextid
-                WHERE
-                  c.contextlevel = 70";
+        $sql = "SELECT f.contenthash, f.pathnamehash, MAX(f.filesize) as filesize
+            FROM {files} f
+                INNER JOIN {context} c ON c.id=f.contextid
+                LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
+                WHERE c.contextlevel = 70
+                AND f.filesize <> 0
+                AND f.mimetype = 'application/pdf'
+                AND f.component <> 'assignfeedback_editpdf'
+                AND f.filearea <> 'stamps'
+                AND actp.contenthash IS NULL
+            GROUP BY f.contenthash, f.pathnamehash
+            ORDER BY MAX(f.id) DESC";
 
         $files = $DB->get_records_sql($sql, null, 0, $limit);
         if (!$files) {
@@ -93,7 +78,7 @@ class pdf {
 
         global $DB;
 
-        $sql = "SELECT f.contenthash as contenthash, f.pathnamehash as pathnamehash
+        $sql = "SELECT f.scanid, f.contenthash as contenthash, f.pathnamehash as pathnamehash
             FROM {local_a11y_check_type_pdf} f
             INNER JOIN {local_a11y_check} c ON c.id = f.scanid
         ";
@@ -117,8 +102,7 @@ class pdf {
     public static function update_scan_record($contenthash, $payload) {
         global $DB;
 
-        $table = "mdl_local_a11y_check_type_pdf";
-        $sql = "UPDATE {$table}
+        $sql = "UPDATE {local_a11y_check_type_pdf}
             SET hastext={$payload->hastext},hastitle={$payload->hastitle},haslanguage={$payload->haslanguage},hasoutline={$payload->hasoutline}
             WHERE contenthash = '{$contenthash}'
         ";
