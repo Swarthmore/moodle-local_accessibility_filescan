@@ -46,7 +46,7 @@ class pdf {
         global $DB;
 
         mtrace("Looking for PDF files to scan for accessibility");
-        $sql = "SELECT f.contenthash, MAX(f.filesize) as filesize
+        $sql = "SELECT f.contenthash, f.pathnamehash, MAX(f.filesize) as filesize
             FROM {files} f
                 INNER JOIN {context} c ON c.id=f.contextid
                 LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
@@ -56,7 +56,7 @@ class pdf {
                 AND f.component <> 'assignfeedback_editpdf'
                 AND f.filearea <> 'stamps'
                 AND actp.contenthash IS NULL
-            GROUP BY f.contenthash
+            GROUP BY f.contenthash, f.pathnamehash
             ORDER BY MAX(f.id) DESC";
 
         $files = $DB->get_records_sql($sql, null, 0, $limit);
@@ -69,9 +69,51 @@ class pdf {
     }
 
     /**
+     * Get files that have been scanned, but do not have anything in the
+     * mdl_local_a11y_check_type_pdf table
+     * @param Number $limit
+     * @return array
+     */
+    public static function get_pdf_files($limit = 10000) {
+
+        global $DB;
+
+        $sql = "SELECT f.scanid, f.contenthash as contenthash, f.pathnamehash as pathnamehash
+            FROM {local_a11y_check_type_pdf} f
+            INNER JOIN {local_a11y_check} c ON c.id = f.scanid
+        ";
+
+        $files = $DB->get_records_sql($sql, null, 0, $limit);
+
+        if (!$files) {
+            mtrace("No PDF files found");
+        } else {
+            mtrace("Found " . count($files) . " PDF files");
+        }
+
+        return $files;
+    }
+
+    /**
+     * Updates the scan record for file
+     * @param String $contenthash
+     * @param Stdclass $payload
+     */
+    public static function update_scan_record($contenthash, $payload) {
+        global $DB;
+
+        $sql = "UPDATE {local_a11y_check_type_pdf}
+            SET hastext={$payload->hastext},hastitle={$payload->hastitle},haslanguage={$payload->haslanguage},hasoutline={$payload->hasoutline}
+            WHERE contenthash = '{$contenthash}'
+        ";
+        $DB->execute($sql);
+
+        return true;
+    }
+
+    /**
      * Create the scan and result record for a single PDF.
-     * @param stdClass $file The partial SQL file record containing contenthash and filesize
-     *
+     * @param \stdClass $file The partial SQL file record containing contenthash and filesize
      * @return boolean
      */
     public static function create_scan_record($file) {
@@ -103,10 +145,11 @@ class pdf {
         }
 
         // Create the scan result record.
-        $scanresult              = new \stdClass;
-        $scanresult->scanid      = $scanid;
-        $scanresult->contenthash = $file->contenthash;
-        $scanresultid            = $DB->insert_record('local_a11y_check_type_pdf', $scanresult);
+        $scanresult               = new \stdClass;
+        $scanresult->scanid       = $scanid;
+        $scanresult->contenthash  = $file->contenthash;
+        $scanresult->pathnamehash = $file->pathnamehash;
+        $scanresultid             = $DB->insert_record('local_a11y_check_type_pdf', $scanresult);
 
         if (!$scanresultid) {
             mtrace("Failed to insert scan result record for PDF {$contenthash}");
@@ -120,7 +163,6 @@ class pdf {
     /**
      * Takes the result object and returns the accessibility status.
      * @param \stdClass $result The result object
-     *
      * @return int the status
      */
     public static function evaluate_item_status($result) {

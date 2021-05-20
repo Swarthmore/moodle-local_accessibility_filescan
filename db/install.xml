@@ -25,6 +25,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="scanid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="contenthash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="The contenthash of the file."/>
+        <FIELD NAME="pathnamehash" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="The pathnamehash of the file."/>
         <FIELD NAME="hastext" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="hastitle" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="haslanguage" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
