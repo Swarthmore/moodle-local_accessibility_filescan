@@ -46,19 +46,5 @@ function xmldb_local_a11y_check_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020021800, 'local', 'a11y_check');
     }
 
-    if ($oldversion < 2020021914) {
-
-        // Define table local_a11y_check to be dropped.
-        $table = new xmldb_table('local_a11y_check_courses');
-
-        // Conditionally launch drop table for local_a11y_check.
-        if ($dbman->table_exists($table)) {
-            $dbman->drop_table($table);
-        }
-
-        // A11y_check savepoint reached.
-        upgrade_plugin_savepoint(true, 2020021914, 'local', 'a11y_check');
-    }
-
     return true;
 }
