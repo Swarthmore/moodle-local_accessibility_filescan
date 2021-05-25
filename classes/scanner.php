@@ -24,7 +24,7 @@
 
 namespace local_a11y_check;
 
-//defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../vendor/autoload.php');
 
@@ -34,9 +34,9 @@ require_once(dirname(__FILE__) . '/../vendor/autoload.php');
 class scanner {
     /**
      * Scan a pdf for a11y
-     * 
+     *
      * @param $content The content of the pdf
-     * 
+     *
      * @return \stdClass $results The a11y results
      */
     public static function scan($content) {
@@ -45,18 +45,18 @@ class scanner {
         $pdf = $parser->parseContent($content);
         $details = $pdf->getDetails();
 
-        $results = self::_initResultsObject();
-        
+        $results = self::_initresults();
+
         // check for title
         if (array_key_exists('Title', $details)) {
             $results->hastitle = true;
         }
 
         // check for language
-        $results->haslanguage = self::_extractLanguage($content);
+        $results->haslanguage = self::_extractlanguage($content);
 
         // check for bookmarks
-        $bookmarks = self::_extractBookmarks($pdf);
+        $bookmarks = self::_extractbookmarks($pdf);
 
         if (!empty($bookmarks)) {
             if (count($bookmarks) > 0) {
@@ -65,7 +65,7 @@ class scanner {
         }
 
         // check for page text
-        $text = self::_extractText($pdf);
+        $text = self::_extracttext($pdf);
 
         var_dump($text);
 
@@ -78,10 +78,10 @@ class scanner {
 
     /**
      * Creates a new results object
-     * 
+     *
      * @return /stdClass
      */
-    private static function _initResultsObject() {
+    private static function _initresults() {
         $results = new \stdClass;
         $results->hastitle = false;
         $results->hasoutline = false;
@@ -92,12 +92,12 @@ class scanner {
 
     /**
      * Extract the language from a pdf's metadata
-     * 
-     * @param $content - The pdf file contents 
-     * 
+     *
+     * @param $content - The pdf file contents
+     *
      * @returns boolean
      */
-    private static function _extractLanguage($content) {
+    private static function _extractlanguage($content) {
         $haslanguage = false;
         // check for lang string
         preg_match_all("/lang\(([a-z\-]+?)\)/mi", $content, $matches);
@@ -112,12 +112,12 @@ class scanner {
 
     /**
      * Extract bookmarks from a pdf
-     * 
+     *
      * @param $pdf - The pdf object
-     * 
-     * @returns [] 
+     *
+     * @returns []
      */
-    private static function _extractBookmarks($pdf) {
+    private static function _extractbookmarks($pdf) {
         $bookmarks = [];
         foreach ($pdf->getObjects() as $obj) {
             $details = $obj->getHeader()->getDetails();
@@ -130,12 +130,12 @@ class scanner {
 
     /**
      * Extract text from a pdf
-     * 
+     *
      * @param $pdf - The pdf object
-     * 
+     *
      * @returns string
      */
-    private static function _extractText($pdf) {
+    private static function _extracttext($pdf) {
         $pages = $pdf->getPages();
         $text = "";
         foreach ($pages as $page) {

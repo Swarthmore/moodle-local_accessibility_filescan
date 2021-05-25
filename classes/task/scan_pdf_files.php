@@ -54,13 +54,14 @@ class scan_pdf_files extends \core\task\scheduled_task {
         $apibaseurl = $pluginconfig->api_url;
         $apitoken = $pluginconfig->api_token;
         $maxfilesize = $pluginconfig->max_file_size_mb;
+        $uselocalscan = $pluginconfig->use_local_scan;
 
-        if (!$apibaseurl) {
+        if (!$uselocalscan && !$apibaseurl) {
             mtrace("API Base URL setting is missing!");
             die();
         }
 
-        if (!$apitoken) {
+        if (!$uselocalscan && !$apitoken) {
             mtrace("API token setting is missing!");
             die();
         }
