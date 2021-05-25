@@ -28,13 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../locallib.php');
 
-/**
- * PDF helper functions local_a11y_check
- *
- * @package   local_a11y_check
- * @copyright 2020 Swarthmore College
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class pdf {
     /**
      * Get all unscanned PDF files.
