@@ -116,7 +116,7 @@ class scanner {
 
     /**
      * Extract text from a pdf
-     * @param $pdf - The pdf object
+     * @param \smalot\pdfparser\Document $pdf The pdf object
      * @return string
      */
     private static function extracttext($pdf) {

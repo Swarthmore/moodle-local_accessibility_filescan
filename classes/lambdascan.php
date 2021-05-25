@@ -15,16 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This class manages a file scan request to AWS lambda
- * @copyright 2020 Swarthmore College
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Scan documents on AWS lambda
+ *
+ * @package   local_a11y_check
+ * @copyright 2021 Swarthmore College
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace local_a11y_check;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../locallib.php');
 
+/**
+ * This class handles the scanning of documents on a lambda function
+ */
 class lambdascan {
 
     /**
