@@ -32,7 +32,6 @@ class pdf {
     /**
      * Get all unscanned PDF files.
      * @param int $limit The number of files to process at a time.
-     *
      * @return array
      */
     public static function get_unscanned_pdf_files($limit = 1000) {
@@ -64,7 +63,7 @@ class pdf {
     /**
      * Get files that have been scanned, but do not have anything in the
      * mdl_local_a11y_check_type_pdf table
-     * @param Number $limit
+     * @param int $limit
      * @return array
      */
     public static function get_pdf_files($limit = 10000) {
@@ -89,8 +88,9 @@ class pdf {
 
     /**
      * Updates the scan record for file
-     * @param String $contenthash
-     * @param Stdclass $payload
+     * @param string $contenthash
+     * @param \stdClass $payload
+     * @return boolean
      */
     public static function update_scan_record($contenthash, $payload) {
         global $DB;
@@ -159,7 +159,7 @@ class pdf {
     /**
      * Takes the result object and returns the accessibility status.
      * @param \stdClass $result The result object
-     * @return int the status
+     * @return int
      */
     public static function evaluate_item_status($result) {
         if ($result->title && $result->hasOutline && $result->hasText && $result->language) {

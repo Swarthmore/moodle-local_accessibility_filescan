@@ -34,10 +34,8 @@ require_once(dirname(__FILE__) . '/../vendor/autoload.php');
 class scanner {
     /**
      * Scan a pdf for a11y
-     *
-     * @param $content The content of the pdf
-     *
-     * @return \stdClass $results The a11y results
+     * @param string $content The content of the pdf
+     * @return \stdClass
      */
     public static function scan($content) {
 
@@ -45,18 +43,15 @@ class scanner {
         $pdf = $parser->parseContent($content);
         $details = $pdf->getDetails();
 
-        $results = self::_initresults();
+        $results = self::initresults();
 
-        // check for title
         if (array_key_exists('Title', $details)) {
             $results->hastitle = true;
         }
 
-        // check for language
-        $results->haslanguage = self::_extractlanguage($content);
+        $results->haslanguage = self::extractlanguage($content);
 
-        // check for bookmarks
-        $bookmarks = self::_extractbookmarks($pdf);
+        $bookmarks = self::extractbookmarks($pdf);
 
         if (!empty($bookmarks)) {
             if (count($bookmarks) > 0) {
@@ -64,10 +59,7 @@ class scanner {
             }
         }
 
-        // check for page text
-        $text = self::_extracttext($pdf);
-
-        var_dump($text);
+        $text = self::extracttext($pdf);
 
         if (strlen($text) > 1) {
             $results->hastext = true;
@@ -78,10 +70,9 @@ class scanner {
 
     /**
      * Creates a new results object
-     *
      * @return /stdClass
      */
-    private static function _initresults() {
+    private static function initresults() {
         $results = new \stdClass;
         $results->hastitle = false;
         $results->hasoutline = false;
@@ -92,14 +83,11 @@ class scanner {
 
     /**
      * Extract the language from a pdf's metadata
-     *
-     * @param $content - The pdf file contents
-     *
-     * @returns boolean
+     * @param string $content The pdf file contents
+     * @return boolean
      */
-    private static function _extractlanguage($content) {
+    private static function extractlanguage($content) {
         $haslanguage = false;
-        // check for lang string
         preg_match_all("/lang\(([a-z\-]+?)\)/mi", $content, $matches);
         foreach ($matches as $match) {
             if (!empty($match)) {
@@ -112,12 +100,10 @@ class scanner {
 
     /**
      * Extract bookmarks from a pdf
-     *
-     * @param $pdf - The pdf object
-     *
-     * @returns []
+     * @param \smalot\pdfparser\Document $pdf The pdf object
+     * @return array
      */
-    private static function _extractbookmarks($pdf) {
+    private static function extractbookmarks($pdf) {
         $bookmarks = [];
         foreach ($pdf->getObjects() as $obj) {
             $details = $obj->getHeader()->getDetails();
@@ -130,12 +116,10 @@ class scanner {
 
     /**
      * Extract text from a pdf
-     *
      * @param $pdf - The pdf object
-     *
-     * @returns string
+     * @return string
      */
-    private static function _extracttext($pdf) {
+    private static function extracttext($pdf) {
         $pages = $pdf->getPages();
         $text = "";
         foreach ($pages as $page) {
