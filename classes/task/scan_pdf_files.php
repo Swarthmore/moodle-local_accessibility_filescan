@@ -103,8 +103,7 @@ class scan_pdf_files extends \core\task\scheduled_task {
                         $payload->hastext = 1;
                     }
                     $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
-                }
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     mtrace('Caught exception: ' . $e->getMessage());
                     continue;
                 }
@@ -124,8 +123,7 @@ class scan_pdf_files extends \core\task\scheduled_task {
                         $payload->hasoutline = 1;
                     }
                     $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
-                }
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     mtrace($e->getMessage());
                     continue;
                 }
@@ -134,13 +132,10 @@ class scan_pdf_files extends \core\task\scheduled_task {
     }
 
     /**
-     * Use local scanner to scan pdf documents
-     */
-    private function localscan($content) {
-    }
-
-    /**
      * Use aws lambda function to scan pdf documents
+     * @param string $baseurl The base URL of your lambda filescan server
+     * @param string $token Token to access filescan server
+     * @param buffer $fh File handle to pdf
      */
     private function lambdascan($baseurl, $token, $fh) {
         $requesthandler = new \local_a11y_check\lambdascan($baseurl, $token);
