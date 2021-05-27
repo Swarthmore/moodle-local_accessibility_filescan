@@ -61,7 +61,7 @@ class scanner {
 
         $text = self::extracttext($pdf);
 
-        if (strlen($text) > 1) {
+        if (strlen($text) > 0) {
             $results->hastext = true;
         }
 
@@ -121,7 +121,7 @@ class scanner {
      */
     private static function extracttext($pdf) {
         $pages = $pdf->getPages();
-        $text = "";
+        $text = '';
         foreach ($pages as $page) {
             $pagetext = $page->getText();
             $text = $text . $pagetext;
