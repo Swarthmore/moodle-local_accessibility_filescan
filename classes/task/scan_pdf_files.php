@@ -18,7 +18,7 @@
  * Find PDF files task definition for local_a11y_check
  *
  * @package   local_a11y_check
- * @copyright 2020 Swarthmore College
+ * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -49,13 +49,13 @@ class scan_pdf_files extends \core\task\scheduled_task {
     public function execute() {
 
         $pluginconfig = get_config('local_a11y_check');
-        $apibaseurl = $pluginconfig->api_url;
+        $apiurl = $pluginconfig->api_url;
         $apitoken = $pluginconfig->api_token;
         $maxfilesize = $pluginconfig->max_file_size_mb;
         $uselocalscan = $pluginconfig->use_local_scan;
 
-        if (!$uselocalscan && !$apibaseurl) {
-            mtrace("API Base URL setting is missing!");
+        if (!$uselocalscan && !$apiurl) {
+            mtrace("API url setting is missing!");
             die();
         }
 
@@ -89,7 +89,7 @@ class scan_pdf_files extends \core\task\scheduled_task {
 
             if ($uselocalscan) {
                 try {
-                    $results = \local_a11y_check\scanner::scan($content);
+                    $results = \local_a11y_check\localscanner::scan($content);
                     if ($results->hastitle) {
                         $payload->hastitle = 1;
                     }
@@ -109,17 +109,17 @@ class scan_pdf_files extends \core\task\scheduled_task {
                 }
             } else {
                 try {
-                    $res = self::lambdascan($apibaseurl, $apitoken, $fh);
-                    if ($res->hasText) {
+                    $res = \local_a11y_check\remotescan::scan($apiurl, $file, $contenthash);
+                    if ((int) $res["application/json"]["hasText"]) {
                         $payload->hastext = 1;
                     }
-                    if ($res->title) {
+                    if ($res["application/json"]["title"]) {
                         $payload->hastitle = 1;
                     }
-                    if ($res->language) {
+                    if ($res["application/json"]["language"]) {
                         $payload->haslanguage = 1;
                     }
-                    if ($res->hasOutline) {
+                    if ((int) $res["application/json"]["hasOutline"]) {
                         $payload->hasoutline = 1;
                     }
                     $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
@@ -129,26 +129,6 @@ class scan_pdf_files extends \core\task\scheduled_task {
                 }
             }
         }
-    }
-
-    /**
-     * Use aws lambda function to scan pdf documents
-     * @param string $baseurl The base URL of your lambda filescan server
-     * @param string $token Token to access filescan server
-     * @param buffer $fh File handle to pdf
-     */
-    private function lambdascan($baseurl, $token, $fh) {
-        $requesthandler = new \local_a11y_check\lambdascan($baseurl, $token);
-        $credentials = $requesthandler->getpresignedurl('/test/requesturl');
-        $putresponse = $requesthandler->putfile($credentials->uploadurl, $credentials->key, $fh);
-        $scanresponse = $requesthandler->scanfile('/test/scan', $credentials->key);
-        if (property_exists($scanresponse, "message")) {
-            if ($scanresponse->message === "Internal server error") {
-                mtrace("Skipping file");
-                return false;
-            }
-        }
-        return $scanresponse;
     }
 
 }

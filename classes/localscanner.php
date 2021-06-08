@@ -26,12 +26,10 @@ namespace local_a11y_check;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/../vendor/autoload.php');
-
 /**
  * A class to orchestrate the scanning of a pdf for a11y
  */
-class scanner {
+class localscanner {
     /**
      * Scan a pdf for a11y
      * @param string $content The content of the pdf

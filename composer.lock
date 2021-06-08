@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "smalot/pdfparser",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smalot/pdfparser.git",
-                "reference": "d4148fd8160f2e9cfc03f0bbfa4efba8a4e15fa4"
+                "reference": "b32bb7a35e24f39c4bd5cfff124b590767dea2e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smalot/pdfparser/zipball/d4148fd8160f2e9cfc03f0bbfa4efba8a4e15fa4",
-                "reference": "d4148fd8160f2e9cfc03f0bbfa4efba8a4e15fa4",
+                "url": "https://api.github.com/repos/smalot/pdfparser/zipball/b32bb7a35e24f39c4bd5cfff124b590767dea2e0",
+                "reference": "b32bb7a35e24f39c4bd5cfff124b590767dea2e0",
                 "shasum": ""
             },
             "require": {
@@ -52,9 +52,9 @@
             ],
             "support": {
                 "issues": "https://github.com/smalot/pdfparser/issues",
-                "source": "https://github.com/smalot/pdfparser/tree/v1.0.0"
+                "source": "https://github.com/smalot/pdfparser/tree/v1.0.1"
             },
-            "time": "2021-04-26T12:46:49+00:00"
+            "time": "2021-05-20T11:55:13+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
