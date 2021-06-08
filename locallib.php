@@ -37,3 +37,6 @@ define('LOCAL_A11Y_CHECK_STATUS_ERROR', 4);     // Encountered an error on the l
 
 // File is intentionally skipped, either from multiple errors, oversize, or some other issue.
 define('LOCAL_A11Y_CHECK_STATUS_IGNORE', 5);
+
+// Load composer dependencies.
+require_once(dirname(__FILE__) . '/vendor/autoload.php');

@@ -18,10 +18,9 @@
  * Find PDF files task definition for local_a11y_check
  *
  * @package   local_a11y_check
- * @copyright 2020 Swarthmore College
+ * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 namespace local_a11y_check\task;
 
@@ -50,17 +49,17 @@ class scan_pdf_files extends \core\task\scheduled_task {
     public function execute() {
 
         $pluginconfig = get_config('local_a11y_check');
-
-        $apibaseurl = $pluginconfig->api_url;
+        $apiurl = $pluginconfig->api_url;
         $apitoken = $pluginconfig->api_token;
         $maxfilesize = $pluginconfig->max_file_size_mb;
+        $uselocalscan = $pluginconfig->use_local_scan;
 
-        if (!$apibaseurl) {
-            mtrace("API Base URL setting is missing!");
+        if (!$uselocalscan && !$apiurl) {
+            mtrace("API url setting is missing!");
             die();
         }
 
-        if (!$apitoken) {
+        if (!$uselocalscan && !$apitoken) {
             mtrace("API token setting is missing!");
             die();
         }
@@ -72,35 +71,64 @@ class scan_pdf_files extends \core\task\scheduled_task {
             die();
         }
 
-        $requesthandler = new \local_a11y_check\lambdascan($apibaseurl, $apitoken);
-
         foreach ($files as $ref) {
 
-            $credentials = $requesthandler->getpresignedurl('/test/requesturl');
+            mtrace('Scanning: ' . $ref->pathnamehash);
 
             $file = $fs->get_file_by_hash($ref->pathnamehash);
             $contenthash = $ref->contenthash;
             $scanid = $ref->scanid;
             $fh = $file->get_content_file_handle();
-            $putresponse = $requesthandler->putfile($credentials->uploadurl, $credentials->key, $fh);
-            $scanresponse = $requesthandler->scanfile('/test/scan', $credentials->key);
+            $content = $file->get_content();
 
-            if (property_exists($scanresponse, "message")) {
-                if ($scanresponse->message === "Internal server error") {
-                    mtrace("Skipping file");
+            $payload = new \stdClass();
+            $payload->hastext = 0;
+            $payload->hastitle = 0;
+            $payload->haslanguage = 0;
+            $payload->hasoutline = 0;
+
+            if ($uselocalscan) {
+                try {
+                    $results = \local_a11y_check\localscanner::scan($content);
+                    if ($results->hastitle) {
+                        $payload->hastitle = 1;
+                    }
+                    if ($results->hasoutline) {
+                        $payload->hasoutline = 1;
+                    }
+                    if ($results->haslanguage) {
+                        $payload->haslanguage = 1;
+                    }
+                    if ($results->hastext) {
+                        $payload->hastext = 1;
+                    }
+                    $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
+                } catch (\Exception $e) {
+                    mtrace('Caught exception: ' . $e->getMessage());
+                    continue;
+                }
+            } else {
+                try {
+                    $res = \local_a11y_check\remotescan::scan($apiurl, $file, $contenthash);
+                    if ((int) $res["application/json"]["hasText"]) {
+                        $payload->hastext = 1;
+                    }
+                    if ($res["application/json"]["title"]) {
+                        $payload->hastitle = 1;
+                    }
+                    if ($res["application/json"]["language"]) {
+                        $payload->haslanguage = 1;
+                    }
+                    if ((int) $res["application/json"]["hasOutline"]) {
+                        $payload->hasoutline = 1;
+                    }
+                    $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
+                } catch (\Exception $e) {
+                    mtrace($e->getMessage());
                     continue;
                 }
             }
-
-            $payload = new \stdClass();
-            $payload->hastext = $scanresponse->hasText ? 1 : 0;
-            $payload->hastitle = $scanresponse->title ? 1 : 0;
-            $payload->haslanguage = $scanresponse->language ? 1 : 0;
-            $payload->hasoutline = $scanresponse->hasOutline ? 1 : 0;
-
-            $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
-
         }
-
     }
+
 }

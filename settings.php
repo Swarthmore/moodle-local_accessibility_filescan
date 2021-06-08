@@ -31,52 +31,76 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext('local_a11y_check/api_url',
         get_string('settings:api_url', 'local_a11y_check'),
         get_string('settings:api_url_desc', 'local_a11y_check'),
-        '', PARAM_TEXT, 128));
+        '',
+        PARAM_URL,
+        128
+    ));
+
     $settings->add(new admin_setting_configtext('local_a11y_check/api_token',
         get_string('settings:api_token', 'local_a11y_check'),
         get_string('settings:api_token_desc', 'local_a11y_check'),
-        '', PARAM_TEXT, 128));
+        '',
+        PARAM_TEXT,
+        128
+    ));
+
+    $settings->add(new admin_setting_configcheckbox('local_a11y_check/use_local_scan',
+        get_string('settings:use_local_scan', 'local_a11y_check'),
+        get_string('settings:use_local_scan_desc', 'local_a11y_check'),
+        0
+    ));
 
     $settings->add(new admin_setting_configtext('local_a11y_check/files_per_cron',
         get_string('settings:files_per_cron', 'local_a11y_check'),
         get_string('settings:files_per_cron_desc', 'local_a11y_check'),
-        5, PARAM_INT));
+        5,
+        PARAM_INT
+    ));
 
     $settings->add(new admin_setting_configtext('local_a11y_check/max_file_size_mb',
         get_string('settings:max_file_size_mb', 'local_a11y_check'),
         get_string('settings:max_file_size_mb_desc', 'local_a11y_check'),
-        100, PARAM_INT));
+        100,
+        PARAM_INT
+    ));
 
     $settings->add(new admin_setting_configtext('local_a11y_check/max_retries',
         get_string('settings:max_retries', 'local_a11y_check'),
         get_string('settings:max_retries_desc', 'local_a11y_check'),
-        '3', PARAM_TEXT, 128));
+        '3',
+        PARAM_TEXT,
+        128
+    ));
 
     $settings->add(new admin_setting_configtext('local_a11y_check/text_check_help',
         get_string('settings:text_check_help', 'local_a11y_check'),
         get_string('settings:text_check_help_desc', 'local_a11y_check'),
         'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
         PARAM_URL,
-        60));
+        60
+    ));
 
     $settings->add(new admin_setting_configtext('local_a11y_check/title_check_help',
         get_string('settings:title_check_help', 'local_a11y_check'),
         get_string('settings:title_check_help_desc', 'local_a11y_check'),
         'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
         PARAM_URL,
-        60));
+        60
+    ));
 
     $settings->add(new admin_setting_configtext('local_a11y_check/lang_check_help',
         get_string('settings:lang_check_help', 'local_a11y_check'),
         get_string('settings:lang_check_help_desc', 'local_a11y_check'),
         'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
         PARAM_URL,
-        60));
+        60
+    ));
 
     $settings->add(new admin_setting_configtext('local_a11y_check/outline_check_help',
         get_string('settings:outline_check_help', 'local_a11y_check'),
         get_string('settings:outline_check_help_desc', 'local_a11y_check'),
         'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
         PARAM_URL,
-        60));
+        60
+    ));
 }
