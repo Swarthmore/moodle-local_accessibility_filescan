@@ -46,7 +46,7 @@ class remotescan {
             "Content-Type: multipart/form-data",
             "Accept: application/json"
         );
-        
+
         $opts = array(
             "curlopt_httpheader" => $headers,
             "curlopt_timeout" => "120L",
