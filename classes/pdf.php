@@ -162,11 +162,12 @@ class pdf {
     /**
      * Get the scan status of a file.
      * @param int $scanid The scanid of the file.
+     * @param int $limit The limit of records to return. Optional.
      * @return int
      */
     public static function get_scan_status($scanid, $limit = 5000) {
         global $DB;
-        $sql = "SELECT c.status, c.statustext 
+        $sql = "SELECT c.status, c.statustext
             FROM {local_a11y_check} c 
             WHERE c.id = {$scanid}
         ";
