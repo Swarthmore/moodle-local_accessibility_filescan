@@ -30,10 +30,15 @@ defined('MOODLE_INTERNAL') || die();
  * A class to orchestrate the scanning of a pdf for a11y
  */
 class remotescan {
+    /**
+     * Scan a pdf for a11y using a web endpoint
+     * @param string $endpoint The endpoint
+     * @param stored_file $file The file to scan
+     * @param string $contenthash The contenthash of the file
+     * @return array
+     */
     public static function scan($endpoint, $file, $contenthash) {
-        // Set up the request handler, which is an instance of Moodle's curl implementation
-        // See the undocumented curl docs in the Moodle source code
-        // https://github.com/moodle/moodle/blob/master/lib/filelib.php#L2972
+        // See https://github.com/moodle/moodle/blob/master/lib/filelib.php#L2972.
         $request = new \curl();
 
         $headers = array(
