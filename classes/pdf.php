@@ -168,7 +168,7 @@ class pdf {
     public static function get_scan_status($scanid, $limit = 5000) {
         global $DB;
         $sql = "SELECT c.status, c.statustext
-            FROM {local_a11y_check} c 
+            FROM {local_a11y_check} c
             WHERE c.id = {$scanid}
         ";
         $records = $DB->get_records_sql($sql, null, 0, $limit);
