@@ -26,10 +26,13 @@ namespace local_a11y_check;
 
 defined('MOODLE_INTERNAL') || die();
 
+// Load composer dependencies.
+require_once(dirname(__FILE__) . '/vendor/autoload.php');
+
 /**
  * A class to orchestrate the scanning of a pdf for a11y
  */
-class localscanner {
+class pdf_scanner {
     /**
      * Scan a pdf for a11y
      * @param string $content The content of the pdf
@@ -41,10 +44,10 @@ class localscanner {
         $pdf = $parser->parseContent($content);
         $details = $pdf->getDetails();
 
-        $results = self::initresults();
+        $results = new \local_a11y_check\pdf_a11y_results();
 
         if (array_key_exists('Title', $details)) {
-            $results->hastitle = true;
+            $results->hastitle = 1;
         }
 
         $results->haslanguage = self::extractlanguage($content);
@@ -53,43 +56,30 @@ class localscanner {
 
         if (!empty($bookmarks)) {
             if (count($bookmarks) > 0) {
-                $results->hasoutline = true;
+                $results->hasoutline = 1;
             }
         }
 
         $text = self::extracttext($pdf);
 
         if (strlen($text) > 0) {
-            $results->hastext = true;
+            $results->hastext = 1;
         }
 
         return $results;
     }
 
     /**
-     * Creates a new results object
-     * @return /stdClass
-     */
-    private static function initresults() {
-        $results = new \stdClass;
-        $results->hastitle = false;
-        $results->hasoutline = false;
-        $results->hastext = false;
-        $results->haslanguage = false;
-        return $results;
-    }
-
-    /**
      * Extract the language from a pdf's metadata
      * @param string $content The pdf file contents
-     * @return boolean
+     * @return int
      */
     private static function extractlanguage($content) {
-        $haslanguage = false;
+        $haslanguage = 0;
         preg_match_all("/lang\(([a-z\-]+?)\)/mi", $content, $matches);
         foreach ($matches as $match) {
             if (!empty($match)) {
-                $haslanguage = true;
+                $haslanguage = 1;
                 continue;
             }
         }

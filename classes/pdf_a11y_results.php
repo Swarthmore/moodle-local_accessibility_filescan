@@ -15,25 +15,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * local library functions local_a11y_check
+ * Result class for local_a11y_check
  *
  * @package   local_a11y_check
- * @copyright 2020 Swarthmore College
+ * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_a11y_check;
+
 defined('MOODLE_INTERNAL') || die();
 
-// Types of checks.
-define('LOCAL_A11Y_CHECK_TYPE_UNDEFINED', 0);
-define('LOCAL_A11Y_CHECK_TYPE_PDF', 1);
+class pdf_a11y_results {
 
-// Status types for scan checks.
-define('LOCAL_A11Y_CHECK_STATUS_UNCHECKED', 0); // File has not been checked.
-define('LOCAL_A11Y_CHECK_STATUS_PASS', 1);      // File passes all a11y checks.
-define('LOCAL_A11Y_CHECK_STATUS_CHECK', 2);     // File passes some a11y checks.
-define('LOCAL_A11Y_CHECK_STATUS_FAIL', 3);      // File fails all a11y checks.
-define('LOCAL_A11Y_CHECK_STATUS_ERROR', 4);     // Encountered an error on the last check.
+    public int $hastext;
+    public int $hasoutline;
+    public int $hastitle;
+    public int $haslanguage;
 
-// File is intentionally skipped, either from multiple errors, oversize, or some other issue.
-define('LOCAL_A11Y_CHECK_STATUS_IGNORE', 5);
+    public function __construct($text = 0, $outline = 0, $title = 0, $language = 0) {
+        $this->hastext = $text;
+        $this->hasoutline = $outline;
+        $this->hastitle = $title;
+        $this->haslanguage = $language;
+    }
+
+}

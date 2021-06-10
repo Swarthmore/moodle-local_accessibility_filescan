@@ -49,21 +49,8 @@ class scan_pdf_files extends \core\task\scheduled_task {
     public function execute() {
 
         $pluginconfig = get_config('local_a11y_check');
-        $apiurl = $pluginconfig->api_url;
-        $apitoken = $pluginconfig->api_token;
         $maxfilesize = $pluginconfig->max_file_size_mb;
         $uselocalscan = $pluginconfig->use_local_scan;
-
-        if (!$uselocalscan && !$apiurl) {
-            mtrace("API url setting is missing!");
-            die();
-        }
-
-        if (!$uselocalscan && !$apitoken) {
-            mtrace("API token setting is missing!");
-            die();
-        }
-
         $files = \local_a11y_check\pdf::get_pdf_files();
         $fs = get_file_storage();
 
@@ -80,53 +67,16 @@ class scan_pdf_files extends \core\task\scheduled_task {
             $scanid = $ref->scanid;
             $fh = $file->get_content_file_handle();
             $content = $file->get_content();
-
-            $payload = new \stdClass();
-            $payload->hastext = 0;
-            $payload->hastitle = 0;
-            $payload->haslanguage = 0;
-            $payload->hasoutline = 0;
-
-            if ($uselocalscan) {
-                try {
-                    $results = \local_a11y_check\localscanner::scan($content);
-                    if ($results->hastitle) {
-                        $payload->hastitle = 1;
-                    }
-                    if ($results->hasoutline) {
-                        $payload->hasoutline = 1;
-                    }
-                    if ($results->haslanguage) {
-                        $payload->haslanguage = 1;
-                    }
-                    if ($results->hastext) {
-                        $payload->hastext = 1;
-                    }
-                    $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
-                } catch (\Exception $e) {
-                    mtrace('Caught exception: ' . $e->getMessage());
-                    continue;
-                }
-            } else {
-                try {
-                    $res = \local_a11y_check\remotescan::scan($apiurl, $file, $contenthash);
-                    if ((int) $res["application/json"]["hasText"]) {
-                        $payload->hastext = 1;
-                    }
-                    if ($res["application/json"]["title"]) {
-                        $payload->hastitle = 1;
-                    }
-                    if ($res["application/json"]["language"]) {
-                        $payload->haslanguage = 1;
-                    }
-                    if ((int) $res["application/json"]["hasOutline"]) {
-                        $payload->hasoutline = 1;
-                    }
-                    $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
-                } catch (\Exception $e) {
-                    mtrace($e->getMessage());
-                    continue;
-                }
+            
+            // Use the scanner to scan the file.
+            try {
+                $results = \local_a11y_check\pdf_scanner::scan($content);
+                $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $results);
+                $a11ystatus = \local_a11y_check\pdf::eval_a11y_status($results);
+                // TODO: Update the record with the $a11ystatus.
+            } catch (\Exception $e) {
+                mtrace($e->getMessage());
+                continue;
             }
         }
     }

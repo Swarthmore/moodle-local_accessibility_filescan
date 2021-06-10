@@ -55,11 +55,7 @@ class pdf {
             ORDER BY MAX(f.id) DESC";
 
         $files = $DB->get_records_sql($sql, null, 0, $limit);
-        if (!$files) {
-            mtrace("No PDF files found");
-        } else {
-            mtrace("Found " . count($files) . " PDF files");
-        }
+        !$files ? mtrace("No PDF files found") : "Found " . count($files) . " PDF files";
         return $files;
     }
 
@@ -79,12 +75,7 @@ class pdf {
         ";
 
         $files = $DB->get_records_sql($sql, null, 0, $limit);
-
-        if (!$files) {
-            mtrace("No PDF files found");
-        } else {
-            mtrace("Found " . count($files) . " PDF files");
-        }
+        !$files ? mtrace("No PDF files found") : mtrace("Found " . count($files) . " PDF files");
 
         return $files;
     }
@@ -92,7 +83,7 @@ class pdf {
     /**
      * Updates the scan record for file
      * @param string $contenthash
-     * @param \stdClass $payload
+     * @param \result $payload The results of the a11y scan
      * @return boolean
      */
     public static function update_scan_record($contenthash, $payload) {
@@ -119,9 +110,9 @@ class pdf {
         global $DB;
 
         // Create the primary scan record for the PDF file.
-        $scanrecord              = new \stdClass;
-        $scanrecord->checktype   = LOCAL_A11Y_CHECK_TYPE_PDF;
-        $scanrecord->faildelay   = 0;
+        $scanrecord = new \stdClass;
+        $scanrecord->checktype = LOCAL_A11Y_CHECK_TYPE_PDF;
+        $scanrecord->faildelay = 0;
         $scanrecord->lastchecked = 0;
 
         // Determine if PDF is too big to scan.
@@ -130,10 +121,10 @@ class pdf {
         $maxfilesize = (int) get_config("local_a11y_check", "max_file_size_mb");
         if ($file->filesize > $maxfilesize * 1000000) {
             // File is too big, ignore.
-            $scanrecord->status      = LOCAL_A11Y_CHECK_STATUS_IGNORE;
-            $scanrecord->statustext  = "File too large to scan";
+            $scanrecord->status = LOCAL_A11Y_CHECK_STATUS_IGNORE;
+            $scanrecord->statustext = "File too large to scan";
         } else {
-            $scanrecord->status      = LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
+            $scanrecord->status = LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
         }
 
         $scanid = $DB->insert_record('local_a11y_check', $scanrecord);
@@ -144,11 +135,11 @@ class pdf {
         }
 
         // Create the scan result record.
-        $scanresult               = new \stdClass;
-        $scanresult->scanid       = $scanid;
-        $scanresult->contenthash  = $file->contenthash;
+        $scanresult = new \stdClass;
+        $scanresult->scanid = $scanid;
+        $scanresult->contenthash = $file->contenthash;
         $scanresult->pathnamehash = $file->pathnamehash;
-        $scanresultid             = $DB->insert_record('local_a11y_check_type_pdf', $scanresult);
+        $scanresultid = $DB->insert_record('local_a11y_check_type_pdf', $scanresult);
 
         if (!$scanresultid) {
             mtrace("Failed to insert scan result record for PDF {$contenthash}");
@@ -161,13 +152,18 @@ class pdf {
 
     /**
      * Takes the result object and returns the accessibility status.
-     * @param \stdClass $result The result object
+     * @param \result $result The result object
      * @return int
      */
-    public static function evaluate_item_status($result) {
-        if ($result->title && $result->hasOutline && $result->hasText && $result->language) {
+    public static function eval_a11y_status($result) {
+        if (
+            boolval($result->hastext)
+            && boolval($result->hasoutline)
+            && boolval($result->hastitle)
+            && boolval($result->haslanguage)
+        ) {
             return LOCAL_A11Y_CHECK_STATUS_PASS;
-        } else if ($result->hasText) {
+        } else if (!boolval($result->hastext)) {
             return LOCAL_A11Y_CHECK_STATUS_CHECK;
         } else {
             return LOCAL_A11Y_CHECK_STATUS_FAIL;
