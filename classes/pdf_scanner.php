@@ -26,8 +26,8 @@ namespace local_a11y_check;
 
 defined('MOODLE_INTERNAL') || die();
 
-// Load composer dependencies.
-require_once(dirname(__FILE__) . '/vendor/autoload.php');
+require_once(dirname(__FILE__) . "/../vendor/autoload.php");
+require_once(dirname(__FILE__) . "/pdf_a11y_results.php");
 
 /**
  * A class to orchestrate the scanning of a pdf for a11y
@@ -35,86 +35,96 @@ require_once(dirname(__FILE__) . '/vendor/autoload.php');
 class pdf_scanner {
     /**
      * Scan a pdf for a11y
-     * @param string $content The content of the pdf
-     * @return \stdClass
+     * @param string $file The filepath to the pdf
+     * @return \pdf_a11y_results
      */
-    public static function scan($content) {
-
-        $parser = new \Smalot\PdfParser\Parser();
-        $pdf = $parser->parseContent($content);
-        $details = $pdf->getDetails();
-
+    public static function scan($file) {
+        // Initiate the new results object.
         $results = new \local_a11y_check\pdf_a11y_results();
+        $pagecount = 0;
+        $info = self::get_pdfinfo($file);
 
-        if (array_key_exists('Title', $details)) {
-            $results->hastitle = 1;
-        }
-
-        $results->haslanguage = self::extractlanguage($content);
-
-        $bookmarks = self::extractbookmarks($pdf);
-
-        if (!empty($bookmarks)) {
-            if (count($bookmarks) > 0) {
-                $results->hasoutline = 1;
+        // Iterate through the output lines and assign a11y results.
+        foreach ($info as $line) {
+            if (substr($line, 0, strlen("Title:")) === "Title:") {
+                $results->hastitle = (strlen(trim(explode(":", $line, 2)[1])) > 0) ? 1 : 0;
+            } else if (substr($line, 0, strlen("Pages:")) === "Pages:") {
+                $pagecount = trim(explode(":", $line, 2)[1]);
             }
         }
 
-        $text = self::extracttext($pdf);
+        // Get the hastext status.
+        $text = self::get_pdftext($file, $pagecount);
+        $results->hastext = intval($text && count($text) > 1);
 
-        if (strlen($text) > 0) {
-            $results->hastext = 1;
-        }
+        // Get the haslanguage status.
+        $lang = self::get_pdf_lang($file);
+        $results->haslanguage = empty($lang) ? 0 : 1;
+
+        // Get the outline.
+        $outline = self::extract_outline($file);
+        $results->hasoutline = empty($outline) ? 0 : 1;
 
         return $results;
     }
 
-    /**
-     * Extract the language from a pdf's metadata
-     * @param string $content The pdf file contents
-     * @return int
-     */
-    private static function extractlanguage($content) {
-        $haslanguage = 0;
-        preg_match_all("/lang\(([a-z\-]+?)\)/mi", $content, $matches);
-        foreach ($matches as $match) {
-            if (!empty($match)) {
-                $haslanguage = 1;
-                continue;
-            }
-        }
-        return $haslanguage;
-    }
-
-    /**
-     * Extract bookmarks from a pdf
-     * @param \smalot\pdfparser\Document $pdf The pdf object
-     * @return array
-     */
-    private static function extractbookmarks($pdf) {
-        $bookmarks = [];
+    private static function extract_outline(string $file) {
+        $contents = file_get_contents($file);
+        $parser = new \Smalot\PdfParser\Parser();
+        $pdf = $parser->parseContent($contents);
+        $outline = array();
         foreach ($pdf->getObjects() as $obj) {
             $details = $obj->getHeader()->getDetails();
-            if (isset($details['Title'])) {
-                $bookmarks[] = $details['Title'];
+            if (isset($details["Title"])) {
+                if (isset($details["A"])) {
+                    $outline[] = $details;
+                } else if (isset($details["Dest"])) {
+                    $outline[] = $details;
+                } else if (isset($details["First"]) && isset($details["Last"])) {
+                    $outline[] = $details;
+                } else if (isset($details["Next"])) {
+                    $outline[] = $details;
+                }
             }
         }
-        return $bookmarks;
+        return $outline;
     }
 
-    /**
-     * Extract text from a pdf
-     * @param \smalot\pdfparser\Document $pdf The pdf object
-     * @return string
-     */
-    private static function extracttext($pdf) {
-        $pages = $pdf->getPages();
-        $text = '';
-        foreach ($pages as $page) {
-            $pagetext = $page->getText();
-            $text = $text . $pagetext;
+    private function get_pdf_lang(string $file) {
+        $contents = file_get_contents($file);
+        preg_match('/\/Lang\((.*)\)/mU', $contents, $matches);
+        return count($matches) > 1 && $matches[1] ? $pdfcheck["haslanguage"] = $matches[1] : "";
+    }
+
+    private function get_pdftext(string $file, int $pagecount) {
+        $cmd = self::get_pdftotext_command_for_file($file, $pagecount);
+        $text = exec($cmd, $output, $exitcode);
+        if ($exitcode <> 0) {
+            throw new \Exception("Error getting PDF text. " . $exitcode);
         }
-        return trim($text);
+        return $output;
     }
 
+    private function get_pdfinfo(string $file) {
+        $cmd = self::get_pdfinfo_command_for_file($file);
+        exec($cmd, $output, $exitcode);
+        // If a non-standard exit code is returned, throw an error.
+        if ($exitcode <> 0) {
+            throw new \Exception("Error getting PDF info. " . $exitcode);
+        }
+        return $output;
+    }
+
+    private function get_pdfinfo_command_for_file(string $pdffile) {
+        $pdftotextexec = \escapeshellarg('pdfinfo');
+        $pdffilearg = \escapeshellarg($pdffile);
+        return "$pdftotextexec $pdffilearg";
+    }
+
+    private function get_pdftotext_command_for_file(string $pdffile, int $pdfpagecount) {
+        $pdftotextexec = \escapeshellarg('pdftotext');
+        $pdffilearg = \escapeshellarg($pdffile);
+        $lastpage = \escapeshellarg(min($pdfpagecount, 50));
+        return "$pdftotextexec $pdffilearg -f 1 -l $lastpage -";
+    }
 }

@@ -27,17 +27,10 @@ namespace local_a11y_check;
 defined('MOODLE_INTERNAL') || die();
 
 class pdf_a11y_results {
-
-    public int $hastext;
-    public int $hasoutline;
-    public int $hastitle;
-    public int $haslanguage;
-
     public function __construct($text = 0, $outline = 0, $title = 0, $language = 0) {
         $this->hastext = $text;
         $this->hasoutline = $outline;
         $this->hastitle = $title;
         $this->haslanguage = $language;
     }
-
 }

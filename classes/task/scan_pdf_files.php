@@ -74,6 +74,7 @@ class scan_pdf_files extends \core\task\scheduled_task {
                 $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $results);
                 $a11ystatus = \local_a11y_check\pdf::eval_a11y_status($results);
                 // TODO: Update the record with the $a11ystatus.
+                //\local_a11y_check\pdf::update_a11y_status($scanid, $a11ystatus);
             } catch (\Exception $e) {
                 mtrace($e->getMessage());
                 continue;

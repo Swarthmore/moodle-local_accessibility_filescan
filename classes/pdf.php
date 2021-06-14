@@ -169,4 +169,5 @@ class pdf {
             return LOCAL_A11Y_CHECK_STATUS_FAIL;
         }
     }
+
 }
