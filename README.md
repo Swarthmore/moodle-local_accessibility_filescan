@@ -10,6 +10,9 @@ This plugin consists of a scheduled task that looks for PDFs within courses, eva
 
 ## Installation
 
+### Dependencies
+`poppler-utils`
+
 ### From the command line 
 
 ```sh

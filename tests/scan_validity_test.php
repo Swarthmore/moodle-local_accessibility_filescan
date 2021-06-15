@@ -58,8 +58,6 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
 
             if (strpos($filename, '-') !== false) {
 
-                echo PHP_EOL . "Scanning " . $filename . PHP_EOL;
-
                 $a11ytokens = explode('-', explode('_', $filename)[1]);
                 $a11ycheck = new \local_a11y_check\pdf_a11y_results();
                 $contents = file_get_contents($pdf);
