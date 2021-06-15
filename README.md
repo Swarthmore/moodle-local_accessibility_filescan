@@ -2,14 +2,11 @@
 
 ## A Moodle plugin that scans your course files for accessibility.
 
-This plugin consists of: 
-
-* A scheduled task that looks for PDFs within courses, sends them to an external server to check for accessibilty, and saves the results to the Moodle database
+This plugin consists of a scheduled task that looks for PDFs within courses, evaluates their a11y, then saves the results to the Moodle database
 
 ## Dependencies
 
-* Moodle 3.1+
-* [filescan-server](https://github.com/Swarthmore/filescan-server/) is required to scan your Moodle's PDF files.
+* Moodle 3.11+
 
 ## Installation
 

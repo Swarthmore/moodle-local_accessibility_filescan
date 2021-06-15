@@ -68,6 +68,11 @@ class pdf_scanner {
         return $results;
     }
 
+    /**
+     * Extract bookmarks (outline) from a pdf
+     * @param string $file The filepath to the pdf
+     * @return array
+     */
     private static function extract_outline(string $file) {
         $contents = file_get_contents($file);
         $parser = new \Smalot\PdfParser\Parser();
@@ -90,13 +95,24 @@ class pdf_scanner {
         return $outline;
     }
 
-    private function get_pdf_lang(string $file) {
+    /**
+     * Extract the language from a pdf
+     * @param string $file The filepath to the pdf
+     * @return array
+     */
+    private static function get_pdf_lang(string $file) {
         $contents = file_get_contents($file);
         preg_match('/\/Lang\((.*)\)/mU', $contents, $matches);
         return count($matches) > 1 && $matches[1] ? $pdfcheck["haslanguage"] = $matches[1] : "";
     }
 
-    private function get_pdftext(string $file, int $pagecount) {
+    /**
+     * Extract text from a pdf
+     * @param string $file The filepath to the pdf
+     * @param int $pagecount How many pages are in the pdf
+     * @return string
+     */
+    private static function get_pdftext(string $file, int $pagecount) {
         $cmd = self::get_pdftotext_command_for_file($file, $pagecount);
         $text = exec($cmd, $output, $exitcode);
         if ($exitcode <> 0) {
@@ -105,7 +121,12 @@ class pdf_scanner {
         return $output;
     }
 
-    private function get_pdfinfo(string $file) {
+    /**
+     * Extract info from a pdf
+     * @param string $file The filepath to the pdf
+     * @return string
+     */
+    private static function get_pdfinfo(string $file) {
         $cmd = self::get_pdfinfo_command_for_file($file);
         exec($cmd, $output, $exitcode);
         // If a non-standard exit code is returned, throw an error.
@@ -115,13 +136,24 @@ class pdf_scanner {
         return $output;
     }
 
-    private function get_pdfinfo_command_for_file(string $pdffile) {
+    /**
+     * Get the pdfino command
+     * @param string $pdffile The filepath to the pdf
+     * @return string
+     */
+    private static function get_pdfinfo_command_for_file(string $pdffile) {
         $pdftotextexec = \escapeshellarg('pdfinfo');
         $pdffilearg = \escapeshellarg($pdffile);
         return "$pdftotextexec $pdffilearg";
     }
 
-    private function get_pdftotext_command_for_file(string $pdffile, int $pdfpagecount) {
+    /**
+     * Get the pdftotext command
+     * @param string $pdffile The filepath to the pdf
+     * @param int $pdfpagecount How many pages are in the pdf
+     * @return string
+     */
+    private static function get_pdftotext_command_for_file(string $pdffile, int $pdfpagecount) {
         $pdftotextexec = \escapeshellarg('pdftotext');
         $pdffilearg = \escapeshellarg($pdffile);
         $lastpage = \escapeshellarg(min($pdfpagecount, 50));

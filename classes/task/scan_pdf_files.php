@@ -67,14 +67,13 @@ class scan_pdf_files extends \core\task\scheduled_task {
             $scanid = $ref->scanid;
             $fh = $file->get_content_file_handle();
             $content = $file->get_content();
-            
+
             // Use the scanner to scan the file.
             try {
                 $results = \local_a11y_check\pdf_scanner::scan($content);
                 $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $results);
                 $a11ystatus = \local_a11y_check\pdf::eval_a11y_status($results);
                 // TODO: Update the record with the $a11ystatus.
-                //\local_a11y_check\pdf::update_a11y_status($scanid, $a11ystatus);
             } catch (\Exception $e) {
                 mtrace($e->getMessage());
                 continue;

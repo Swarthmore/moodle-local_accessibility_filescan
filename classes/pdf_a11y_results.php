@@ -26,7 +26,16 @@ namespace local_a11y_check;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * A class to standardize a11y results for pdfs
+ */
 class pdf_a11y_results {
+    /**
+     * @param int $text
+     * @param int $outline
+     * @param int $title
+     * @param int $language
+     */
     public function __construct($text = 0, $outline = 0, $title = 0, $language = 0) {
         $this->hastext = $text;
         $this->hasoutline = $outline;
