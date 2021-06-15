@@ -31,6 +31,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class pdf_a11y_results {
     /**
+     * Constructor function
      * @param int $text
      * @param int $outline
      * @param int $title
