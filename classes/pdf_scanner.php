@@ -41,7 +41,6 @@ class pdf_scanner {
     public static function scan($file) {
         // Initiate the new results object.
         $results = new \local_a11y_check\pdf_a11y_results();
-        $pagecount = 0;
         $info = self::get_pdfinfo($file);
 
         // Iterate through the output lines and assign a11y results.
@@ -49,7 +48,9 @@ class pdf_scanner {
             if (substr($line, 0, strlen("Title:")) === "Title:") {
                 $results->hastitle = (strlen(trim(explode(":", $line, 2)[1])) > 0) ? 1 : 0;
             } else if (substr($line, 0, strlen("Pages:")) === "Pages:") {
-                $pagecount = trim(explode(":", $line, 2)[1]);
+                $results->pagecount = trim(explode(":", $line, 2)[1]);
+            } else if (substr($line, 0, strlen("Tagged:")) === "Tagged:") {
+                $results->istagged = (trim(explode(":", $line, 2)[1]) === "yes") ? 1 : 0;
             }
         }
 
@@ -59,11 +60,11 @@ class pdf_scanner {
 
         // Get the haslanguage status.
         $lang = self::get_pdf_lang($file);
-        $results->haslanguage = empty($lang) ? 0 : 1;
+        $results->haslanguage = count($lang) > 1 ? 1 : 0;
 
-        // Get the outline.
-        $outline = self::extract_outline($file);
-        $results->hasoutline = empty($outline) ? 0 : 1;
+        // Get any bookmarks in the pdf.
+        $bookmarks = self::extract_bookmarks($file);
+        $results->hasbookmarks = empty($bookmarks) ? 0 : 1;
 
         return $results;
     }
@@ -73,7 +74,7 @@ class pdf_scanner {
      * @param string $file The filepath to the pdf
      * @return array
      */
-    private static function extract_outline(string $file) {
+    private static function extract_bookmarks(string $file) {
         $contents = file_get_contents($file);
         $parser = new \Smalot\PdfParser\Parser();
         $pdf = $parser->parseContent($contents);
@@ -103,7 +104,7 @@ class pdf_scanner {
     private static function get_pdf_lang(string $file) {
         $contents = file_get_contents($file);
         preg_match('/\/Lang\((.*)\)/mU', $contents, $matches);
-        return count($matches) > 1 && $matches[1] ? $pdfcheck["haslanguage"] = $matches[1] : "";
+        return $matches;
     }
 
     /**

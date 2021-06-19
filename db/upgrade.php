@@ -31,33 +31,54 @@ defined('MOODLE_INTERNAL') || die();
  * @return bool A status indicating success or failure
  */
 function xmldb_local_a11y_check_upgrade($oldversion) {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+
     if ($oldversion < 2020021800) {
 
-        // Define field statustext to be added to local_a11y_check.
         $table = new xmldb_table('local_a11y_check');
         $field = new xmldb_field('statustext', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'status');
 
-        // Conditionally launch add field statustext.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        // A11y_check savepoint reached.
         upgrade_plugin_savepoint(true, 2020021800, 'local', 'a11y_check');
     }
 
     if ($oldversion < 2020021914) {
 
-        // Define table local_a11y_check to be dropped.
         $table = new xmldb_table('local_a11y_check_courses');
 
-        // Conditionally launch drop table for local_a11y_check.
         if ($dbman->table_exists($table)) {
             $dbman->drop_table($table);
         }
 
-        // A11y_check savepoint reached.
         upgrade_plugin_savepoint(true, 2020021914, 'local', 'a11y_check');
+    }
+
+    if ($oldversion < 2021061502) {
+
+        $table = new xmldb_table('local_a11y_check_type_pdf');
+        $hasoutlinefield = new xmldb_field('hasoutline', XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        $hasbookmarksfield = new xmldb_field('hasbookmarks', XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+        $pagecountfield = new xmldb_field('pagecount', XMLDB_TYPE_INTEGER, '5', null, null, null, null);
+        $istaggedfield = new xmldb_field('istagged', XMLDB_TYPE_INTEGER, '1', null, null, null, null);
+
+        if (!$dbman->field_exists($table, $istaggedfield)) {
+            $dbman->add_field($table, $istaggedfield);
+        }
+
+        if (!$dbman->field_exists($table, $pagecountfield)) {
+            $dbman->add_field($table, $pagecountfield);
+        }
+
+        if ($dbman->field_exists($table, $hasoutlinefield)) {
+            $dbman->rename_field($table, $hasoutlinefield, $hasbookmarksfield);
+        }
+
+        upgrade_plugin_savepoint(true, 2021061502, 'local', 'a11y_check');
     }
 
     return true;

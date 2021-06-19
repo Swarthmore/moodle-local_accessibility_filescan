@@ -68,7 +68,7 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
                 }
 
                 if (in_array('OL', $a11ytokens)) {
-                    $a11ycheck->hasoutline = 1;
+                    $a11ycheck->hasbookmarks = 1;
                 }
 
                 if (in_array('LN', $a11ytokens)) {
@@ -80,7 +80,7 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
                 }
 
                 $this->assertEquals($a11ycheck->hastitle, $results->hastitle);
-                $this->assertEquals($a11ycheck->hasoutline, $results->hasoutline);
+                $this->assertEquals($a11ycheck->hasbookmarks, $results->hasbookmarks);
                 $this->assertEquals($a11ycheck->haslanguage, $results->haslanguage);
                 $this->assertEquals($a11ycheck->hastext, $results->hastext);
             }

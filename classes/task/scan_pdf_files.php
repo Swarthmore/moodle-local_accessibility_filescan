@@ -50,7 +50,6 @@ class scan_pdf_files extends \core\task\scheduled_task {
 
         $pluginconfig = get_config('local_a11y_check');
         $maxfilesize = $pluginconfig->max_file_size_mb;
-        $uselocalscan = $pluginconfig->use_local_scan;
         $files = \local_a11y_check\pdf::get_pdf_files();
         $fs = get_file_storage();
 
@@ -62,6 +61,9 @@ class scan_pdf_files extends \core\task\scheduled_task {
 
             mtrace('Scanning: ' . $ref->pathnamehash);
 
+            // TODO: Save the file to a tmp directory. We need to do this because pdftotext expects a filepath to the file.
+            // Moodle intentionally does not provide an API to get a file's path on disk, so we must create one.
+            // TODO: Delete the created temp file.
             $file = $fs->get_file_by_hash($ref->pathnamehash);
             $contenthash = $ref->contenthash;
             $scanid = $ref->scanid;

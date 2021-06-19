@@ -93,7 +93,9 @@ class pdf {
             . "SET hastext={$payload->hastext},"
             . "hastitle={$payload->hastitle},"
             . "haslanguage={$payload->haslanguage},"
-            . "hasoutline={$payload->hasoutline}\n"
+            . "hasbookmarks={$payload->hasbookmarks},"
+            . "istagged={$payload->istagged},"
+            . "pagecount={$payload->pagecount}\n"
             . "WHERE contenthash='{$contenthash}'";
 
         $DB->execute($sql);
@@ -158,7 +160,7 @@ class pdf {
     public static function eval_a11y_status($result) {
         if (
             boolval($result->hastext)
-            && boolval($result->hasoutline)
+            && boolval($result->istagged)
             && boolval($result->hastitle)
             && boolval($result->haslanguage)
         ) {

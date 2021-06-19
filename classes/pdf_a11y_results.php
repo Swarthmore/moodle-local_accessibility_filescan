@@ -33,14 +33,17 @@ class pdf_a11y_results {
     /**
      * Constructor function
      * @param int $text
-     * @param int $outline
+     * @param int $bookmarks
      * @param int $title
      * @param int $language
+     * @param int $istagged
      */
-    public function __construct($text = 0, $outline = 0, $title = 0, $language = 0) {
+    public function __construct($text = 0, $bookmarks = 0, $title = 0, $language = 0, $istagged = 0, $pagecount = 0) {
         $this->hastext = $text;
-        $this->hasoutline = $outline;
+        $this->hasbookmarks = $bookmarks;
         $this->hastitle = $title;
         $this->haslanguage = $language;
+        $this->istagged = $istagged;
+        $this->pagecount = $pagecount;
     }
 }
