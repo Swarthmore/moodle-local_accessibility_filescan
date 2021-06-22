@@ -103,6 +103,19 @@ class pdf {
         return true;
     }
 
+    public static function update_scan_status($scanid, $status) {
+        global $DB;
+        $now = time();
+        $sql = "UPDATE {local_a11y_check}\n"
+        . "SET status={$status},"
+        . "lastchecked={$now}\n"
+        . "WHERE id='{$scanid}'";
+
+        $DB->execute($sql);
+
+        return true;
+    }
+
     /**
      * Create the scan and result record for a single PDF.
      * @param \stdClass $file The partial SQL file record containing contenthash and filesize

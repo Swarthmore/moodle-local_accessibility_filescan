@@ -63,15 +63,13 @@ class scan_pdf_files extends \core\task\scheduled_task {
 
             mtrace('Scanning: ' . $ref->pathnamehash);
 
-            // TODO: Save the file to a tmp directory. We need to do this because pdftotext expects a filepath to the file.
-            // Moodle intentionally does not provide an API to get a file's path on disk, so we must create one.
-            // TODO: Delete the created temp file.
             $file = $fs->get_file_by_hash($ref->pathnamehash);
             $contenthash = $ref->contenthash;
             $scanid = $ref->scanid;
             $fh = $file->get_content_file_handle();
             $content = $file->get_content();
 
+            // Moodle intentionally does not provide an API to get a file's path on disk, so we must create one.
             // The temp filepath of the pdf.
             $tmp = $CFG->dataroot . '/temp/filestorage/' . $ref->pathnamehash . '.pdf';
             file_put_contents($tmp, $content);
@@ -81,7 +79,8 @@ class scan_pdf_files extends \core\task\scheduled_task {
                 $results = \local_a11y_check\pdf_scanner::scan($tmp);
                 $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $results);
                 $a11ystatus = \local_a11y_check\pdf::eval_a11y_status($results);
-                // TODO: Update the record with the $a11ystatus.
+                // Update the record with the $a11ystatus.
+                \local_a11y_check\pdf::update_scan_status($scanid, $a11ystatus);
             } catch (\Exception $e) {
                 mtrace($e->getMessage());
                 continue;
