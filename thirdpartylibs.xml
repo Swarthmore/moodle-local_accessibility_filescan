@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <libraries>
     <library>
-        <location>vendor/smalot/pdfparser/</location>
+        <location>lib/smalot/pdfparser/</location>
         <name>pdfparser</name>
         <version>v1.0.0</version>
         <license>LGPL</license>
