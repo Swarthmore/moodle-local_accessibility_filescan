@@ -103,8 +103,15 @@ class pdf {
         return true;
     }
 
+    /**
+     * Update scan status for given scanid
+     * @param int $scanid
+     * @param int $status
+     * @return boolean
+     */
     public static function update_scan_status($scanid, $status) {
         global $DB;
+
         $now = time();
         $sql = "UPDATE {local_a11y_check}\n"
         . "SET status={$status},"

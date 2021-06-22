@@ -37,6 +37,7 @@ class pdf_a11y_results {
      * @param int $title
      * @param int $language
      * @param int $istagged
+     * @param int $pagecount
      */
     public function __construct($text = 0, $bookmarks = 0, $title = 0, $language = 0, $istagged = 0, $pagecount = 0) {
         $this->hastext = $text;
