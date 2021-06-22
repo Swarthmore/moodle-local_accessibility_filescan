@@ -48,6 +48,8 @@ class scan_pdf_files extends \core\task\scheduled_task {
      */
     public function execute() {
 
+        global $CFG;
+
         $pluginconfig = get_config('local_a11y_check');
         $maxfilesize = $pluginconfig->max_file_size_mb;
         $files = \local_a11y_check\pdf::get_pdf_files();
@@ -70,15 +72,22 @@ class scan_pdf_files extends \core\task\scheduled_task {
             $fh = $file->get_content_file_handle();
             $content = $file->get_content();
 
+            // The temp filepath of the pdf.
+            $tmp = $CFG->dataroot . '/temp/filestorage/' . $ref->pathnamehash . '.pdf';
+            file_put_contents($tmp, $content);
+
             // Use the scanner to scan the file.
             try {
-                $results = \local_a11y_check\pdf_scanner::scan($content);
+                $results = \local_a11y_check\pdf_scanner::scan($tmp);
                 $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $results);
                 $a11ystatus = \local_a11y_check\pdf::eval_a11y_status($results);
                 // TODO: Update the record with the $a11ystatus.
             } catch (\Exception $e) {
                 mtrace($e->getMessage());
                 continue;
+            } finally {
+                // Delete the tmp file.
+                unlink($tmp);
             }
         }
     }

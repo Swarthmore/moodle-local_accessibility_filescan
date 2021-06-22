@@ -26,7 +26,7 @@ namespace local_a11y_check;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . "/../vendor/autoload.php");
+require_once(dirname(__FILE__) . "/../lib/smalot/pdfparser/alt_autoload.php-dist");
 require_once(dirname(__FILE__) . "/pdf_a11y_results.php");
 
 /**
@@ -55,7 +55,7 @@ class pdf_scanner {
         }
 
         // Get the hastext status.
-        $text = self::get_pdftext($file, $pagecount);
+        $text = self::get_pdftext($file, $results->pagecount === 0 ? 1 : $results->pagecount);
         $results->hastext = intval($text && count($text) > 1);
 
         // Get the haslanguage status.

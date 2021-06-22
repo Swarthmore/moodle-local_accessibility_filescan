@@ -15,8 +15,6 @@ This plugin consists of a scheduled task that looks for PDFs within courses, eva
 
 ### From the command line 
 
-```sh
-MOODLE=/path/to/moodle
-REPO=https://github.com/Swarthmore/moodle-local_a11y_check
-git clone $REPO $MOODLE/local/a11y_check
+```bash
+git clone https://github.com/Swarthmore/moodle-local_a11y_check /moodle/root/dir/local/a11y_check
 ```
