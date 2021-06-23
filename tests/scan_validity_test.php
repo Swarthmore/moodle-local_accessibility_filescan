@@ -56,6 +56,8 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
             $file = basename($pdf);
             $filename = explode('.pdf', $file)[0];
 
+            mtrace("Scanning" . $filename);
+
             if (strpos($filename, '-') !== false) {
 
                 $a11ytokens = explode('-', explode('_', $filename)[1]);

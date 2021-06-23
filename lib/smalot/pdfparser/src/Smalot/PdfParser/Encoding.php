@@ -154,6 +154,7 @@ class Encoding extends PDFObject
     {
         // Load reference table charset.
         $baseEncoding = preg_replace('/[^A-Z0-9]/is', '', $this->get('BaseEncoding')->getContent());
+
         $className = '\\Smalot\\PdfParser\\Encoding\\'.$baseEncoding;
 
         if (!class_exists($className)) {
