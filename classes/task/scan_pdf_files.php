@@ -66,7 +66,7 @@ class scan_pdf_files extends \core\task\scheduled_task {
                     mtrace("File has already been scanned.");
                     continue;
                 }
-              
+
                 mtrace('Scanning: ' . $ref->pathnamehash);
 
                 $file = $fs->get_file_by_hash($ref->pathnamehash);
