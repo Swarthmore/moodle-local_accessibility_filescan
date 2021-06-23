@@ -67,68 +67,74 @@ class scan_pdf_files extends \core\task\scheduled_task {
         $files = \local_a11y_check\pdf::get_pdf_files();
         $fs = get_file_storage();
 
-        if (!is_array($files) || count($files) <= 0) {
-            die();
-        }
+        if (is_array($files) && count($files) > 0) {
+            foreach ($files as $ref) {
 
-        foreach ($files as $ref) {
+                mtrace('Scanning: ' . $ref->pathnamehash);
 
-            mtrace('Scanning: ' . $ref->pathnamehash);
+                $file = $fs->get_file_by_hash($ref->pathnamehash);
+                $contenthash = $ref->contenthash;
+                $scanid = $ref->scanid;
+                $fh = $file->get_content_file_handle();
+                $content = $file->get_content();
 
-            $file = $fs->get_file_by_hash($ref->pathnamehash);
-            $contenthash = $ref->contenthash;
-            $scanid = $ref->scanid;
-            $fh = $file->get_content_file_handle();
-            $content = $file->get_content();
+                // Get the scan status before actually scanning.
+                $scanstatus = \local_a11y_check\pdf::get_scan_status($scanid);
 
-            $payload = new \stdClass();
-            $payload->hastext = 0;
-            $payload->hastitle = 0;
-            $payload->haslanguage = 0;
-            $payload->hasoutline = 0;
-
-            if ($uselocalscan) {
-                try {
-                    $results = \local_a11y_check\localscanner::scan($content);
-                    if ($results->hastitle) {
-                        $payload->hastitle = 1;
-                    }
-                    if ($results->hasoutline) {
-                        $payload->hasoutline = 1;
-                    }
-                    if ($results->haslanguage) {
-                        $payload->haslanguage = 1;
-                    }
-                    if ($results->hastext) {
-                        $payload->hastext = 1;
-                    }
-                    $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
-                } catch (\Exception $e) {
-                    mtrace('Caught exception: ' . $e->getMessage());
+                // If the file has already been scanned, skip it.
+                if ($scanstatus != LOCAL_A11Y_CHECK_STATUS_UNCHECKED && $scanstatus != LOCAL_A11Y_CHECK_STATUS_ERROR) {
+                    mtrace("File has already been scanned.");
                     continue;
                 }
-            } else {
-                try {
-                    $res = \local_a11y_check\remotescan::scan($apiurl, $file, $contenthash);
-                    if ((int) $res["application/json"]["hasText"]) {
-                        $payload->hastext = 1;
+
+                $payload = new \stdClass();
+                $payload->hastext = 0;
+                $payload->hastitle = 0;
+                $payload->haslanguage = 0;
+                $payload->hasoutline = 0;
+
+                if ($uselocalscan) {
+                    try {
+                        $results = \local_a11y_check\localscanner::scan($content);
+                        if ($results->hastitle) {
+                            $payload->hastitle = 1;
+                        }
+                        if ($results->hasoutline) {
+                            $payload->hasoutline = 1;
+                        }
+                        if ($results->haslanguage) {
+                            $payload->haslanguage = 1;
+                        }
+                        if ($results->hastext) {
+                            $payload->hastext = 1;
+                        }
+                        $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
+                    } catch (\Exception $e) {
+                        mtrace('Caught exception: ' . $e->getMessage());
+                        continue;
                     }
-                    if ($res["application/json"]["title"]) {
-                        $payload->hastitle = 1;
+                } else {
+                    try {
+                        $res = \local_a11y_check\remotescan::scan($apiurl, $file, $contenthash);
+                        if ((int) $res["application/json"]["hasText"]) {
+                            $payload->hastext = 1;
+                        }
+                        if ($res["application/json"]["title"]) {
+                            $payload->hastitle = 1;
+                        }
+                        if ($res["application/json"]["language"]) {
+                            $payload->haslanguage = 1;
+                        }
+                        if ((int) $res["application/json"]["hasOutline"]) {
+                            $payload->hasoutline = 1;
+                        }
+                        $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
+                    } catch (\Exception $e) {
+                        mtrace($e->getMessage());
+                        continue;
                     }
-                    if ($res["application/json"]["language"]) {
-                        $payload->haslanguage = 1;
-                    }
-                    if ((int) $res["application/json"]["hasOutline"]) {
-                        $payload->hasoutline = 1;
-                    }
-                    $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
-                } catch (\Exception $e) {
-                    mtrace($e->getMessage());
-                    continue;
                 }
             }
         }
     }
-
 }

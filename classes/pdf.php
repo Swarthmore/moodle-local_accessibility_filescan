@@ -125,7 +125,7 @@ class pdf {
         $scanrecord->lastchecked = 0;
 
         // Determine if PDF is too big to scan.
-        // Moodle file sizes are stored as bytes in the database
+        // Moodle file sizes are stored as bytes in the database.
         // Max file size setting is in megabytes (MB).
         $maxfilesize = (int) get_config("local_a11y_check", "max_file_size_mb");
         if ($file->filesize > $maxfilesize * 1000000) {
@@ -157,6 +157,29 @@ class pdf {
         }
 
         return true;
+    }
+
+    /**
+     * Get the scan status of a file.
+     * @param int $scanid The scanid of the file.
+     * @param int $limit The limit of records to return. Optional.
+     * @return int
+     */
+    public static function get_scan_status($scanid, $limit = 5000) {
+        global $DB;
+        $sql = "SELECT c.status, c.statustext
+            FROM {local_a11y_check} c
+            WHERE c.id = {$scanid}
+        ";
+        $records = $DB->get_records_sql($sql, null, 0, $limit);
+        if (!$records) {
+            mtrace("No scan records found for id " . $scanid);
+            return LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
+        } else {
+            // Get the first value in the array.
+            $record = reset($records);
+            return $record->status;
+        }
     }
 
     /**
