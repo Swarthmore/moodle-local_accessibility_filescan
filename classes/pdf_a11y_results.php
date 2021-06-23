@@ -15,17 +15,36 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for local_a11y_check
+ * Result class for local_a11y_check
  *
  * @package   local_a11y_check
  * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_a11y_check;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021062300;
-$plugin->requires  = 2021051700;
-$plugin->component = 'local_a11y_check';
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = 'v0.0.1';
+/**
+ * A class to standardize a11y results for pdfs
+ */
+class pdf_a11y_results {
+    /**
+     * Constructor function
+     * @param int $text
+     * @param int $bookmarks
+     * @param int $title
+     * @param int $language
+     * @param int $istagged
+     * @param int $pagecount
+     */
+    public function __construct($text = 0, $bookmarks = 0, $title = 0, $language = 0, $istagged = 0, $pagecount = 0) {
+        $this->hastext = $text;
+        $this->hasbookmarks = $bookmarks;
+        $this->hastitle = $title;
+        $this->haslanguage = $language;
+        $this->istagged = $istagged;
+        $this->pagecount = $pagecount;
+    }
+}

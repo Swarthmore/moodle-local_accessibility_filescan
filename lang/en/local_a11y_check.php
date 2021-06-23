@@ -26,19 +26,7 @@ defined('MOODLE_INTERNAL') || die;
 
 $string['pdf:find_files_task'] = 'Find unscanned PDF files';
 $string['pdf:scan_files_task'] = 'Scan PDF files';
-$string['pluginname'] = 'Accessibility Check';
-
-// Reserved for settings.
-$string['settings:api_url'] = 'External service endpoint';
-$string['settings:api_url_desc'] = 'URL to post files for accessibility scanning (e.g. https://example.edu/filescan)';
-
-$string['settings:api_token'] = 'External service token';
-$string['settings:api_token_desc'] = 'The external service token';
-
-$string['settings:use_local_scan'] = 'Use local scan service';
-$string['settings:use_local_scan_desc'] = 'Check this box to scan files locally as a cron task. If this option is enabled,' .
-    ' any value in the api url field will be ignored. This setting may adversely affect the performance of your server so use' .
-    ' with caution.';
+$string['pluginname'] = 'A11y Check';
 
 $string['settings:files_per_cron'] = 'Batch size';
 $string['settings:files_per_cron_desc'] = 'Maximum number of files to scan per cron job';

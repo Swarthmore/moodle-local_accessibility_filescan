@@ -48,38 +48,18 @@ class scan_pdf_files extends \core\task\scheduled_task {
      */
     public function execute() {
 
+        global $CFG;
+
         $pluginconfig = get_config('local_a11y_check');
-        $apiurl = $pluginconfig->api_url;
-        $apitoken = $pluginconfig->api_token;
         $maxfilesize = $pluginconfig->max_file_size_mb;
-        $uselocalscan = $pluginconfig->use_local_scan;
-
-        if (!$uselocalscan && !$apiurl) {
-            mtrace("API url setting is missing!");
-            die();
-        }
-
-        if (!$uselocalscan && !$apitoken) {
-            mtrace("API token setting is missing!");
-            die();
-        }
-
         $files = \local_a11y_check\pdf::get_pdf_files();
         $fs = get_file_storage();
 
         if (is_array($files) && count($files) > 0) {
             foreach ($files as $ref) {
 
-                mtrace('Scanning: ' . $ref->pathnamehash);
-
-                $file = $fs->get_file_by_hash($ref->pathnamehash);
-                $contenthash = $ref->contenthash;
-                $scanid = $ref->scanid;
-                $fh = $file->get_content_file_handle();
-                $content = $file->get_content();
-
                 // Get the scan status before actually scanning.
-                $scanstatus = \local_a11y_check\pdf::get_scan_status($scanid);
+                $scanstatus = \local_a11y_check\pdf::get_scan_status($ref->scanid);
 
                 // If the file has already been scanned, skip it.
                 if ($scanstatus != LOCAL_A11Y_CHECK_STATUS_UNCHECKED && $scanstatus != LOCAL_A11Y_CHECK_STATUS_ERROR) {
@@ -87,52 +67,31 @@ class scan_pdf_files extends \core\task\scheduled_task {
                     continue;
                 }
 
-                $payload = new \stdClass();
-                $payload->hastext = 0;
-                $payload->hastitle = 0;
-                $payload->haslanguage = 0;
-                $payload->hasoutline = 0;
+                mtrace('Scanning: ' . $ref->pathnamehash);
 
-                if ($uselocalscan) {
-                    try {
-                        $results = \local_a11y_check\localscanner::scan($content);
-                        if ($results->hastitle) {
-                            $payload->hastitle = 1;
-                        }
-                        if ($results->hasoutline) {
-                            $payload->hasoutline = 1;
-                        }
-                        if ($results->haslanguage) {
-                            $payload->haslanguage = 1;
-                        }
-                        if ($results->hastext) {
-                            $payload->hastext = 1;
-                        }
-                        $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
-                    } catch (\Exception $e) {
-                        mtrace('Caught exception: ' . $e->getMessage());
-                        continue;
-                    }
-                } else {
-                    try {
-                        $res = \local_a11y_check\remotescan::scan($apiurl, $file, $contenthash);
-                        if ((int) $res["application/json"]["hasText"]) {
-                            $payload->hastext = 1;
-                        }
-                        if ($res["application/json"]["title"]) {
-                            $payload->hastitle = 1;
-                        }
-                        if ($res["application/json"]["language"]) {
-                            $payload->haslanguage = 1;
-                        }
-                        if ((int) $res["application/json"]["hasOutline"]) {
-                            $payload->hasoutline = 1;
-                        }
-                        $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $payload);
-                    } catch (\Exception $e) {
-                        mtrace($e->getMessage());
-                        continue;
-                    }
+                $file = $fs->get_file_by_hash($ref->pathnamehash);
+                $contenthash = $ref->contenthash;
+                $fh = $file->get_content_file_handle();
+                $content = $file->get_content();
+
+                // Moodle intentionally does not provide an API to get a file's path on disk, so we must create one.
+                // The temp filepath of the pdf.
+                $tmp = $CFG->dataroot . '/temp/filestorage/' . $ref->pathnamehash . '.pdf';
+                file_put_contents($tmp, $content);
+
+                // Use the scanner to scan the file.
+                try {
+                    $results = \local_a11y_check\pdf_scanner::scan($tmp);
+                    $updatedrecord = \local_a11y_check\pdf::update_scan_record($contenthash, $results);
+                    $a11ystatus = \local_a11y_check\pdf::eval_a11y_status($results);
+                    // Update the record with the $a11ystatus.
+                    \local_a11y_check\pdf::update_scan_status($scanid, $a11ystatus);
+                } catch (\Exception $e) {
+                    mtrace($e->getMessage());
+                    continue;
+                } finally {
+                    // Delete the tmp file.
+                    unlink($tmp);
                 }
             }
         }

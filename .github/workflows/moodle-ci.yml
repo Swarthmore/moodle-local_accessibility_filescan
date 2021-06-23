@@ -32,6 +32,9 @@ jobs:
         database: [pgsql, mariadb]
 
     steps:
+      - name: Install poppler-utils
+        run: sudo apt-get update && sudo apt-get install poppler-utils
+
       - name: Check out repository code
         uses: actions/checkout@v2
         with:
@@ -59,7 +62,6 @@ jobs:
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
-          IGNORE_PATHS: "vendor"
 
       - name: PHP Lint
         if: ${{ always() }}

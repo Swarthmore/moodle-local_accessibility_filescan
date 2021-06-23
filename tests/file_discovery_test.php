@@ -47,9 +47,9 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
     public function test_file_discovery() {
         $this->resetAfterTest(true);
         $this->pdfhelper = new \local_a11y_check\pdf();
-        $this->task      = new \local_a11y_check\task\find_pdf_files();
-        $this->course    = $this->getDataGenerator()->create_course(array('shortname' => 'testcourse'));
-        $this->page      = $this->getDataGenerator()->create_module('page', array('course' => $this->course->id));
+        $this->task = new \local_a11y_check\task\find_pdf_files();
+        $this->course = $this->getDataGenerator()->create_course(array('shortname' => 'testcourse'));
+        $this->page = $this->getDataGenerator()->create_module('page', array('course' => $this->course->id));
 
         $this->add_garbage_files();
 
@@ -107,11 +107,11 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
             $uniquetext = (string) time() . (string) $this->filesadded;
             $record->contextid = $record->contextid ?? context_module::instance($this->page->cmid)->id;
             $record->component = $record->component ?? 'local_a11y_check';
-            $record->filearea  = $record->filearea ?? 'local_a11y_check_test_files';
-            $record->itemid    = $record->itemid ?? $i;
-            $record->filepath  = $record->filepath ?? '/';
-            $record->filename  = $record->filename ?? 'local_a11y_check_test_file_' . $uniquetext . '.pdf';
-            $record->mimetype  = $record->mimetype ?? 'application/pdf';
+            $record->filearea = $record->filearea ?? 'local_a11y_check_test_files';
+            $record->itemid = $record->itemid ?? $i;
+            $record->filepath = $record->filepath ?? '/';
+            $record->filename = $record->filename ?? 'local_a11y_check_test_file_' . $uniquetext . '.pdf';
+            $record->mimetype = $record->mimetype ?? 'application/pdf';
             $fs->create_file_from_string($record, $uniquetext);
             $this->filesadded++;
         }
@@ -119,11 +119,11 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
         $record = (object) array(
             'contextid' => context_module::instance($this->page->cmid)->id,
             'component' => 'local_a11y_check',
-            'filearea'  => 'local_a11y_check_test_files',
-            'itemid'    => $i,
-            'filepath'  => '/',
-            'filename'  => 'local_a11y_check_test_file_empty.pdf',
-            'mimetype'  => 'application/pdf',
+            'filearea' => 'local_a11y_check_test_files',
+            'itemid' => $i,
+            'filepath' => '/',
+            'filename' => 'local_a11y_check_test_file_empty.pdf',
+            'mimetype' => 'application/pdf',
         );
         $fs->create_file_from_string($record, '');
         $this->filesadded++;
@@ -141,11 +141,11 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
             $record = (object) array(
                 'contextid' => context_module::instance($this->page->cmid)->id,
                 'component' => 'local_a11y_check',
-                'filearea'  => 'local_a11y_check_test_files',
-                'itemid'    => $i,
-                'filepath'  => '/',
-                'filename'  => 'local_a11y_check_test_file_' . $uniquetext . '.pdf',
-                'mimetype'  => 'application/pdf',
+                'filearea' => 'local_a11y_check_test_files',
+                'itemid' => $i,
+                'filepath' => '/',
+                'filename' => 'local_a11y_check_test_file_' . $uniquetext . '.pdf',
+                'mimetype' => 'application/pdf',
             );
             $fs->create_file_from_string($record, $uniquetext);
             $this->filesadded++;
