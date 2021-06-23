@@ -57,17 +57,16 @@ class scan_pdf_files extends \core\task\scheduled_task {
 
         if (is_array($files) && count($files) > 0) {
             foreach ($files as $ref) {
+                mtrace("Scanning $ref->pathnamehash");
 
                 // Get the scan status before actually scanning.
                 $scanstatus = \local_a11y_check\pdf::get_scan_status($ref->scanid);
 
                 // If the file has already been scanned, skip it.
                 if ($scanstatus != LOCAL_A11Y_CHECK_STATUS_UNCHECKED && $scanstatus != LOCAL_A11Y_CHECK_STATUS_ERROR) {
-                    mtrace("File has already been scanned.");
+                    mtrace("Skipping scan for $ref->pathnamehash because it has a scanstatus of $scanstatus");
                     continue;
                 }
-
-                mtrace('Scanning: ' . $ref->pathnamehash);
 
                 $file = $fs->get_file_by_hash($ref->pathnamehash);
                 $contenthash = $ref->contenthash;
@@ -87,7 +86,10 @@ class scan_pdf_files extends \core\task\scheduled_task {
                     // Update the record with the $a11ystatus.
                     \local_a11y_check\pdf::update_scan_status($scanid, $a11ystatus);
                 } catch (\Exception $e) {
-                    mtrace($e->getMessage());
+                    mtrace("Encountered error while scanning $ref->pathnamehash: $e->getMessage()");
+                    // If there is an error scanning the file, set the status appropriately so the file does not get scanned again.
+                    $err = new \local_a11y_check\pdf_a11y_results();
+                    \local_a11y_check\pdf::update_scan_status($ref->scanid, LOCAL_A11Y_CHECK_STATUS_IGNORE, $e->getMessage());
                     continue;
                 } finally {
                     // Delete the tmp file.

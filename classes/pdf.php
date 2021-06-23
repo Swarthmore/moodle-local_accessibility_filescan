@@ -107,14 +107,16 @@ class pdf {
      * Update scan status for given scanid
      * @param int $scanid
      * @param int $status
+     * @param string|null $statustext
      * @return boolean
      */
-    public static function update_scan_status($scanid, $status) {
+    public static function update_scan_status($scanid, $status, $statustext = null) {
         global $DB;
 
         $now = time();
         $sql = "UPDATE {local_a11y_check}\n"
         . "SET status={$status},"
+        . "statustext='{$statustext}',"
         . "lastchecked={$now}\n"
         . "WHERE id='{$scanid}'";
 
