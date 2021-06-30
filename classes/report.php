@@ -32,7 +32,8 @@ require_once(dirname(__FILE__) . '/../locallib.php');
  * Report generator functions.
  */
 class report {
-    public static function generate_report() {
+    
+    public static function generate_report($limit = 1000) {
         global $DB;
         $sql = "SELECT f.scanid, f.contenthash as contenthash,"
             . "f.pathnamehash as pathnamehash, f.hastext, f.hastitle, f.haslanguage,"
@@ -41,8 +42,43 @@ class report {
             . "FROM {local_a11y_check_type_pdf} f "
             . "INNER JOIN {local_a11y_check} c ON c.id = f.scanid "
             . "INNER JOIN {files} files ON files.contenthash=f.contenthash";
-        $limit = 1000;
         $files = $DB->get_records_sql($sql, null, 0, $limit);
         return $files;
     }
+
+    /**
+     * Provides a download URL to a generated CSV report.
+     * @param string $outputpath
+     * @return string
+     */
+    public static function generate_csv() {
+        
+        global $CFG;
+
+        $report = self::generate_report();
+        $fields = array(
+            array('Filename', 'Has Text', 'Has Title', 'Has Language', 'Is Tagged', 'Page Count')
+        );
+        foreach ($report as $row) {
+            $csvrow = array(
+                $row->filename,
+                $row->hastext,
+                $row->hastitle,
+                $row->haslanguage,
+                $row->istagged,
+                $row->pagecount
+            );
+            array_push($fields, $csvrow);
+        }
+        $now = (string) time();
+        $filename = $now . '_a11y-check-pdfs.csv';
+        $filepath = $CFG->dataroot . '/temp/filestorage/' . $filename;
+        $fh = fopen($filepath, 'w');
+        foreach ($fields as $row) {
+            fputcsv($fh, $row);
+        }
+        fclose($fh);
+        return $fields;
+    }
+
 }
