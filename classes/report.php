@@ -15,17 +15,34 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for local_a11y_check
+ * PDF helper functions local_a11y_check
  *
  * @package   local_a11y_check
  * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_a11y_check;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021062901;
-$plugin->requires  = 2021051700;
-$plugin->component = 'local_a11y_check';
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = 'v0.0.1';
+require_once(dirname(__FILE__) . '/../locallib.php');
+
+/**
+ * Report generator functions.
+ */
+class report {
+    public static function generate_report() {
+        global $DB;
+        $sql = "SELECT f.scanid, f.contenthash as contenthash,"
+            . "f.pathnamehash as pathnamehash, f.hastext, f.hastitle, f.haslanguage,"
+            . "f.istagged, f.pagecount, f.hasbookmarks, c.status, c.statustext,"
+            . "c.lastchecked, files.filename "
+            . "FROM {local_a11y_check_type_pdf} f "
+            . "INNER JOIN {local_a11y_check} c ON c.id = f.scanid "
+            . "INNER JOIN {files} files ON files.contenthash=f.contenthash";
+        $limit = 1000;
+        $files = $DB->get_records_sql($sql, null, 0, $limit);
+        return $files;
+    }
+}
