@@ -33,6 +33,11 @@ require_once(dirname(__FILE__) . '/../locallib.php');
  */
 class report {
     
+    /**
+     * Returns an array of all scanned files.
+     * @param number $limit
+     * @return array
+     */
     public static function generate_report($limit = 1000) {
         global $DB;
         $sql = "SELECT f.scanid, f.contenthash as contenthash,"
