@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This page handles a general overview of PDF accessibility issues. 
+ * This page handles a general overview of PDF accessibility issues.
  *
  * @package   local_a11y_check
  * @copyright 2021 Swarthmore College
