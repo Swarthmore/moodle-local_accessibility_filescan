@@ -32,7 +32,7 @@ require_once(dirname(__FILE__) . '/../locallib.php');
  * Report generator functions.
  */
 class report {
-    
+
     /**
      * Returns an array of all scanned files.
      * @param number $limit
@@ -53,11 +53,10 @@ class report {
 
     /**
      * Provides a download URL to a generated CSV report.
-     * @param string $outputpath
      * @return string
      */
     public static function generate_csv() {
-        
+
         global $CFG;
 
         $report = self::generate_report();
