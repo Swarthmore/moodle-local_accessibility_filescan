@@ -21,4 +21,16 @@ git clone https://github.com/Swarthmore/moodle-local_a11y_check /moodle/root/dir
 
 ### A11y Report
 
-To view the a11y report for scanned PDFs, you must be an administrator for your Moodle instance. Head to `/local/a11y_check/views/report.php` to view.
+This plugin provides the following endpoints to Moodle administrators. All URLs should be prefixed by your Moodle base URL (ie. https://moodle.mycollege.edu)
+
+#### Provides details about scanned PDFs and their accessibility score.
+
+```
+/local/a11y_check/views/report.php
+```
+
+#### Download a CSV report containing scanned PDFs and their accessibility score.
+
+```
+/local/a11y_check/views/download_report.php
+```
