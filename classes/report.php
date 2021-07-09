@@ -50,7 +50,7 @@ class report {
         $rs = $DB->get_recordset_sql($sql, null, 0, $limit);
         $files = array();
         foreach ($rs as $record) {
-          array_push($files, $record);
+            array_push($files, $record);
         }
         $rs->close();
         return $files;
