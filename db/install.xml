@@ -35,7 +35,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="pdf_scan_id" TYPE="foreign-unique" FIELDS="scanid" REFTABLE="local_a11y_check_scan" REFFIELDS="id"/>
+        <KEY NAME="pdf_scan_id" TYPE="foreign-unique" FIELDS="scanid" REFTABLE="local_a11y_check" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="pdf_contenthash" UNIQUE="true" FIELDS="contenthash"/>
