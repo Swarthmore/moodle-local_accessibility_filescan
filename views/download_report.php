@@ -29,6 +29,19 @@ require_admin();
 
 // This page will provide a URL to download a report containing the PDF scan results.
 // Hitting this URL will create the report on the fly.
-$report = \local_a11y_check\report::generate_csv();
+$filepath = \local_a11y_check\report::generate_csv();
 
-echo "Report created.";
+header('Content-Description: File Transfer');
+header('Content-Type: application/force-download');
+header("Content-Disposition: attachment; filename=\"" . basename($filepath) . "\";");
+header('Content-Transfer-Encoding: binary');
+header('Expires: 0');
+header('Cache-Control: must-revalidate');
+header('Pragma: public');
+header('Content-Length: ' . filesize($filepath));
+ob_clean();
+flush();
+readfile($filepath);
+
+// Destroy the file after the user has downloaded it.
+unlink($filepath);

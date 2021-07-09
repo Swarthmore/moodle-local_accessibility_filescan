@@ -87,7 +87,7 @@ class report {
             fputcsv($fh, $row);
         }
         fclose($fh);
-        return $fields;
+        return $filepath;
     }
 
 }
