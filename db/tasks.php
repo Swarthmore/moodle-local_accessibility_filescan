@@ -44,5 +44,16 @@ $tasks = array(
         'month' => '*',
         'dayofweek' => '*',
         'disabled' => 0
+    ),
+    array(
+        'classname' => 'local_a11y_check\task\clean',
+        'blocking' => 0,
+        'minute' => '*/5',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0,
+        'blocking' => 0
     )
 );

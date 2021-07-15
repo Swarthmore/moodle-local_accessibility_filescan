@@ -32,6 +32,50 @@ require_once(dirname(__FILE__) . '/../locallib.php');
  * PDF helper functions
  */
 class pdf {
+
+    /**
+     * Get all PDF files.
+     * @param int $limit The number of files to process at a time.
+     * @return array
+     */
+    public static function get_all_pdfs($limit = 100000) {
+        global $DB;
+        $sql = "SELECT f.contenthash, f.pathnamehash, MAX(f.filesize) as filesize
+            FROM {files} f
+                INNER JOIN {context} c ON c.id=f.contextid
+                WHERE c.contextlevel = 70
+                AND f.filesize <> 0
+                AND f.mimetype = 'application/pdf'
+                AND f.component <> 'assignfeedback_editpdf'
+                AND f.filearea <> 'stamps'
+            GROUP BY f.contenthash, f.pathnamehash
+            ORDER BY MAX(f.id) DESC";
+        $files = $DB->get_records_sql($sql, null, 0, $limit);
+        !$files ? mtrace("No PDF files found") : "Found " . count($files) . " PDF files";
+        return $files;
+    }
+
+    /**
+     * Get all of the a11y_check records.
+     * @return int $limit
+     */
+    public static function get_all_records($limit = 100000) {
+        global $DB;
+        $sql = "SELECT tp.contenthash as contenthash, c.id as scanid
+            FROM {local_a11y_check_type_pdf} tp
+            INNER JOIN {local_a11y_check} c ON c.id = tp.scanid";
+        $records = $DB->get_records_sql($sql, null, 0, $limit);
+        return $records;
+    }
+
+    /**
+     * Get all of the rows in local_a11y_check_type_pdf that should be deleted.
+     */
+    public static function get_rows_to_delete($limit = 100000) {
+        global $DB;
+        $records = self::get_all_records($limit);
+    }
+
     /**
      * Get all unscanned PDF files.
      * @param int $limit The number of files to process at a time.
