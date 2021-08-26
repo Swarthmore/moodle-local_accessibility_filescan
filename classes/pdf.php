@@ -57,6 +57,7 @@ class pdf {
 
     /**
      * Get all of the a11y_check records.
+     * @param int $limit The number of records to process at a time.
      * @return int $limit
      */
     public static function get_all_records($limit = 100000) {
