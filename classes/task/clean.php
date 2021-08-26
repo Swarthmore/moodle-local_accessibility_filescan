@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This task scans the plugin tables for deleted files. If it
- * finds that a file has been delted, it will delete the record.
+ * Removes deleted records from plugin tables.
  *
  * @package   local_a11y_check
  * @copyright 2021 Swarthmore College

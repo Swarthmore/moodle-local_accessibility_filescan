@@ -70,10 +70,13 @@ class pdf {
 
     /**
      * Remove all rows that that don't have a record in mdl_files (draft context is ignored).
+     * @param int $limit The number of files to process at a time.
+     * @return bool
      */
     public static function remove_deleted_files($limit = 100000) {
         global $DB;
-        // Get all records with a contenthash that exists in the plugin, but does not exist in the mdl_files table (i.e. it was deleted).
+        // Get all records with a contenthash that exists in the plugin, but does not exist in the mdl_files table.
+        // This indicates that the file was deleted.
         // TODO: Someone should check this -- I'm tired and not sure if this is the right way to do it.
         $sql = "SELECT tp.contenthash, tp.scanid
                 FROM {local_a11y_check_type_pdf} tp
@@ -92,7 +95,6 @@ class pdf {
             $DB->delete_records('local_a11y_check_type_pdf', array('contenthash' => $row->contenthash, 'scanid' => $row->scanid));
             $DB->delete_records('local_a11y_check', array('id' => $row->scanid));
         }
-        
         return true;
     }
 
