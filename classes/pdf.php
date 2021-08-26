@@ -89,7 +89,7 @@ class pdf {
                 )";
         $records = $DB->get_records_sql($sql, null, 0, $limit);
 
-        !$records ? mtrace("No PDF files found") : "Found " . count($files) . " PDF files";
+        !$records ? mtrace("0 records marked for deletion.") : count($files) . " records marked for deletion.";
 
         // Iterate over the $todelete records and delete them from the database.
         foreach ($records as $row) {
