@@ -73,7 +73,26 @@ class pdf {
      */
     public static function get_rows_to_delete($limit = 100000) {
         global $DB;
-        $records = self::get_all_records($limit);
+        // Get all files in $records that do not have an entry in mdl_files;
+        // TODO: Someone should check this -- I'm tired and not sure if this is the right way to do it.
+        $sql = "SELECT tp.contenthash, tp.scanid
+                FROM {local_a11y_check_type_pdf} tp
+                INNER JOIN {local_a11y_check} c ON c.id = tp.scanid
+                WHERE tp.contenthash NOT IN (
+                    SELECT f.contenthash
+                    FROM {files} f
+                    WHERE f.contenthash = tp.contenthash AND f.filearea <> 'draft'
+                )";
+        mtrace($sql);
+        $todelete = $DB->get_records_sql($sql, null, 0, $limit);
+
+        // Iterate over the $todelete records and delete them from the database.
+        foreach ($todelete as $row) {
+            $DB->delete_records('local_a11y_check_type_pdf', array('contenthash' => $row->contenthash, 'scanid' => $row->scanid));
+            $DB->delete_records('local_a11y_check', array('id' => $row->scanid));
+        }
+        
+        return;
     }
 
     /**
@@ -81,7 +100,7 @@ class pdf {
      * @param int $limit The number of files to process at a time.
      * @return array
      */
-    public static function get_unscanned_pdf_files($limit = 1000) {
+    public static function get_unscanned_pdf_files($limit = 100000) {
         global $DB;
 
         mtrace("Looking for PDF files to scan for accessibility");

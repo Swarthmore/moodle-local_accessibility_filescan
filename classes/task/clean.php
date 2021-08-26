@@ -49,12 +49,6 @@ class clean extends \core\task\scheduled_task {
      */
     public function execute() {
         global $DB;
-
         \local_a11y_check\pdf::get_rows_to_delete();
-
-        //$lockfactory = \core\lock\lock_config::get_lock_factory('local_a11y_check_clean_task');
-        //$lockkey = "contenthash: {$file->contenthash}";
-
-        return;
     }
 }
