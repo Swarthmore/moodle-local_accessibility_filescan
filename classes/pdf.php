@@ -69,9 +69,9 @@ class pdf {
     }
 
     /**
-     * Get all of the rows in local_a11y_check_type_pdf that should be deleted.
+     * Remove all rows that that don't have a record in mdl_files (draft context is ignored).
      */
-    public static function get_rows_to_delete($limit = 100000) {
+    public static function remove_deleted_files($limit = 100000) {
         global $DB;
         // Get all records with a contenthash that exists in the plugin, but does not exist in the mdl_files table (i.e. it was deleted).
         // TODO: Someone should check this -- I'm tired and not sure if this is the right way to do it.
@@ -83,15 +83,17 @@ class pdf {
                     FROM {files} f
                     WHERE f.contenthash = tp.contenthash AND f.filearea <> 'draft'
                 )";
-        $todelete = $DB->get_records_sql($sql, null, 0, $limit);
+        $records = $DB->get_records_sql($sql, null, 0, $limit);
+
+        !$records ? mtrace("No PDF files found") : "Found " . count($files) . " PDF files";
 
         // Iterate over the $todelete records and delete them from the database.
-        foreach ($todelete as $row) {
+        foreach ($records as $row) {
             $DB->delete_records('local_a11y_check_type_pdf', array('contenthash' => $row->contenthash, 'scanid' => $row->scanid));
             $DB->delete_records('local_a11y_check', array('id' => $row->scanid));
         }
         
-        return;
+        return true;
     }
 
     /**
