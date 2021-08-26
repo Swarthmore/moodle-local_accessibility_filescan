@@ -48,8 +48,8 @@ $tasks = array(
     array(
         'classname' => 'local_a11y_check\task\clean',
         'blocking' => 0,
-        'minute' => '*/5',
-        'hour' => '*',
+        'minute' => '0',
+        'hour' => '*/2',
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
