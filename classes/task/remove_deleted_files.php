@@ -48,6 +48,7 @@ class clean extends \core\task\scheduled_task {
      */
     public function execute() {
         global $DB;
-        \local_a11y_check\pdf::get_rows_to_delete();
+        \local_a11y_check\pdf::remove_deleted_files();
+        return;
     }
 }

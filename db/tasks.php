@@ -46,7 +46,7 @@ $tasks = array(
         'disabled' => 0
     ),
     array(
-        'classname' => 'local_a11y_check\task\clean',
+        'classname' => 'local_a11y_check\task\remove_deleted_files',
         'blocking' => 0,
         'minute' => '0',
         'hour' => '*/2',
