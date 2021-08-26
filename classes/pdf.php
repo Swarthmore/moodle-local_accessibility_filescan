@@ -73,7 +73,7 @@ class pdf {
      */
     public static function get_rows_to_delete($limit = 100000) {
         global $DB;
-        // Get all files in $records that do not have an entry in mdl_files;
+        // Get all records with a contenthash that exists in the plugin, but does not exist in the mdl_files table (i.e. it was deleted).
         // TODO: Someone should check this -- I'm tired and not sure if this is the right way to do it.
         $sql = "SELECT tp.contenthash, tp.scanid
                 FROM {local_a11y_check_type_pdf} tp
@@ -83,7 +83,6 @@ class pdf {
                     FROM {files} f
                     WHERE f.contenthash = tp.contenthash AND f.filearea <> 'draft'
                 )";
-        mtrace($sql);
         $todelete = $DB->get_records_sql($sql, null, 0, $limit);
 
         // Iterate over the $todelete records and delete them from the database.
