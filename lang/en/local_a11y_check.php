@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die;
 
 $string['pdf:find_files_task'] = 'Find unscanned PDF files';
 $string['pdf:scan_files_task'] = 'Scan PDF files';
+$string['clean_task'] = 'Clean a11y_check tables';
 $string['pluginname'] = 'A11y Check';
 
 $string['settings:files_per_cron'] = 'Batch size';

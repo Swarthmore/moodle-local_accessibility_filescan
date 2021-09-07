@@ -32,12 +32,79 @@ require_once(dirname(__FILE__) . '/../locallib.php');
  * PDF helper functions
  */
 class pdf {
+
+    /**
+     * Get all PDF files.
+     * @param int $limit The number of files to process at a time.
+     * @return array
+     */
+    public static function get_all_pdfs($limit = 100000) {
+        global $DB;
+        $sql = "SELECT f.contenthash, f.pathnamehash, MAX(f.filesize) as filesize
+            FROM {files} f
+                INNER JOIN {context} c ON c.id=f.contextid
+                WHERE c.contextlevel = 70
+                AND f.filesize <> 0
+                AND f.mimetype = 'application/pdf'
+                AND f.component <> 'assignfeedback_editpdf'
+                AND f.filearea <> 'stamps'
+            GROUP BY f.contenthash, f.pathnamehash
+            ORDER BY MAX(f.id) DESC";
+        $files = $DB->get_records_sql($sql, null, 0, $limit);
+        !$files ? mtrace("No PDF files found") : "Found " . count($files) . " PDF files";
+        return $files;
+    }
+
+    /**
+     * Get all of the a11y_check records.
+     * @param int $limit The number of records to process at a time.
+     * @return int $limit
+     */
+    public static function get_all_records($limit = 100000) {
+        global $DB;
+        $sql = "SELECT tp.contenthash as contenthash, c.id as scanid
+            FROM {local_a11y_check_type_pdf} tp
+            INNER JOIN {local_a11y_check} c ON c.id = tp.scanid";
+        $records = $DB->get_records_sql($sql, null, 0, $limit);
+        return $records;
+    }
+
+    /**
+     * Remove all rows that that don't have a record in mdl_files (draft context is ignored).
+     * @param int $limit The number of files to process at a time.
+     * @return bool
+     */
+    public static function remove_deleted_files($limit = 100000) {
+        global $DB;
+        // Get all records with a contenthash that exists in the plugin, but does not exist in the mdl_files table.
+        // This indicates that the file was deleted.
+        // TODO: Someone should check this -- I'm tired and not sure if this is the right way to do it.
+        $sql = "SELECT tp.contenthash, tp.scanid
+                FROM {local_a11y_check_type_pdf} tp
+                INNER JOIN {local_a11y_check} c ON c.id = tp.scanid
+                WHERE tp.contenthash NOT IN (
+                    SELECT f.contenthash
+                    FROM {files} f
+                    WHERE f.contenthash = tp.contenthash AND f.filearea <> 'draft'
+                )";
+        $records = $DB->get_records_sql($sql, null, 0, $limit);
+
+        !$records ? mtrace("0 records marked for deletion.") : count($files) . " records marked for deletion.";
+
+        // Iterate over the $todelete records and delete them from the database.
+        foreach ($records as $row) {
+            $DB->delete_records('local_a11y_check_type_pdf', array('contenthash' => $row->contenthash, 'scanid' => $row->scanid));
+            $DB->delete_records('local_a11y_check', array('id' => $row->scanid));
+        }
+        return true;
+    }
+
     /**
      * Get all unscanned PDF files.
      * @param int $limit The number of files to process at a time.
      * @return array
      */
-    public static function get_unscanned_pdf_files($limit = 1000) {
+    public static function get_unscanned_pdf_files($limit = 100000) {
         global $DB;
 
         mtrace("Looking for PDF files to scan for accessibility");

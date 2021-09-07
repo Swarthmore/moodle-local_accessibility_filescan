@@ -44,5 +44,16 @@ $tasks = array(
         'month' => '*',
         'dayofweek' => '*',
         'disabled' => 0
+    ),
+    array(
+        'classname' => 'local_a11y_check\task\remove_deleted_files',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '*/2',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0,
+        'blocking' => 0
     )
 );

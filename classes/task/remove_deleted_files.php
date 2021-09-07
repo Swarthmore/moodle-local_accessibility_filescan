@@ -15,17 +15,40 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for local_a11y_check
+ * Removes deleted records from plugin tables.
  *
  * @package   local_a11y_check
  * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_a11y_check\task;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021082603;
-$plugin->requires  = 2020110906;
-$plugin->component = 'local_a11y_check';
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = 'v0.0.1';
+/**
+ * Scheduled task to find scan plugin tables for deleted files.
+ *
+ * @package   local_a11y_check
+ * @copyright 2021 Swarthmore College
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class remove_deleted_files extends \core\task\scheduled_task {
+    /**
+     * Get the name of the task.
+     *
+     * @return string the name of the task
+     */
+    public function get_name() {
+        return get_string('clean_task', 'local_a11y_check');
+    }
+
+    /**
+     * Execute the task.
+     */
+    public function execute() {
+        global $DB;
+        \local_a11y_check\pdf::remove_deleted_files();
+        return;
+    }
+}
