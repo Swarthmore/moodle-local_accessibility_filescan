@@ -15,36 +15,40 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Result class for local_a11y_check
+ * Removes deleted records from plugin tables.
  *
  * @package   local_a11y_check
  * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_a11y_check;
+namespace local_a11y_check\task;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * A class to standardize a11y results for pdfs
+ * Scheduled task to find scan plugin tables for deleted files.
+ *
+ * @package   local_a11y_check
+ * @copyright 2021 Swarthmore College
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class pdf_a11y_results {
+class remove_deleted_files extends \core\task\scheduled_task {
     /**
-     * Constructor function
-     * @param int $text
-     * @param int $bookmarks
-     * @param int $title
-     * @param int $language
-     * @param int $istagged
-     * @param int $pagecount
+     * Get the name of the task.
+     *
+     * @return string the name of the task
      */
-    public function __construct($text = 0, $bookmarks = 0, $title = 0, $language = 0, $istagged = 0, $pagecount = 0) {
-        $this->hastext = $text;
-        $this->hasbookmarks = $bookmarks;
-        $this->hastitle = $title;
-        $this->haslanguage = $language;
-        $this->istagged = $istagged;
-        $this->pagecount = $pagecount;
+    public function get_name() {
+        return get_string('clean_task', 'local_a11y_check');
+    }
+
+    /**
+     * Execute the task.
+     */
+    public function execute() {
+        global $DB;
+        \local_a11y_check\pdf::remove_deleted_files();
+        return;
     }
 }
