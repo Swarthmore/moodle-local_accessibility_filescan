@@ -48,7 +48,7 @@ class find_pdf_files extends \core\task\scheduled_task {
      */
     public function execute() {
 
-        $timeout = 5;
+        $timeout = 10;
 
         $offset = 0;
 

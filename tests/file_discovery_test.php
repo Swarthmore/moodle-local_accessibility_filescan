@@ -45,6 +45,10 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
     public $filesadded;
 
     public function test_file_discovery() {
+        // !!
+        // !!IMPORTANT: This test only works if files_cron >= 5
+        // !!
+
         $this->resetAfterTest(true);
         $this->pdfhelper = new \local_a11y_check\pdf();
         $this->task = new \local_a11y_check\task\find_pdf_files();
