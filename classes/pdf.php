@@ -38,7 +38,7 @@ class pdf {
      * @param int $limit The number of files to process at a time.
      * @return array
      */
-    public static function get_all_pdfs($limit = 100000) {
+    public static function get_all_pdfs($limit = 5) {
         global $DB;
         $sql = "SELECT f.contenthash, f.pathnamehash, MAX(f.filesize) as filesize
             FROM {files} f
@@ -60,7 +60,7 @@ class pdf {
      * @param int $limit The number of records to process at a time.
      * @return int $limit
      */
-    public static function get_all_records($limit = 100000) {
+    public static function get_all_records($limit = 5) {
         global $DB;
         $sql = "SELECT tp.contenthash as contenthash, c.id as scanid
             FROM {local_a11y_check_type_pdf} tp
@@ -74,7 +74,7 @@ class pdf {
      * @param int $limit The number of files to process at a time.
      * @return bool
      */
-    public static function remove_deleted_files($limit = 100000) {
+    public static function remove_deleted_files($limit = 5) {
         global $DB;
         // Get all records with a contenthash that exists in the plugin, but does not exist in the mdl_files table.
         // This indicates that the file was deleted.
@@ -105,7 +105,7 @@ class pdf {
      * @param int $limit The number of files to process at a time.
      * @return array
      */
-    public static function get_unscanned_pdf_files(int $offset = 0, int $limit = 100) {
+    public static function get_unscanned_pdf_files(int $offset = 0, int $limit = 5) {
         global $DB;
 
         mtrace("Looking for PDF files to scan for accessibility");
@@ -140,7 +140,7 @@ class pdf {
      * @param int $limit
      * @return array
      */
-    public static function get_pdf_files($limit = 10000) {
+    public static function get_pdf_files($limit = 5) {
 
         global $DB;
 
@@ -281,7 +281,7 @@ class pdf {
      * @param int $limit The limit of records to return. Optional.
      * @return int
      */
-    public static function get_scan_status($scanid, $limit = 5000) {
+    public static function get_scan_status($scanid, $limit = 5) {
         global $DB;
         $sql = "SELECT c.status, c.statustext
             FROM {local_a11y_check} c
