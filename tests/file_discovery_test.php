@@ -177,6 +177,8 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
      */
     protected function assert_unscanned_files_count($count) {
         $queryresults = $this->pdfhelper->get_unscanned_pdf_files();
+        mtrace('count is ' . $count);
+        mtrace('queryresults is' . $queryresults);
         return $this->assertEquals($count, count($queryresults));
     }
 }
