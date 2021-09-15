@@ -100,14 +100,16 @@ class pdf {
     }
 
     /**
-     * Get all unscanned PDF files.
+     * Get all PDFs that have not been scanned by this plugin.
+     * @param int $offset The offset to start reading the db from.
      * @param int $limit The number of files to process at a time.
      * @return array
      */
-    public static function get_unscanned_pdf_files($limit = 100000) {
+    public static function get_unscanned_pdf_files(int $offset = 0, int $limit = 100) {
         global $DB;
 
         mtrace("Looking for PDF files to scan for accessibility");
+
         $sql = "SELECT f.contenthash, f.pathnamehash, MAX(f.filesize) as filesize
             FROM {files} f
                 INNER JOIN {context} c ON c.id=f.contextid
@@ -121,9 +123,15 @@ class pdf {
             GROUP BY f.contenthash, f.pathnamehash
             ORDER BY MAX(f.id) DESC";
 
-        $files = $DB->get_records_sql($sql, null, 0, $limit);
-        !$files ? mtrace("No PDF files found") : "Found " . count($files) . " PDF files";
-        return $files;
+        $files = $DB->get_records_sql($sql, null, $offset, $limit);
+
+        if (!$files) {
+            mtrace("No PDF files found");
+        } else {
+            mtrace("Found " . count($files) . " PDF files");
+            return $files;
+        }
+
     }
 
     /**
@@ -193,52 +201,78 @@ class pdf {
     }
 
     /**
+     * Checks if a file is less than or greater than the max file size to scan
+     * in the plugin settings.
+     * @param int $filesize The filesize in bytes.
+     * @return boolean Returns true if the filesize is under the config max file size, and false
+     * if it is over it.
+     */
+    public static function is_under_max_filesize(int $filesize) {
+        $maxfilesize = (int) get_config('local_a11y_check', 'max_file_size_mb');
+        $mb = $maxfilesize * 1000000;
+        return $filesize < $mb;
+    }
+
+    /**
      * Create the scan and result record for a single PDF.
-     * @param \stdClass $file The partial SQL file record containing contenthash and filesize
-     * @return boolean
+     * @param mixed $file The partial SQL file record containing contenthash and filesize
+     * @return mixed Returns the created record id on success.
      */
     public static function create_scan_record($file) {
         global $DB;
 
         // Create the primary scan record for the PDF file.
-        $scanrecord = new \stdClass;
-        $scanrecord->checktype = LOCAL_A11Y_CHECK_TYPE_PDF;
-        $scanrecord->faildelay = 0;
-        $scanrecord->lastchecked = 0;
+        $record  = new \stdClass;
+        $record->checktype = LOCAL_A11Y_CHECK_TYPE_PDF;
+        $record->faildelay = 0;
+        $record->lastchecked = 0;
 
         // Determine if PDF is too big to scan.
-        // Moodle file sizes are stored as bytes in the database.
-        // Max file size setting is in megabytes (MB).
-        $maxfilesize = (int) get_config("local_a11y_check", "max_file_size_mb");
-        if ($file->filesize > $maxfilesize * 1000000) {
-            // File is too big, ignore.
-            $scanrecord->status = LOCAL_A11Y_CHECK_STATUS_IGNORE;
-            $scanrecord->statustext = "File too large to scan";
+        if (self::is_under_max_filesize($file->filesize)) {
+            $record->status = LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
         } else {
-            $scanrecord->status = LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
+            // File is too big, ignore.
+            $record->status = LOCAL_A11Y_CHECK_STATUS_IGNORE;
+            $record->statustext = "File too large to scan";
         }
 
-        $scanid = $DB->insert_record('local_a11y_check', $scanrecord);
+        // Insert the scan record into the database.
+        return $DB->insert_record('local_a11y_check', $record);
+    }
 
-        if (!$scanid) {
-            mtrace("Failed to insert scan record for PDF {$contenthash}");
-            return false;
+    /**
+     * Create a row in the a11y_check_type_pdf table.
+     * @param int $id The scan id.
+     * @param string $contenthash The file contenthash.
+     * @param string $pathnamehash The file pathnamehash.
+     * @return mixed Returns the created record id on success.
+     */
+    public static function create_scan_result_record(int $id, string $contenthash, string $pathnamehash) {
+        global $DB;
+        $record = new \stdClass;
+        $record->scanid = $id;
+        $record->contenthash = $contenthash;
+        $record->pathnamehash = $pathnamehash;
+        return $DB->insert_record('local_a11y_check_type_pdf', $record);
+    }
+
+    /**
+     * Creates the required records in a11y_check and a11y_check_type_pdf tables.
+     * @param mixed $file The file to create the records for.
+     */
+    public static function provision_db_records($file) {
+        global $DB;
+        $id = self::create_scan_record($file);
+        if (!$id) {
+            // If a record cannot be created, there's no need to create the scan_result_record.
+            mtrace('Could not create scan_record for ' . $file->contenthash);
+        } else {
+            // If the scan_result_record cannot be created, remove the original record for the database.
+            if (!self::create_scan_result_record($id, $file->contenthash, $file->pathnamehash)) {
+                mtrace('Could not create scan_result_record for ' . $file->contenthash);
+                $DB->delete_records('local_a11y_check', array('id' => $id));
+            }
         }
-
-        // Create the scan result record.
-        $scanresult = new \stdClass;
-        $scanresult->scanid = $scanid;
-        $scanresult->contenthash = $file->contenthash;
-        $scanresult->pathnamehash = $file->pathnamehash;
-        $scanresultid = $DB->insert_record('local_a11y_check_type_pdf', $scanresult);
-
-        if (!$scanresultid) {
-            mtrace("Failed to insert scan result record for PDF {$contenthash}");
-            $DB->delete_records('local_a11y_check', array('id' => $scanid));
-            return false;
-        }
-
-        return true;
     }
 
     /**
