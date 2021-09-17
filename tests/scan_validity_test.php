@@ -69,7 +69,7 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
                 // Extract the a11y tokens from the filename.
                 $a11ytokens = explode('-', explode('_', $filename)[1]);
 
-                // Create a blank results object. 
+                // Create a blank results object.
                 // This will be filled with the results.
                 $a11ycheck = new \local_a11y_check\pdf_a11y_results();
 
@@ -79,7 +79,7 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
                 // Scan the PDF.
                 $results = \local_a11y_check\pdf_scanner::scan($pdf);
 
-                //  Set the results based on the filename tokens.
+                // Set the results based on the filename tokens.
                 if (in_array('TI', $a11ytokens)) {
                     $a11ycheck->hastitle = 1;
                 }

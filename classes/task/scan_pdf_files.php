@@ -54,7 +54,7 @@ class scan_pdf_files extends \core\task\scheduled_task {
         $limit = (int) get_config('local_a11y_check', 'files_per_cron');
 
         mtrace("Scanning " . $limit . " PDF files for accessibility issues.");
-        
+
         // Get the files to scan.
         $files = \local_a11y_check\pdf::get_pdf_files($limit);
 
