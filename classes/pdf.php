@@ -51,7 +51,6 @@ class pdf {
             GROUP BY f.contenthash, f.pathnamehash
             ORDER BY MAX(f.id) DESC";
         $files = $DB->get_records_sql($sql, null, 0, $limit);
-        !$files ? mtrace("No PDF files found") : "Found " . count($files) . " PDF files";
         return $files;
     }
 
@@ -88,9 +87,6 @@ class pdf {
                     WHERE f.contenthash = tp.contenthash AND f.filearea <> 'draft'
                 )";
         $records = $DB->get_records_sql($sql, null, 0, $limit);
-
-        !$records ? mtrace("0 records marked for deletion.") : count($files) . " records marked for deletion.";
-
         // Iterate over the $todelete records and delete them from the database.
         foreach ($records as $row) {
             $DB->delete_records('local_a11y_check_type_pdf', array('contenthash' => $row->contenthash, 'scanid' => $row->scanid));
@@ -101,15 +97,11 @@ class pdf {
 
     /**
      * Get all PDFs that have not been scanned by this plugin.
-     * @param int $offset The offset to start reading the db from.
      * @param int $limit The number of files to process at a time.
      * @return array
      */
-    public static function get_unscanned_pdf_files(int $offset = 0, int $limit = 5) {
+    public static function get_unscanned_pdf_files($limit = 5) {
         global $DB;
-
-        mtrace("Looking for PDF files to scan for accessibility");
-
         $sql = "SELECT f.contenthash, f.pathnamehash, MAX(f.filesize) as filesize
             FROM {files} f
                 INNER JOIN {context} c ON c.id=f.contextid
@@ -123,12 +115,11 @@ class pdf {
             GROUP BY f.contenthash, f.pathnamehash
             ORDER BY MAX(f.id) DESC";
 
-        $files = $DB->get_records_sql($sql, null, $offset, $limit);
+        $files = $DB->get_records_sql($sql, null, 0, $limit);
 
         if (!$files) {
-            mtrace("No PDF files found");
+            return array();
         } else {
-            mtrace("Found " . count($files) . " PDF files");
             return $files;
         }
 
@@ -150,7 +141,6 @@ class pdf {
         ";
 
         $files = $DB->get_records_sql($sql, null, 0, $limit);
-        !$files ? mtrace("No PDF files found") : mtrace("Found " . count($files) . " PDF files");
 
         return $files;
     }
@@ -203,14 +193,13 @@ class pdf {
     /**
      * Checks if a file is less than or greater than the max file size to scan
      * in the plugin settings.
-     * @param int $filesize The filesize in bytes.
+     * @param int $filesize The filesize in megabytes.
      * @return boolean Returns true if the filesize is under the config max file size, and false
      * if it is over it.
      */
     public static function is_under_max_filesize(int $filesize) {
         $maxfilesize = (int) get_config('local_a11y_check', 'max_file_size_mb');
-        $mb = $maxfilesize * 1000000;
-        return $filesize < $mb;
+        return (bool) $filesize <= $maxfilesize;
     }
 
     /**
@@ -289,7 +278,6 @@ class pdf {
         ";
         $records = $DB->get_records_sql($sql, null, 0, $limit);
         if (!$records) {
-            mtrace("No scan records found for id " . $scanid);
             return LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
         } else {
             // Get the first value in the array.
