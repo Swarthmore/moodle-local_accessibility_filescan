@@ -138,8 +138,10 @@ class pdf {
         $sql = "SELECT f.scanid, f.contenthash as contenthash, f.pathnamehash as pathnamehash
             FROM {local_a11y_check_type_pdf} f
             INNER JOIN {local_a11y_check} c ON c.id = f.scanid
-        ";
+            WHERE c.status = " . LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
 
+        mtrace($sql);
+        
         $files = $DB->get_records_sql($sql, null, 0, $limit);
 
         return $files;
