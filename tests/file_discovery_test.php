@@ -48,7 +48,7 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
 
         /*
          * @important
-         * This test will fail if $this->add_pdfs() is called with a value greater 
+         * This test will fail if $this->add_pdfs() is called with a value greater
          * than the plugins max cron limit size.
          */
 
@@ -75,7 +75,7 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
 
         // After the task is run, there should be 0 unscanned files.
         $this->assert_unscanned_files_count(0);
-        
+
         // After the task has run, there should be 5 records created.
         $this->assert_custom_record_count(5);
 
