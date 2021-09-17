@@ -45,6 +45,13 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
     public $filesadded;
 
     public function test_file_discovery() {
+
+        /*
+         * @important
+         * This test will fail if $this->add_pdfs() is called with a value greater 
+         * than the plugins max cron limit size.
+         */
+
         $this->resetAfterTest(true);
         $this->pdfhelper = new \local_a11y_check\pdf();
         $this->task = new \local_a11y_check\task\find_pdf_files();
@@ -72,11 +79,11 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
         // After the task has run, there should be 5 records created.
         $this->assert_custom_record_count(5);
 
-        // Add 7 pdfs.
-        $this->add_pdfs(7);
+        // Add 4 pdfs.
+        $this->add_pdfs(4);
 
         // There should now be 7 unscanned files.
-        $this->assert_unscanned_files_count(7);
+        $this->assert_unscanned_files_count(4);
 
         // Sanity check - There should still be 5 records created.
         $this->assert_custom_record_count(5);
@@ -88,7 +95,7 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
         $this->assert_unscanned_files_count(0);
 
         // There should be 12 records total.
-        $this->assert_custom_record_count(12);
+        $this->assert_custom_record_count(9);
 
     }
 
