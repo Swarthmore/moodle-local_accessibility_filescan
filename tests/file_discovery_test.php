@@ -47,7 +47,6 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
     public function test_file_discovery() {
 
         /*
-         * @important
          * This test will fail if $this->add_pdfs() is called with a value greater
          * than the plugins max cron limit size.
          */
