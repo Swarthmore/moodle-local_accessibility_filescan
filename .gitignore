@@ -1,5 +1,7 @@
 local/
 .DS_Store
+.idea/
+.vscode/
 
 # Logs
 logs

@@ -45,32 +45,57 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
     public $filesadded;
 
     public function test_file_discovery() {
+
+        /*
+         * This test will fail if $this->add_pdfs() is called with a value greater
+         * than the plugins max cron limit size.
+         */
+
         $this->resetAfterTest(true);
         $this->pdfhelper = new \local_a11y_check\pdf();
         $this->task = new \local_a11y_check\task\find_pdf_files();
         $this->course = $this->getDataGenerator()->create_course(array('shortname' => 'testcourse'));
         $this->page = $this->getDataGenerator()->create_module('page', array('course' => $this->course->id));
 
+        // Add files that should be excluded from the scan.
         $this->add_garbage_files();
 
+        // Add 5 pdfs.
         $this->add_pdfs(5);
 
-        $this->assert_custom_record_count(0);
+        // There should be 5 unscanned files.
         $this->assert_unscanned_files_count(5);
 
+        // There should be 0 records created.
+        $this->assert_custom_record_count(0);
+
+        // Execute the task.
         $this->task->execute();
 
+        // After the task is run, there should be 0 unscanned files.
+        $this->assert_unscanned_files_count(0);
+
+        // After the task has run, there should be 5 records created.
         $this->assert_custom_record_count(5);
-        $this->assert_unscanned_files_count(0);
 
-        $this->add_pdfs(7);
+        // Add 4 pdfs.
+        $this->add_pdfs(4);
 
-        $this->assert_unscanned_files_count(7);
+        // There should now be 7 unscanned files.
+        $this->assert_unscanned_files_count(4);
 
+        // Sanity check - There should still be 5 records created.
+        $this->assert_custom_record_count(5);
+
+        // Execute the task again.
         $this->task->execute();
 
-        $this->assert_custom_record_count(12);
+        // After the task executes, there should be 0 unscanned files.
         $this->assert_unscanned_files_count(0);
+
+        // There should be 12 records total.
+        $this->assert_custom_record_count(9);
+
     }
 
     /**
@@ -160,9 +185,8 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
      */
     protected function assert_custom_record_count($count) {
         global $DB;
-
-        $customrecords = $DB->get_records('local_a11y_check');
-        return $this->assertEquals($count, count($customrecords));
+        $records = $DB->count_records('local_a11y_check');
+        return $this->assertEquals($count, $records);
     }
 
     /**
@@ -172,7 +196,7 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
      * @return boolean
      */
     protected function assert_unscanned_files_count($count) {
-        $queryresults = $this->pdfhelper->get_unscanned_pdf_files();
+        $queryresults = $this->pdfhelper->get_unscanned_pdf_files(100);
         return $this->assertEquals($count, count($queryresults));
     }
 }

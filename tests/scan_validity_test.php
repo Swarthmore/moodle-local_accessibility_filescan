@@ -34,15 +34,21 @@ defined('MOODLE_INTERNAL') || die();
 class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
 
     public function test_scan_validity() {
+
+        // Get the directory where all of the PDFs are stored.
         $pdfdir = dirname(__FILE__) . '/fixtures/pdfs';
 
         if (!is_dir($pdfdir)) {
             throw new \Exception("Invalid directory.");
         }
 
+        // Create an arry to store the pdfs.
         $pdfs = array();
+
+        // Get all of the PDFs in the directory.
         $files = array_diff(scandir($pdfdir), array('.', '..'));
 
+        // Iterate through the files, and if the file is a PDF, add it to $pdfs.
         foreach ($files as $file) {
             $fp = $pdfdir . '/' . $file;
             $ext = pathinfo($fp, PATHINFO_EXTENSION);
@@ -60,11 +66,20 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
 
             if (strpos($filename, '-') !== false) {
 
+                // Extract the a11y tokens from the filename.
                 $a11ytokens = explode('-', explode('_', $filename)[1]);
+
+                // Create a blank results object.
+                // This will be filled with the results.
                 $a11ycheck = new \local_a11y_check\pdf_a11y_results();
+
+                // Get the file contents of the PDF.
                 $contents = file_get_contents($pdf);
+
+                // Scan the PDF.
                 $results = \local_a11y_check\pdf_scanner::scan($pdf);
 
+                // Set the results based on the filename tokens.
                 if (in_array('TI', $a11ytokens)) {
                     $a11ycheck->hastitle = 1;
                 }
@@ -81,6 +96,7 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
                     $a11ycheck->hastext = 1;
                 }
 
+                // Assert that the results match the expected results.
                 $this->assertEquals($a11ycheck->hastitle, $results->hastitle);
                 $this->assertEquals($a11ycheck->hasbookmarks, $results->hasbookmarks);
                 $this->assertEquals($a11ycheck->haslanguage, $results->haslanguage);
@@ -90,4 +106,3 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
     }
 
 }
-

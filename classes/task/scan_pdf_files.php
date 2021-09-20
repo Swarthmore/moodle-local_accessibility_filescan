@@ -50,9 +50,15 @@ class scan_pdf_files extends \core\task\scheduled_task {
 
         global $CFG;
 
-        $pluginconfig = get_config('local_a11y_check');
-        $maxfilesize = $pluginconfig->max_file_size_mb;
-        $files = \local_a11y_check\pdf::get_pdf_files();
+        // Get the max amount of files to process from the plugin config.
+        $limit = (int) get_config('local_a11y_check', 'files_per_cron');
+
+        mtrace("Scanning " . $limit . " PDF files for accessibility issues.");
+
+        // Get the files to scan.
+        $files = \local_a11y_check\pdf::get_pdf_files($limit);
+
+        // Get the file storage handler.
         $fs = get_file_storage();
 
         if (is_array($files) && count($files) > 0) {
