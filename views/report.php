@@ -25,52 +25,31 @@
 require_once(dirname(__FILE__) . '/../../../config.php');
 require_once(dirname(__FILE__) . '/../classes/report.php');
 
+// Restrict this page to administrators only.
 require_admin();
 
 // Page setup.
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/a11y_check/views/report.php');
+$PAGE->set_url('/local/a11y_check/views/react-report.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title('A11y Check - Scanned PDFs');
 $PAGE->set_heading('A11y Check - Scanned PDFs');
 
-// Get the report.
-$report = \local_a11y_check\report::generate_report();
-
 echo $OUTPUT->header();
 
-echo '<table class="table">';
-echo '<thead>';
-echo '<tr>';
-echo '<th scopr="col">Filename</th>';
-echo '<th scope="col">Title</th>';
-echo '<th scope="col">Language</th>';
-echo '<th scope="col">Tagged</th>';
-echo '<th scope="col">Pages</th>';
-echo '</tr>';
-echo '</thead>';
+// Get the report.
+$report = \local_a11y_check\report::generate_report();
+$json = json_encode($report);
 
-echo '<tbody>';
-foreach ($report as $row) {
+// Add the DOM element for the React app to attach to.
+echo '<div id="a11y_check__Root"></div>';
 
-    $hastitlemark = $row->hastitle == 1 ? '✓' : '';
-    $haslanguagemark = $row->haslanguage == 1 ? '✓' : '';
-    $istaggedmark = $row->istagged == 1 ? '✓' : '';
+// Add $json as a global variable so it can be accessed by the React app.
+echo '<script>';
+echo "const data = $json";
+echo '</script>';
 
-    $rowclass = $row->hastitle == 1 && $row->haslanguage == 1 && $row->istagged == 1 ? 'table-success' : '';
-    echo "<tr class=\"$rowclass\">";
-    echo "<td>$row->filename</td>";
-    echo '<td class="text-success">' . $hastitlemark . '</td>';
-    echo '<td class="text-success">' . $haslanguagemark . '</td>';
-    echo '<td class="text-success">' . $istaggedmark . '</td>';
-    echo '<td>' . $row->pagecount . '</td>';
-    echo '</tr>';
-
-}
-
-echo '</tbody>';
-echo "</table>";
-
-echo '<script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>';
+// Add the React app.
+echo '<script src="js/report.js"></script>';
 
 echo $OUTPUT->footer();
