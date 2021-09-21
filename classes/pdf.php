@@ -34,41 +34,6 @@ require_once(dirname(__FILE__) . '/../locallib.php');
 class pdf {
 
     /**
-     * Get all PDF files.
-     * @param int $limit The number of files to process at a time.
-     * @return array
-     */
-    public static function get_all_pdfs($limit = 5) {
-        global $DB;
-        $sql = "SELECT f.contenthash, f.pathnamehash, MAX(f.filesize) as filesize
-            FROM {files} f
-                INNER JOIN {context} c ON c.id=f.contextid
-                WHERE c.contextlevel = 70
-                AND f.filesize <> 0
-                AND f.mimetype = 'application/pdf'
-                AND f.component <> 'assignfeedback_editpdf'
-                AND f.filearea <> 'stamps'
-            GROUP BY f.contenthash, f.pathnamehash
-            ORDER BY MAX(f.id) DESC";
-        $files = $DB->get_records_sql($sql, null, 0, $limit);
-        return $files;
-    }
-
-    /**
-     * Get all of the a11y_check records.
-     * @param int $limit The number of records to process at a time.
-     * @return int $limit
-     */
-    public static function get_all_records($limit = 5) {
-        global $DB;
-        $sql = "SELECT tp.contenthash as contenthash, c.id as scanid
-            FROM {local_a11y_check_type_pdf} tp
-            INNER JOIN {local_a11y_check} c ON c.id = tp.scanid";
-        $records = $DB->get_records_sql($sql, null, 0, $limit);
-        return $records;
-    }
-
-    /**
      * Remove all rows that that don't have a record in mdl_files (draft context is ignored).
      * @param int $limit The number of files to process at a time.
      * @return bool
