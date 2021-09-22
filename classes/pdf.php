@@ -102,21 +102,28 @@ class pdf {
 
         // Iterate through each of the files and get the instructors.
         foreach ($files as $file) {
-            $courseid = $file->course_id;
-            // Get the instructors for the course.
-            $instructors = \local_a11y_check\halp::get_instructors_for_course($courseid);
-            // Creaete the courseinfo object.
-            $courseinfo = new \local_a11y_check\courseinfo(
-                $file->course_id,
-                $file->course_category,
-                $file->course_name,
-                $file->course_shortname,
-                $file->course_start,
-                $file->course_end,
-                $instructors
-            );
-            // Add the courseinfo object to the file object.
-            $file->courseinfo = $courseinfo;
+
+            // First check to make sure the course id exists.
+            if ($file->course_id) {
+                // Get the instructors for the course.
+                $instructors = \local_a11y_check\halp::get_instructors_for_course($file->courseid);
+                // Create the courseinfo object.
+                $courseinfo = new \local_a11y_check\courseinfo(
+                    $file->course_id,
+                    $file->course_category,
+                    $file->course_name,
+                    $file->course_shortname,
+                    $file->course_start,
+                    $file->course_end,
+                    $instructors
+                );
+                // Add the courseinfo object to the file object.
+                $file->courseinfo = $courseinfo;
+            } else {
+                // Create a placeholder for the courseinfo.
+                $file->courseinfo = json_encode((object) array());
+            }
+
         }
 
         // Return the files.

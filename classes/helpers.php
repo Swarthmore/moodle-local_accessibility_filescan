@@ -34,15 +34,16 @@ require_once(dirname(__FILE__) . '/../locallib.php');
 class halp {
 
     /**
-     * Get instructors for a course 
+     * Get instructors for a course
      * @param string $courseid
      * @return array of user objects
      */
     public static function get_instructors_for_course(string $courseid) {
+
         global $DB;
-     
+
         // This is the shortname in the database that identifes the user as a teacher.
-        $teacher_role_shortname = 'editingteacher';
+        $roleshortname = 'editingteacher';
 
         // Create the query.
         $sql = "SELECT
@@ -58,7 +59,7 @@ class halp {
         JOIN {role_assignments} ra ON ra.contextid = ctx.id
         JOIN {user} u ON u.id = ra.userid
         JOIN {role} r ON r.id = ra.roleid
-        WHERE c.id = $courseid AND r.shortname = '$teacher_role_shortname';";
+        WHERE c.id = $courseid AND r.shortname = '$roleshortname';";
 
         // Run the query.
         $instructors = $DB->get_records_sql($sql);
