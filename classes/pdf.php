@@ -27,6 +27,7 @@ namespace local_a11y_check;
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../locallib.php');
+require_once(dirname(__FILE__) . '/helpers.php');
 
 /**
  * PDF helper functions
@@ -66,27 +67,67 @@ class pdf {
      * @return array
      */
     public static function get_unscanned_pdf_files($limit = 5) {
+
         global $DB;
-        $sql = "SELECT f.contenthash, f.pathnamehash, MAX(f.filesize) as filesize
+
+        // Create the query.
+        $sql = "SELECT f.contenthash as contenthash, f.pathnamehash as pathnamehash,
+            f.id as file_id,
+            f.author as author,
+            f.timecreated as file_timecreated,
+            MAX(f.filesize) as filesize,
+            crs.id as course_id,
+            crs.category as course_category,
+            crs.fullname as course_name,
+            crs.shortname as course_shortname,
+            crs.startdate as course_start,
+            crs.enddate as course_end
             FROM {files} f
-                INNER JOIN {context} c ON c.id=f.contextid
+                INNER JOIN {context} ctx ON ctx.id=f.contextid
+                LEFT OUTER JOIN {course} crs ON crs.id=ctx.instanceid
                 LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
-                WHERE c.contextlevel = 70
+                WHERE ctx.contextlevel = 70
                 AND f.filesize <> 0
                 AND f.mimetype = 'application/pdf'
                 AND f.component <> 'assignfeedback_editpdf'
                 AND f.filearea <> 'stamps'
                 AND actp.contenthash IS NULL
-            GROUP BY f.contenthash, f.pathnamehash
-            ORDER BY MAX(f.id) DESC";
+            GROUP BY f.contenthash, f.pathnamehash,
+                     f.id, f.author, f.timecreated, crs.id, crs.category, crs.fullname, crs.shortname,
+                     crs.startdate, crs.enddate
+            ORDER BY MAX(f.filesize) DESC";
 
+        // Run the query.
         $files = $DB->get_records_sql($sql, null, 0, $limit);
 
-        if (!$files) {
-            return array();
-        } else {
-            return $files;
+        // Iterate through each of the files and get the instructors.
+        foreach ($files as $file) {
+
+            // First check to make sure the course id exists.
+            if ($file->course_id) {
+                // Get the instructors for the course.
+                $instructors = \local_a11y_check\halp::get_instructors_for_course($file->course_id);
+                // Create the courseinfo object.
+                $courseinfo = new \local_a11y_check\courseinfo(
+                    $file->course_id,
+                    $file->course_category,
+                    $file->course_name,
+                    $file->course_shortname,
+                    $file->course_start,
+                    $file->course_end,
+                    $instructors
+                );
+                // Add the courseinfo object to the file object.
+                $file->courseinfo = $courseinfo;
+            } else {
+                // Create a placeholder for the courseinfo.
+                $file->courseinfo = json_encode((object) array());
+            }
+
         }
+
+        // Return the files.
+        return $files;
 
     }
 
@@ -100,13 +141,16 @@ class pdf {
 
         global $DB;
 
+        // Create the query.
         $sql = "SELECT f.scanid, f.contenthash as contenthash, f.pathnamehash as pathnamehash
             FROM {local_a11y_check_type_pdf} f
             INNER JOIN {local_a11y_check} c ON c.id = f.scanid
             WHERE c.status = " . LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
 
+        // Run the query.
         $files = $DB->get_records_sql($sql, null, 0, $limit);
 
+        // Return the files.
         return $files;
     }
 
@@ -117,8 +161,10 @@ class pdf {
      * @return boolean
      */
     public static function update_scan_record($contenthash, $payload) {
+
         global $DB;
 
+        // Create the query.
         $sql = "UPDATE {local_a11y_check_type_pdf}\n"
             . "SET hastext={$payload->hastext},"
             . "hastitle={$payload->hastitle},"
@@ -128,9 +174,8 @@ class pdf {
             . "pagecount={$payload->pagecount}\n"
             . "WHERE contenthash='{$contenthash}'";
 
-        $DB->execute($sql);
-
-        return true;
+        // Run the query. This will return true if the query was successful.
+        return $DB->execute($sql);
     }
 
     /**
@@ -197,16 +242,18 @@ class pdf {
     /**
      * Create a row in the a11y_check_type_pdf table.
      * @param int $id The scan id.
-     * @param string $contenthash The file contenthash.
-     * @param string $pathnamehash The file pathnamehash.
+     * @param object $file The file object.
      * @return mixed Returns the created record id on success.
      */
-    public static function create_scan_result_record(int $id, string $contenthash, string $pathnamehash) {
+    public static function create_scan_result_record(int $id, $file) {
         global $DB;
         $record = new \stdClass;
         $record->scanid = $id;
-        $record->contenthash = $contenthash;
-        $record->pathnamehash = $pathnamehash;
+        $record->contenthash = $file->contenthash;
+        $record->pathnamehash = $file->pathnamehash;
+        $record->file_author = $file->author;
+        $record->file_timecreated = $file->file_timecreated;
+        $record->courseinfo = json_encode($file->courseinfo);
         return $DB->insert_record('local_a11y_check_type_pdf', $record);
     }
 
@@ -222,7 +269,7 @@ class pdf {
             mtrace('Could not create scan_record for ' . $file->contenthash);
         } else {
             // If the scan_result_record cannot be created, remove the original record for the database.
-            if (!self::create_scan_result_record($id, $file->contenthash, $file->pathnamehash)) {
+            if (!self::create_scan_result_record($id, $file)) {
                 mtrace('Could not create scan_result_record for ' . $file->contenthash);
                 $DB->delete_records('local_a11y_check', array('id' => $id));
             }
