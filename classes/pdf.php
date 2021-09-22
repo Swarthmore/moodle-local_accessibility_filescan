@@ -71,10 +71,8 @@ class pdf {
         global $DB;
 
         // Create the query.
-        $sql = "SELECT 
+        $sql = "SELECT f.contenthash as contenthash, f.pathnamehash as pathnamehash,
             f.id as file_id,
-            f.contenthash as contenthash,
-            f.pathnamehash as pathnamehash,
             f.author as author,
             f.timecreated as file_timecreated,
             MAX(f.filesize) as filesize,
@@ -242,8 +240,7 @@ class pdf {
     /**
      * Create a row in the a11y_check_type_pdf table.
      * @param int $id The scan id.
-     * @param string $contenthash The file contenthash.
-     * @param string $pathnamehash The file pathnamehash.
+     * @param object $file The file object.
      * @return mixed Returns the created record id on success.
      */
     public static function create_scan_result_record(int $id, $file) {
