@@ -93,7 +93,7 @@ class pdf {
                 AND f.filearea <> 'stamps'
                 AND actp.contenthash IS NULL
             GROUP BY f.contenthash, f.pathnamehash
-            ORDER BY MAX(f.id) DESC";
+            ORDER BY MAX(f.filesize) DESC";
 
         // Run the query.
         $files = $DB->get_records_sql($sql, null, 0, $limit);
