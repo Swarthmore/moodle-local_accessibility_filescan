@@ -40,12 +40,13 @@ class report {
      */
     public static function generate_report($limit = 1000) {
         global $DB;
+
         $sql = "SELECT f.id, f.scanid, f.contenthash as contenthash,"
             . "f.pathnamehash as pathnamehash, f.hastext, f.hastitle, f.haslanguage,"
             . "f.istagged, f.pagecount, f.hasbookmarks, c.status, c.statustext,"
             . "c.lastchecked, files.filename "
             . "FROM {local_a11y_check_type_pdf} f "
-            . "INNER JOIN {local_a11y_check} c ON c.id = f.scanid"
+            . "INNER JOIN {local_a11y_check} c ON c.id = f.scanid "
             . "INNER JOIN {files} files ON files.pathnamehash=f.pathnamehash";
         $rs = $DB->get_recordset_sql($sql, null, 0, $limit);
         $files = array();
