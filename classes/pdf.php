@@ -107,12 +107,12 @@ class pdf {
             $instructors = \local_a11y_check\halp::get_instructors_for_course($courseid);
             // Creaete the courseinfo object.
             $courseinfo = new \local_a11y_check\courseinfo(
-                $file->course_id, 
-                $file->course_category, 
-                $file->course_name, 
-                $file->course_shortname, 
-                $file->course_start, 
-                $file->course_end, 
+                $file->course_id,
+                $file->course_category,
+                $file->course_name,
+                $file->course_shortname,
+                $file->course_start,
+                $file->course_end,
                 $instructors
             );
             // Add the courseinfo object to the file object.

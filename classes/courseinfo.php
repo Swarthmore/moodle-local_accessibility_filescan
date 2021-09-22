@@ -42,7 +42,14 @@ class courseinfo {
      * @param int $end The course end datetime
      * @param array $instructors The course instructors
      */
-    public function __construct(int $id, int $category, string $fullname, string $shortname, int $start, int $end, array $instructors) {
+    public function __construct(
+        int $id,
+        int $category,
+        string $fullname,
+        string $shortname,
+        int $start,
+        int $end,
+        array $instructors) {
         $this->id = $id;
         $this->category = $category;
         $this->fullname = $fullname;
