@@ -72,6 +72,7 @@ class pdf {
 
         // Create the query.
         $sql = "SELECT f.contenthash as contenthash, f.pathnamehash as pathnamehash,
+            f.id as file_id,
             f.author as author,
             f.timecreated as file_timecreated,
             MAX(f.filesize) as filesize,
@@ -91,7 +92,7 @@ class pdf {
                 AND f.component <> 'assignfeedback_editpdf'
                 AND f.filearea <> 'stamps'
                 AND actp.contenthash IS NULL
-            GROUP BY f.contenthash, f.pathnamehash
+            GROUP BY f.contenthash, f.pathnamehash, f.id, f.author, f.timecreated
             ORDER BY MAX(f.filesize) DESC";
 
         // Run the query.
