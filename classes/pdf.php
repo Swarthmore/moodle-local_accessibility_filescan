@@ -106,7 +106,7 @@ class pdf {
             // First check to make sure the course id exists.
             if ($file->course_id) {
                 // Get the instructors for the course.
-                $instructors = \local_a11y_check\halp::get_instructors_for_course($file->courseid);
+                $instructors = \local_a11y_check\halp::get_instructors_for_course($file->course_id);
                 // Create the courseinfo object.
                 $courseinfo = new \local_a11y_check\courseinfo(
                     $file->course_id,
