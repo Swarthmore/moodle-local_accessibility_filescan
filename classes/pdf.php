@@ -27,6 +27,7 @@ namespace local_a11y_check;
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../locallib.php');
+require_once(dirname(__FILE__) . '/helpers.php');
 
 /**
  * PDF helper functions
@@ -66,7 +67,10 @@ class pdf {
      * @return array
      */
     public static function get_unscanned_pdf_files($limit = 5) {
+
         global $DB;
+
+        // Create the query.
         $sql = "SELECT 
             f.id as file_id,
             f.contenthash as contenthash,
@@ -93,15 +97,21 @@ class pdf {
             GROUP BY f.contenthash, f.pathnamehash
             ORDER BY MAX(f.id) DESC";
 
+        // Run the query.
         $files = $DB->get_records_sql($sql, null, 0, $limit);
 
-        var_dump($files);
-
-        if (!$files) {
-            return array();
-        } else {
-            return $files;
+        // Iterate through each of the files and get the instructors.
+        foreach ($files as $file) {
+            // Get the course id.
+            $id = $file->course_id;
+            // Get the instructors for the course.
+            $instructors = \local_a11y_check\halp::get_instructors_for_course($id);
+            // Assign the instructors to the file.
+            $file->instructors = $instructors;
         }
+
+        // Return the files.
+        return $files;
 
     }
 
@@ -115,13 +125,16 @@ class pdf {
 
         global $DB;
 
+        // Create the query.
         $sql = "SELECT f.scanid, f.contenthash as contenthash, f.pathnamehash as pathnamehash
             FROM {local_a11y_check_type_pdf} f
             INNER JOIN {local_a11y_check} c ON c.id = f.scanid
             WHERE c.status = " . LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
 
+        // Run the query.
         $files = $DB->get_records_sql($sql, null, 0, $limit);
 
+        // Return the files.
         return $files;
     }
 
@@ -132,8 +145,10 @@ class pdf {
      * @return boolean
      */
     public static function update_scan_record($contenthash, $payload) {
+
         global $DB;
 
+        // Create the query.
         $sql = "UPDATE {local_a11y_check_type_pdf}\n"
             . "SET hastext={$payload->hastext},"
             . "hastitle={$payload->hastitle},"
@@ -143,9 +158,8 @@ class pdf {
             . "pagecount={$payload->pagecount}\n"
             . "WHERE contenthash='{$contenthash}'";
 
-        $DB->execute($sql);
-
-        return true;
+        // Run the query. This will return true if the query was successful.
+        return $DB->execute($sql);
     }
 
     /**
