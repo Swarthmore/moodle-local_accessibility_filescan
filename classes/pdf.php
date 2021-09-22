@@ -92,7 +92,9 @@ class pdf {
                 AND f.component <> 'assignfeedback_editpdf'
                 AND f.filearea <> 'stamps'
                 AND actp.contenthash IS NULL
-            GROUP BY f.contenthash, f.pathnamehash, f.id, f.author, f.timecreated
+            GROUP BY f.contenthash, f.pathnamehash,
+                     f.id, f.author, f.timecreated, crs.id, crs.category, crs.fullname, crs.shortname,
+                     crs.startdate, crs.enddate
             ORDER BY MAX(f.filesize) DESC";
 
         // Run the query.
