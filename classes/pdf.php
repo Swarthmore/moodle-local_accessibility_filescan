@@ -67,11 +67,24 @@ class pdf {
      */
     public static function get_unscanned_pdf_files($limit = 5) {
         global $DB;
-        $sql = "SELECT f.contenthash, f.pathnamehash, MAX(f.filesize) as filesize
+        $sql = "SELECT 
+            f.id as file_id,
+            f.contenthash as contenthash,
+            f.pathnamehash as pathnamehash,
+            f.author as author,
+            f.timecreated as file_timecreated,
+            MAX(f.filesize) as filesize,
+            crs.id as course_id,
+            crs.category as course_category,
+            crs.fullname as course_name,
+            crs.shortname as course_shortname,
+            crs.startdate as course_start,
+            crs.enddate as course_end
             FROM {files} f
-                INNER JOIN {context} c ON c.id=f.contextid
+                INNER JOIN {context} ctx ON ctx.id=f.contextid
+                LEFT OUTER JOIN {course} crs ON crs.id=ctx.instanceid
                 LEFT OUTER JOIN {local_a11y_check_type_pdf} actp ON f.contenthash=actp.contenthash
-                WHERE c.contextlevel = 70
+                WHERE ctx.contextlevel = 70
                 AND f.filesize <> 0
                 AND f.mimetype = 'application/pdf'
                 AND f.component <> 'assignfeedback_editpdf'
@@ -81,6 +94,8 @@ class pdf {
             ORDER BY MAX(f.id) DESC";
 
         $files = $DB->get_records_sql($sql, null, 0, $limit);
+
+        var_dump($files);
 
         if (!$files) {
             return array();
@@ -270,5 +285,52 @@ class pdf {
             return LOCAL_A11Y_CHECK_STATUS_FAIL;
         }
     }
+
+    /**
+     * Find references to a file in the database.
+     */
+    public static function find_file_references($contenthash, $pathnamehash) {
+
+        global $DB;
+
+        // Create the SQL query.
+
+        // SELECT f.id as fileid, f.contenthash as contenthash, ctx.instanceid as instanceid, ctx.path as path, actp.id as scanid,
+        // CASE WHEN f.component = 'mod_resource' THEN r.name ELSE f.filename END AS 'filename'
+        // FROM mdl_files f
+        // INNER JOIN mdl_context ctx on (ctx.id = f.contextid)
+        // INNER JOIN mdl_course_modules cm on (cm.id = ctx.instanceid)
+        // INNER JOIN mdl_local_a11y_check_type_pdf actp on (f.contenthash = actp.contenthash)
+        // LEFT OUTER JOIN mdl_resource r on (r.id = cm.instance)
+        // WHERE f.component in ('course', 'course', 'block_html', 'mod_assign', 'mod_book', 'mod_data', 'mod_folder', 'mod_forum', 'mod_glossary', 'mod_label', 'mod_lesson', 'mod_page', 'mod_publication', 'mod_questionnaire', 'mod_quiz', 'mod_resource', 'mod_scorm', 'mod_url', 'mod_workshop', 'qtype_essay', 'question')
+        // AND f.filesize <> 0
+        // AND f.mimetype = 'application/pdf'
+        // AND f.contextid = ctx.id
+        // AND f.contenthash = actp.contenthash
+
+        $sql = "SELECT f.id as fileid, f.contenthash as contenthash, ctx.instanceid as instanceid, ctx.path as path, fs.id as filescanid,
+        CASE WHEN f.component = 'mod_resource' 
+            THEN r.name 
+            ELSE f.filename 
+        END AS 'filename'
+        FROM {files} f
+        INNER JOIN {context} ctx on (ctx.id = f.contextid)
+        INNER JOIN {course_modules} cm on (cm.id = ctx.instanceid)
+        INNER JOIN {block_filescan_files} fs on (f.contenthash = fs.contenthash)
+        LEFT OUTER JOIN {resource} r on (r.id = cm.instance)
+        WHERE f.component in ('course', 'block_html', 'mod_assign', 'mod_book', 'mod_data', 'mod_folder', 'mod_forum', 'mod_glossary', 'mod_label', 'mod_lesson', 'mod_page', 'mod_publication', 'mod_questionnaire', 'mod_quiz', 'mod_resource', 'mod_scorm', 'mod_url', 'mod_workshop', 'qtype_essay', 'question')
+        AND f.filesize <> 0
+        AND f.mimetype = 'application/pdf'
+        AND f.contextid = ctx.id
+        AND f.contenthash = fs.contenthash";
+
+        // Execute the query.
+        $records = $DB->get_records_sql($sql);
+
+        // Return the records.
+        return $records;
+
+    }
+
 
 }
