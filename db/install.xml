@@ -32,6 +32,9 @@
         <FIELD NAME="hasbookmarks" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="istagged" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" />
         <FIELD NAME="pagecount" TYPE="int" LENGTH="5" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="file_author" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="file_timecreated" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" />
+        <FIELD NAME="courseinfo" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Information about courses that use this file"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

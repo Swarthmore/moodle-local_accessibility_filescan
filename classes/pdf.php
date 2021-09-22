@@ -102,12 +102,21 @@ class pdf {
 
         // Iterate through each of the files and get the instructors.
         foreach ($files as $file) {
-            // Get the course id.
-            $id = $file->course_id;
+            $courseid = $file->course_id;
             // Get the instructors for the course.
-            $instructors = \local_a11y_check\halp::get_instructors_for_course($id);
-            // Assign the instructors to the file.
-            $file->instructors = $instructors;
+            $instructors = \local_a11y_check\halp::get_instructors_for_course($courseid);
+            // Creaete the courseinfo object.
+            $courseinfo = new \local_a11y_check\courseinfo(
+                $file->course_id, 
+                $file->course_category, 
+                $file->course_name, 
+                $file->course_shortname, 
+                $file->course_start, 
+                $file->course_end, 
+                $instructors
+            );
+            // Add the courseinfo object to the file object.
+            $file->courseinfo = $courseinfo;
         }
 
         // Return the files.
@@ -230,12 +239,15 @@ class pdf {
      * @param string $pathnamehash The file pathnamehash.
      * @return mixed Returns the created record id on success.
      */
-    public static function create_scan_result_record(int $id, string $contenthash, string $pathnamehash) {
+    public static function create_scan_result_record(int $id, $file) {
         global $DB;
         $record = new \stdClass;
         $record->scanid = $id;
-        $record->contenthash = $contenthash;
-        $record->pathnamehash = $pathnamehash;
+        $record->contenthash = $file->contenthash;
+        $record->pathnamehash = $file->pathnamehash;
+        $record->file_author = $file->author;
+        $record->file_timecreated = $file->file_timecreated;
+        $record->courseinfo = json_encode($file->courseinfo);
         return $DB->insert_record('local_a11y_check_type_pdf', $record);
     }
 
@@ -251,7 +263,7 @@ class pdf {
             mtrace('Could not create scan_record for ' . $file->contenthash);
         } else {
             // If the scan_result_record cannot be created, remove the original record for the database.
-            if (!self::create_scan_result_record($id, $file->contenthash, $file->pathnamehash)) {
+            if (!self::create_scan_result_record($id, $file)) {
                 mtrace('Could not create scan_result_record for ' . $file->contenthash);
                 $DB->delete_records('local_a11y_check', array('id' => $id));
             }
@@ -299,52 +311,5 @@ class pdf {
             return LOCAL_A11Y_CHECK_STATUS_FAIL;
         }
     }
-
-    /**
-     * Find references to a file in the database.
-     */
-    public static function find_file_references($contenthash, $pathnamehash) {
-
-        global $DB;
-
-        // Create the SQL query.
-
-        // SELECT f.id as fileid, f.contenthash as contenthash, ctx.instanceid as instanceid, ctx.path as path, actp.id as scanid,
-        // CASE WHEN f.component = 'mod_resource' THEN r.name ELSE f.filename END AS 'filename'
-        // FROM mdl_files f
-        // INNER JOIN mdl_context ctx on (ctx.id = f.contextid)
-        // INNER JOIN mdl_course_modules cm on (cm.id = ctx.instanceid)
-        // INNER JOIN mdl_local_a11y_check_type_pdf actp on (f.contenthash = actp.contenthash)
-        // LEFT OUTER JOIN mdl_resource r on (r.id = cm.instance)
-        // WHERE f.component in ('course', 'course', 'block_html', 'mod_assign', 'mod_book', 'mod_data', 'mod_folder', 'mod_forum', 'mod_glossary', 'mod_label', 'mod_lesson', 'mod_page', 'mod_publication', 'mod_questionnaire', 'mod_quiz', 'mod_resource', 'mod_scorm', 'mod_url', 'mod_workshop', 'qtype_essay', 'question')
-        // AND f.filesize <> 0
-        // AND f.mimetype = 'application/pdf'
-        // AND f.contextid = ctx.id
-        // AND f.contenthash = actp.contenthash
-
-        $sql = "SELECT f.id as fileid, f.contenthash as contenthash, ctx.instanceid as instanceid, ctx.path as path, fs.id as filescanid,
-        CASE WHEN f.component = 'mod_resource' 
-            THEN r.name 
-            ELSE f.filename 
-        END AS 'filename'
-        FROM {files} f
-        INNER JOIN {context} ctx on (ctx.id = f.contextid)
-        INNER JOIN {course_modules} cm on (cm.id = ctx.instanceid)
-        INNER JOIN {block_filescan_files} fs on (f.contenthash = fs.contenthash)
-        LEFT OUTER JOIN {resource} r on (r.id = cm.instance)
-        WHERE f.component in ('course', 'block_html', 'mod_assign', 'mod_book', 'mod_data', 'mod_folder', 'mod_forum', 'mod_glossary', 'mod_label', 'mod_lesson', 'mod_page', 'mod_publication', 'mod_questionnaire', 'mod_quiz', 'mod_resource', 'mod_scorm', 'mod_url', 'mod_workshop', 'qtype_essay', 'question')
-        AND f.filesize <> 0
-        AND f.mimetype = 'application/pdf'
-        AND f.contextid = ctx.id
-        AND f.contenthash = fs.contenthash";
-
-        // Execute the query.
-        $records = $DB->get_records_sql($sql);
-
-        // Return the records.
-        return $records;
-
-    }
-
 
 }
