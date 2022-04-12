@@ -90,6 +90,14 @@ class scan_pdf_files extends \core\task\scheduled_task {
                     $a11ystatus = \local_a11y_check\pdf::eval_a11y_status($results);
                     // Update the record with the $a11ystatus.
                     \local_a11y_check\pdf::update_scan_status($ref->scanid, $a11ystatus);
+                } catch (\Throwable $e) {
+                    mtrace("Error scanning $ref->pathnamehash");
+                    $errormessage = $e->getMessage();
+                    // If there is an error scanning the file, set the status appropriately so the file does not get scanned again.
+                    $newstatus = new \local_a11y_check\pdf_a11y_results();
+                    \local_a11y_check\pdf::update_scan_status($ref->scanid, LOCAL_A11Y_CHECK_STATUS_ERROR, $errormessage);
+                    \local_a11y_check\pdf::update_scan_record($ref->contenthash, $newstatus);
+                    continue;
                 } catch (\Exception $e) {
                     mtrace("Error scanning $ref->pathnamehash");
                     $errormessage = $e->getMessage();

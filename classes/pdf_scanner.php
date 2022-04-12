@@ -26,7 +26,7 @@ namespace local_a11y_check;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . "/../lib/smalot/pdfparser/alt_autoload.php-dist");
+require_once(dirname(__FILE__) . "/../lib/smalot/pdfparser-2.2.0/alt_autoload.php-dist");
 require_once(dirname(__FILE__) . "/pdf_a11y_results.php");
 
 /**
