@@ -24,6 +24,13 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+/**
+ * Adds a link to the a11y check report to the course settings menu.
+ * @param $navigation
+ * @param $course
+ * @param $context
+ * @return void
+ */
 function local_a11y_check_extend_navigation_course($navigation, $course, $context) {
     if (has_capability('moodle/site:config', $context)) {
         $url = new moodle_url('/local/a11y_check/reports/admin.php', array('id'=>$course->id));
