@@ -26,10 +26,9 @@ defined('MOODLE_INTERNAL') || die;
 
 /**
  * Adds a link to the a11y check report to the course settings menu.
- * @param $navigation
- * @param $course
- * @param $context
- * @return void
+ * @param navigation_node $navigation The navigation node to extend
+ * @param stdClass        $course The course object
+ * @param context         $context The course context
  */
 function local_a11y_check_extend_navigation_course($navigation, $course, $context) {
     if (has_capability('moodle/site:config', $context)) {
