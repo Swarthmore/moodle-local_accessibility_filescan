@@ -30,7 +30,7 @@ require_admin();
 
 // Page setup.
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/a11y_check/views/react-report.php');
+$PAGE->set_url('/local/a11y_check/reports/admin.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title('A11y Check - Scanned PDFs');
 $PAGE->set_heading('A11y Check - Scanned PDFs');
