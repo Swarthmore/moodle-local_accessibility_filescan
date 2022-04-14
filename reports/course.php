@@ -18,38 +18,20 @@
  * This page handles a general overview of PDF accessibility issues.
  *
  * @package   local_a11y_check
- * @copyright 2021 Swarthmore College
+ * @copyright 2022 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(dirname(__FILE__) . '/../../../config.php');
 require_once(dirname(__FILE__) . '/../classes/report.php');
 
-// Restrict this page to administrators only.
-require_admin();
-
 // Page setup.
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/a11y_check/views/react-report.php');
+$PAGE->set_url('/local/a11y_check/reports/course.php');
 $PAGE->set_pagelayout('report');
 $PAGE->set_title('A11y Check - Scanned PDFs');
 $PAGE->set_heading('A11y Check - Scanned PDFs');
 
 echo $OUTPUT->header();
-
-// Get the report.
-$report = \local_a11y_check\report::generate_report();
-$json = json_encode($report);
-
-// Add the DOM element for the React app to attach to.
-echo '<div id="a11y_check__Root"></div>';
-
-// Add $json as a global variable so it can be accessed by the React app.
-echo '<script>';
-echo "const data = $json";
-echo '</script>';
-
-// Add the React app.
-echo '<script src="js/report.js"></script>';
 
 echo $OUTPUT->footer();

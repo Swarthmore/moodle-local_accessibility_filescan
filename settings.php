@@ -24,6 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+global $CFG;
+
 if ($hassiteconfig) {
     $settings = new admin_settingpage('local_a11y_check', get_string('pluginname', 'local_a11y_check'));
     $ADMIN->add('localplugins', $settings);
@@ -80,4 +82,8 @@ if ($hassiteconfig) {
         PARAM_URL,
         60
     ));
+
+    // Add a link to the report to Site administration -> Reports
+    $ADMIN->add('reports', new admin_externalpage('reporta11ycheck', get_string('pluginname', 'local_a11y_check'),
+        "$CFG->wwwroot/local/a11y_check/reports/admin.php"));
 }

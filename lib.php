@@ -15,17 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for local_a11y_check
+ * Language file for local_a11y_check
  *
  * @package   local_a11y_check
- * @copyright 2021 Swarthmore College
+ * @copyright 2020 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2022041404;
-$plugin->requires  = 2020110906;
-$plugin->component = 'local_a11y_check';
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = 'v0.0.1';
+/**
+ * Adds a link to the a11y check report to the course settings menu.
+ * @param navigation_node $navigation The navigation node to extend
+ * @param stdClass        $course The course object
+ * @param context         $context The course context
+ */
+function local_a11y_check_extend_navigation_course($navigation, $course, $context) {
+    if (has_capability('moodle/site:config', $context)) {
+        $url = new moodle_url('/local/a11y_check/reports/admin.php', array('id' => $course->id));
+        $navigation->add(get_string('pluginname', 'local_a11y_check'), $url,
+            navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
+    }
+}
