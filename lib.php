@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die;
  */
 function local_a11y_check_extend_navigation_course($navigation, $course, $context) {
     if (has_capability('moodle/site:config', $context)) {
-        $url = new moodle_url('/local/a11y_check/reports/admin.php', array('id'=>$course->id));
+        $url = new moodle_url('/local/a11y_check/reports/admin.php', array('id' => $course->id));
         $navigation->add(get_string('pluginname', 'local_a11y_check'), $url,
             navigation_node::TYPE_SETTING, null, null, new pix_icon('i/report', ''));
     }
