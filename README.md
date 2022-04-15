@@ -21,16 +21,6 @@ git clone https://github.com/Swarthmore/moodle-local_a11y_check /moodle/root/dir
 
 ### A11y Report
 
-This plugin provides the following endpoints to Moodle administrators. All URLs should be prefixed by your Moodle base URL (ie. https://moodle.mycollege.edu)
+This plugin adds an `A11y Report` link to a course's settings tree. It also adds a system-wide report in **System Administration -> Reports**
 
-#### Provides details about scanned PDFs and their accessibility score.
-
-```
-/local/a11y_check/views/report.php
-```
-
-#### Download a CSV report containing scanned PDFs and their accessibility score.
-
-```
-/local/a11y_check/views/download_report.php
-```
+The course report displays scanned 

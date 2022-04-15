@@ -86,6 +86,7 @@ function Report({ data }) {
 
     const columns = React.useMemo(() => [
         { Header: 'id', accessor: 'id' },
+        { Header: 'name', accessor: 'filename' },
         { Header: 'text', accessor: 'hastext' },
         { Header: 'title', accessor: 'hastitle' },
         { Header: 'language', accessor: 'haslanguage' },

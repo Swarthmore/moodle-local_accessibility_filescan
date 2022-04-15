@@ -7,7 +7,7 @@ const config = {
         "./src/report.js"
     ],
     output: {
-        path: path.resolve(__dirname, "views", "js"),
+        path: path.resolve(__dirname, "reports", "js"),
         filename: "report.js"
     },
     plugins: [
