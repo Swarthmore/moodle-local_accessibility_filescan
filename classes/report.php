@@ -41,19 +41,30 @@ class report {
     public static function generate_report($limit = 1000) {
         global $DB;
 
-        $sql = "SELECT f.id, f.scanid, f.contenthash as contenthash,"
-            . "f.pathnamehash as pathnamehash, f.hastext, f.hastitle, f.haslanguage,"
-            . "f.istagged, f.pagecount, f.hasbookmarks, c.status, c.statustext,"
-            . "c.lastchecked, files.filename "
-            . "FROM {local_a11y_check_type_pdf} f "
-            . "INNER JOIN {local_a11y_check} c ON c.id = f.scanid "
-            . "INNER JOIN {files} files ON files.pathnamehash=f.pathnamehash";
-        $rs = $DB->get_recordset_sql($sql, null, 0, $limit);
+        $sql = "SELECT actp.id, actp.scanid, actp.contenthash as contenthash,"
+            . "actp.pathnamehash as pathnamehash, actp.hastext, actp.hastitle, actp.haslanguage,"
+            . "actp.istagged, actp.pagecount, actp.hasbookmarks, ac.status, ac.statustext,"
+            . "ac.lastchecked, f.filename, f.contextid, f.component, f.filepath, f.filearea, f.itemid "
+            . "FROM {local_a11y_check_type_pdf} actp "
+            . "INNER JOIN {local_a11y_check} ac ON ac.id = actp.scanid "
+            . "INNER JOIN {files} f ON f.pathnamehash = actp.pathnamehash";
+        $recordset = $DB->get_recordset_sql($sql, null, 0, $limit);
         $files = array();
-        foreach ($rs as $record) {
+
+        foreach ($recordset as $record) {
+            $file_url = \moodle_url::make_pluginfile_url(
+                $record->contextid,
+                $record->component,
+                $record->filearea,
+                $record->itemid,
+                $record->filepath,
+                $record->filename,
+                false
+            );
+            $record->fileurl = $file_url->out(false);
             array_push($files, $record);
         }
-        $rs->close();
+        $recordset->close();
         return $files;
     }
 
