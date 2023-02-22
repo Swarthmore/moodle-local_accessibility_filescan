@@ -41,7 +41,7 @@
         <KEY NAME="pdf_scan_id" TYPE="foreign-unique" FIELDS="scanid" REFTABLE="local_a11y_check" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="pdf_contenthash" UNIQUE="true" FIELDS="contenthash"/>
+        <INDEX NAME="id" UNIQUE="true" FIELDS="id"/>
       </INDEXES>
     </TABLE>
   </TABLES>
