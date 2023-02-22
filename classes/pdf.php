@@ -71,8 +71,7 @@ class pdf {
         global $DB;
 
         // Create the query.
-        $sql = "SELECT f.contenthash as contenthash, f.pathnamehash as pathnamehash,
-            f.id as file_id,
+        $sql = "SELECT f.id as file_id, f.contenthash as contenthash, f.pathnamehash as pathnamehash,
             f.author as author,
             f.timecreated as file_timecreated,
             MAX(f.filesize) as filesize,
