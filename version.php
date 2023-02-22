@@ -18,13 +18,13 @@
  * Version information for local_a11y_check
  *
  * @package   local_a11y_check
- * @copyright 2021 Swarthmore College
+ * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2022041405;
+$plugin->version   = 2023012802;
 $plugin->requires  = 2020110906;
 $plugin->component = 'local_a11y_check';
 $plugin->maturity  = MATURITY_ALPHA;
