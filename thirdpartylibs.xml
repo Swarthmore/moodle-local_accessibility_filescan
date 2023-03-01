@@ -3,7 +3,7 @@
     <library>
         <location>lib/smalot/pdfparser-2.2.0/</location>
         <name>pdfparser</name>
-        <version>v2.2.0</version>
+        <version>v2.3.0</version>
         <license>LGPL</license>
         <licenseversion>3.0</licenseversion>
     </library>
