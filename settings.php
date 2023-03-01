@@ -22,6 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/** @var admin_root $ADMIN */
+
 defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
@@ -50,40 +52,4 @@ if ($hassiteconfig) {
         3,
         PARAM_INT
     ));
-
-    $settings->add(new admin_setting_configtext('local_a11y_check/text_check_help',
-        get_string('settings:text_check_help', 'local_a11y_check'),
-        get_string('settings:text_check_help_desc', 'local_a11y_check'),
-        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-        PARAM_URL,
-        60
-    ));
-
-    $settings->add(new admin_setting_configtext('local_a11y_check/title_check_help',
-        get_string('settings:title_check_help', 'local_a11y_check'),
-        get_string('settings:title_check_help_desc', 'local_a11y_check'),
-        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-        PARAM_URL,
-        60
-    ));
-
-    $settings->add(new admin_setting_configtext('local_a11y_check/lang_check_help',
-        get_string('settings:lang_check_help', 'local_a11y_check'),
-        get_string('settings:lang_check_help_desc', 'local_a11y_check'),
-        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-        PARAM_URL,
-        60
-    ));
-
-    $settings->add(new admin_setting_configtext('local_a11y_check/outline_check_help',
-        get_string('settings:outline_check_help', 'local_a11y_check'),
-        get_string('settings:outline_check_help_desc', 'local_a11y_check'),
-        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-        PARAM_URL,
-        60
-    ));
-
-    // Add a link to the report to Site administration -> Reports
-    $ADMIN->add('reports', new admin_externalpage('reporta11ycheck', get_string('pluginname', 'local_a11y_check'),
-        "$CFG->wwwroot/local/a11y_check/reports/admin.php"));
 }
