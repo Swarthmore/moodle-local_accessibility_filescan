@@ -37,15 +37,3 @@ $string['settings:max_file_size_mb_desc'] = 'The max file size to scan, in megab
 
 $string['settings:max_retries'] = 'Maximum retries';
 $string['settings:max_retries_desc'] = 'Maximum number of times to try scanning a file before giving up';
-
-$string['settings:text_check_help'] = 'Text check help link';
-$string['settings:text_check_help_desc'] = 'Link to help documentation for the text check';
-
-$string['settings:title_check_help'] = 'Title check help link';
-$string['settings:title_check_help_desc'] = 'Link to help documentation for the title check';
-
-$string['settings:lang_check_help'] = 'Language check help link';
-$string['settings:lang_check_help_desc'] = 'Link to help documentation for the language check';
-
-$string['settings:outline_check_help'] = 'Outline check help link';
-$string['settings:outline_check_help_desc'] = 'Link to help documentation for the outline check';
