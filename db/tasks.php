@@ -53,7 +53,6 @@ $tasks = array(
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
-        'disabled' => 0,
-        'blocking' => 0
+        'disabled' => 0
     )
 );
