@@ -1,3 +1,5 @@
+phpcs.xml.dist
+
 local/
 .DS_Store
 .idea/
