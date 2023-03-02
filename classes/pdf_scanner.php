@@ -26,7 +26,7 @@ namespace local_a11y_check;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . "/../lib/smalot/pdfparser-2.2.0/alt_autoload.php-dist");
+require_once(dirname(__FILE__) . "/../lib/smalot/pdfparser-2.3.0/alt_autoload.php-dist");
 require_once(dirname(__FILE__) . "/pdf_a11y_results.php");
 
 /**
@@ -36,7 +36,7 @@ class pdf_scanner {
     /**
      * Scan a pdf for a11y
      * @param string $file The filepath to the pdf
-     * @return \pdf_a11y_results
+     * @return
      */
     public static function scan($file) {
         // Initiate the new results object.
@@ -138,7 +138,7 @@ class pdf_scanner {
     }
 
     /**
-     * Get the pdfino command
+     * Get the pdfinfo command
      * @param string $pdffile The filepath to the pdf
      * @return string
      */
