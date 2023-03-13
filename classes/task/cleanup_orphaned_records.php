@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class remove_deleted_files extends \core\task\scheduled_task {
+class cleanup_orphaned_records extends \core\task\scheduled_task {
     /**
      * Get the name of the task.
      *
@@ -45,10 +45,9 @@ class remove_deleted_files extends \core\task\scheduled_task {
 
     /**
      * Execute the task.
+     * @throws \dml_exception
      */
     public function execute() {
-        global $DB;
-        \local_a11y_check\pdf::remove_deleted_files();
-        return;
+        \local_a11y_check\pdf::cleanup_orphaned_records();
     }
 }

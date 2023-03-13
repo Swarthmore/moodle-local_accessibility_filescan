@@ -55,21 +55,21 @@ class find_pdf_files extends \core\task\scheduled_task {
         $limit = (int) get_config('local_a11y_check', 'files_per_cron');
 
         // Get the unscanned PDF files.
-        $files = \local_a11y_check\pdf::get_unscanned_pdf_files($limit);
+        $files = \local_a11y_check\pdf::get_unqueued_files();
 
-        // Only process if there are files to process.
-        if (is_array($files) && count($files) > 0) {
-            $lockfactory = \core\lock\lock_config::get_lock_factory('local_a11y_check_find_pdf_files_task');
-            foreach ($files as $file) {
-                $lockkey = "contenthash: {$file->contenthash}";
-                if ($lock = $lockfactory->get_lock($lockkey, $timeout)) {
-                    // Create records for the file.
-                    \local_a11y_check\pdf::provision_db_records($file);
-                    $lock->release();
-                } else {
-                    throw new \moodle_exception('locktimeout');
-                }
-            }
-        }
+//        // Only process if there are files to process.
+//        if (is_array($files) && count($files) > 0) {
+//            $lockfactory = \core\lock\lock_config::get_lock_factory('local_a11y_check_find_pdf_files_task');
+//            foreach ($files as $file) {
+//                $lockkey = "contenthash: {$file->contenthash}";
+//                if ($lock = $lockfactory->get_lock($lockkey, $timeout)) {
+//                    // Create records for the file.
+//                    \local_a11y_check\pdf::provision_db_records($file);
+//                    $lock->release();
+//                } else {
+//                    throw new \moodle_exception('locktimeout');
+//                }
+//            }
+//        }
     }
 }

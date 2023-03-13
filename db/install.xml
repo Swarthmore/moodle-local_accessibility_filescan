@@ -46,9 +46,9 @@
         <FIELD NAME="fileid" TYPE="int" LENGTH="10" NOTNULL="true" />
       </FIELDS>
       <KEYS>
-        <KEY NAME="courseid" TYPE="foreign-unique" FIELDS="courseid" REFTABLE="course" REFFIELDS="id" />
-        <KEY NAME="scanid" TYPE="foreign-unique" FIELDS="scanid" REFTABLE="local_a11y_check" REFFIELDS="id" />
-        <KEY NAME="fileid" TYPE="foreign-unique" FIELDS="fileid" REFTABLE="files" REFFIELDS="id" />
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id" />
+        <KEY NAME="scanid" TYPE="foreign" FIELDS="scanid" REFTABLE="local_a11y_check_queue" REFFIELDS="id" />
+        <KEY NAME="fileid" TYPE="foreign" FIELDS="fileid" REFTABLE="files" REFFIELDS="id" />
       </KEYS>
     </TABLE>
   </TABLES>
