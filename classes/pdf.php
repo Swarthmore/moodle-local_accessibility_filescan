@@ -24,6 +24,9 @@
 
 namespace local_a11y_check;
 
+use Exception;
+use Throwable;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../locallib.php');
@@ -34,25 +37,52 @@ require_once(dirname(__FILE__) . '/../locallib.php');
 class pdf {
 
     /**
-     * Find all PDF files that do not have a record in the a11y_check queue.
+     * Remove all rows that don't have a record in mdl_files (draft context is ignored).
+     * @throws \dml_exception
+     */
+    public static function cleanup_orphaned_records(): void {
+        global $DB;
+
+        $sql = 'select lacp.scanid as "scanid", lacp.fileid as "fileid", lacp.courseid as "courseid" '.
+            'from {local_a11y_check_queue} lacq ' .
+            'inner join {local_a11y_check_pivot} lacp on lacq.id = lacp.scanid '.
+            'left outer join {files} f on f.id = lacp.fileid '.
+            'where f.id is null';
+
+        $records = $DB->get_records_sql($sql);
+
+        mtrace('Found ' . count($records) . ' orphaned records');
+
+        foreach ($records as $record) {
+            // Remove record from the PDF results table.
+            $DB->delete_records('local_a11y_check_type_pdf', ['scanid' => $record->scanid]);
+            // Remove record from the queue table.
+            $DB->delete_records('local_a11y_check_queue', ['id' => $record->scanid]);
+            // Remove record from the pivot table.
+            $DB->delete_records('local_a11y_check_pivot',
+                ['scanid' => $record->scanid, 'fileid' => $record->fileid, 'courseid' => $record->courseid]);
+        }
+
+    }
+
+    /**
+     * Find all PDF files that do not have a record in the queue.
      * @throws \dml_exception
      */
     public static function get_unqueued_files(): array {
         global $DB;
 
-        $sql = <<<'SQL'
-            select f.id as "file_id", f.filesize as "file_filesize", f.filename as "file_filename", c.id as "course_id", 
-                   c.shortname as "course_shortname", c.fullname as "course_fullname" 
-            from m_files f 
-            inner join m_context ctx on ctx.id = f.contextid 
-            inner join m_course_modules cm on cm.id = ctx.instanceid 
-            inner join m_course c on c.id = cm.course 
-            left outer join m_local_a11y_check_pivot lacp on lacp.fileid = f.id and lacp.courseid = c.id
-            left outer join m_local_a11y_check_queue lacq on lacq.id = lacp.scanid
-            where f.mimetype = 'application/pdf'
-            and ctx.contextlevel = 70
-            and lacq.id is null
-        SQL;
+        $sql = 'select f.id as "fileid", f.filesize as "filesize", f.filename as "filename", '.
+            'c.id as "courseid", c.shortname as "courseshortname", c.fullname as "coursefullname" '.
+            'from {files} f '.
+            'inner join {context} ctx on ctx.id = f.contextid  '.
+            'inner join {course_modules} cm on cm.id = ctx.instanceid '.
+            'inner join {course} c on c.id = cm.course '.
+            'left outer join {local_a11y_check_pivot} lacp on lacp.fileid = f.id and lacp.courseid = c.id '.
+            'left outer join {local_a11y_check_queue} lacq on lacq.id = lacp.scanid '.
+            'where ctx.contextlevel = 70 '.
+            'and lacq.id is null '.
+            "and f.mimetype = 'application/pdf'";
 
         $files = [];
         $recordset = $DB->get_recordset_sql($sql);
@@ -68,119 +98,18 @@ class pdf {
     }
 
     /**
-     * Create the queue record a single PDF.
-     * @param mixed $file The file object.
-     *                    Must have file_filesize, course_id, and file_id
-     * @return bool|int Returns the created record id on success.
-     * @throws \dml_exception
+     * Return the ids of all PDF files in the queue, but have not been scanned for accessibility.
      */
-    public static function put_file_in_queue(mixed $file): bool|int {
+    public static function get_unscanned_files(): array {
         global $DB;
 
-        $canprocess = self::is_under_max_filesize($file->file_filesize);
-
-        $scanid = $DB->insert_record('local_a11y_check_queue', [
-            'checktype' => LOCAL_A11Y_CHECK_TYPE_PDF,
-            'faildelay' => 120,
-            'lastchecked' => 0,
-            'status' => $canprocess ? LOCAL_A11Y_CHECK_STATUS_UNCHECKED : LOCAL_A11Y_CHECK_STATUS_IGNORE,
-            'statustext' => $canprocess ? null : 'File exceeds max filesize'
-        ]);
-
-        $DB->insert_record('local_a11y_check_pivot', [
-            'courseid' => $file->course_id,
-            'fileid' => $file->file_id,
-            'scanid' => $scanid
-        ], false);
-
-        return $scanid;
-
-    }
-
-
-    /**
-     * Remove all rows that don't have a record in mdl_files (draft context is ignored).
-     * @throws \dml_exception
-     */
-    public static function cleanup_orphaned_records(): void {
-        global $DB;
-
-        $sql = <<< 'SQL'
-            select lacp.scanid as "scanid", lacp.fileid as "fileid", lacp.courseid as "courseid" 
-            from {local_a11y_check_queue} lacq
-            inner join {local_a11y_check_pivot} lacp on lacq.id = lacp.scanid
-            left outer join {files} f on f.id = lacp.fileid
-            where f.id is null;
-        SQL;
-
-        $records = $DB->get_records_sql($sql);
-
-        mtrace('Found ' . count($records) . ' orphaned records');
-
-        foreach ($records as $record) {
-            $DB->delete_records('local_a11y_check_type_pdf', ['scanid' => $record->scanid]);
-            $DB->delete_records('local_a11y_check_queue', ['id' => $record->scanid]);
-            $DB->delete_records('local_a11y_check_pivot',
-                ['scanid' => $record->scanid, 'fileid' => $record->fileid, 'courseid' => $record->courseid]);
-        }
-
-    }
-
-
-    /**
-     * Create a tmp file in the Moodle temp file storage area and return the path.
-     * @param $file
-     * @return string
-     */
-    private static function create_tmp_file($file): string {
-        global $CFG;
-        $fs = get_file_storage();
-        $file = $fs->get_file_by_id($file->fileid);
-        $content = $file->get_content();
-        // Copy the file to a temp directory so that it can be scanned.
-        $tmpfile = $CFG->dataroot . '/temp/filestorage/' . $file->get_pathnamehash() . '.pdf';
-        file_put_contents($tmpfile, $content);
-        return $tmpfile;
-    }
-
-    /**
-     * Scan queued files (at random) and returns its accessibility results,
-     * @return void
-     */
-    public static function scan_queued_files(): void {
-
-        $files = self::find_unscanned_files();
-
-        // Get a random subset of 2 from $files to scan.
-        $keys = array_rand($files, 2);
-
-        if (count($files) == 0) {
-            mtrace('No files found');
-            return;
-        }
-
-        foreach ($keys as $key) {
-            $fileref = $files[$key];
-            $tmpfile = self::create_tmp_file($fileref);
-            $results = \local_a11y_check\pdf_scanner::scan($tmpfile);
-            var_dump($results);
-            // Make sure to delete tmpfile!
-            unlink($tmpfile);
-        }
-
-    }
-
-    public static function find_unscanned_files(): array {
-        global $DB;
-
-        $sql = <<< 'SQL'
-            select *
-            from {local_a11y_check_queue} "lacq"
-            inner join {local_a11y_check_pivot} "lacp" on lacp.scanid = lacq.id
-            inner join {files} "f" on f.id = lacp.fileid
-            where lacq.status = 0 
-            limit 5
-        SQL;
+        $sql = 'select lacp.fileid as "fileid", lacq.id as "scanid" '.
+            'from {local_a11y_check_queue} lacq '.
+            'inner join {local_a11y_check_pivot} lacp on lacp.scanid = lacq.id '.
+            'inner join {files} f on f.id = lacp.fileid '.
+            'where lacq.status = 0  '.
+            "and f.mimetype = 'application/pdf' ".
+            'limit 5';
 
         $files = [];
         $recordset = $DB->get_recordset_sql($sql);
@@ -192,141 +121,111 @@ class pdf {
     }
 
     /**
-     * Updates the scan record for file
-     * @param string $contenthash
-     * @param \result $payload The results of the a11y scan
-     * @return boolean
+     * Create a queue record a single PDF.
+     * @param mixed $file The file object. (Must have file_filesize, course_id, and file_id).
+     * @return void
+     * @throws \dml_exception
      */
-    public static function update_scan_record($contenthash, $payload) {
-
+    public static function put_file_in_queue(mixed $file): void {
         global $DB;
 
-        // Create the query.
-        $sql = "UPDATE {local_a11y_check_type_pdf}\n"
-            . "SET hastext={$payload->hastext},"
-            . "hastitle={$payload->hastitle},"
-            . "haslanguage={$payload->haslanguage},"
-            . "hasbookmarks={$payload->hasbookmarks},"
-            . "istagged={$payload->istagged},"
-            . "pagecount={$payload->pagecount}\n"
-            . "WHERE contenthash='{$contenthash}'";
-
-        // Run the query. This will return true if the query was successful.
-        return $DB->execute($sql);
-    }
-
-    /**
-     * Update scan status for given scanid
-     * @param int $scanid
-     * @param int $status
-     * @param string|null $statustext
-     * @return boolean
-     */
-    public static function update_scan_status($scanid, $status, $statustext = null) {
-        global $DB;
+        // Check if the file exceeds the max filesize set in the config.
+        $maxfilesize = (int) get_config('local_a11y_check', 'max_file_size_mb');
+        $canprocess = (bool) $file->filesize <= $maxfilesize;
 
         $now = time();
-        $sql = "UPDATE {local_a11y_check}\n"
-        . "SET status={$status},"
-        . "statustext='{$statustext}',"
-        . "lastchecked={$now}\n"
-        . "WHERE id='{$scanid}'";
 
-        $DB->execute($sql);
+        // Insert the record into the queue table.
+        $scanid = $DB->insert_record('local_a11y_check_queue', [
+            'checktype' => LOCAL_A11Y_CHECK_TYPE_PDF,
+            'faildelay' => $now + 120,
+            'lastchecked' => $now,
+            'status' => $canprocess ? LOCAL_A11Y_CHECK_STATUS_UNCHECKED : LOCAL_A11Y_CHECK_STATUS_IGNORE,
+            'statustext' => $canprocess ? null : 'File exceeds max filesize'
+        ]);
 
-        return true;
+        // Insert the record into the pivot table.
+        $DB->insert_record('local_a11y_check_pivot', [
+            'courseid' => $file->courseid,
+            'fileid' => $file->fileid,
+            'scanid' => $scanid
+        ], false);
+
     }
 
     /**
-     * Checks if a file is less than or greater than the max file size to scan
-     * in the plugin settings.
-     * @param int $filesize The filesize in megabytes.
-     * @return boolean Returns true if the filesize is under the config max file size, and false
-     * if it is over it.
+     * Scan queued files (at random) and returns its accessibility results.
+     * @return void
+     * @throws \dml_exception
      */
-    public static function is_under_max_filesize(int $filesize) {
-        $maxfilesize = (int) get_config('local_a11y_check', 'max_file_size_mb');
-        return (bool) $filesize <= $maxfilesize;
-    }
+    public static function scan_queued_files(): void {
 
-
-    /**
-     * Create a row in the a11y_check_type_pdf table.
-     * @param int $id The scan id.
-     * @param object $file The file object.
-     * @return mixed Returns the created record id on success.
-     */
-    public static function create_scan_result_record(int $id, $file) {
         global $DB;
-        $record = new \stdClass;
-        $record->scanid = $id;
-        $record->contenthash = $file->contenthash;
-        $record->pathnamehash = $file->pathnamehash;
-        $record->file_author = $file->author;
-        $record->file_timecreated = $file->file_timecreated;
-        $record->courseinfo = json_encode($file->courseinfo);
-        return $DB->insert_record('local_a11y_check_type_pdf', $record);
-    }
 
-    /**
-     * Creates the required records in a11y_check and a11y_check_type_pdf tables.
-     * @param mixed $file The file to create the records for.
-     */
-    public static function provision_db_records($file) {
-        global $DB;
-        $id = self::create_scan_record($file);
-        if (!$id) {
-            // If a record cannot be created, there's no need to create the scan_result_record.
-            mtrace('Could not create scan_record for ' . $file->contenthash);
+        $files = self::get_unscanned_files();
+
+        if (count($files) == 0) {
+            mtrace('No files found');
+            return;
         } else {
-            // If the scan_result_record cannot be created, remove the original record for the database.
-            if (!self::create_scan_result_record($id, $file)) {
-                mtrace('Could not create scan_result_record for ' . $file->contenthash);
-                $DB->delete_records('local_a11y_check', array('id' => $id));
+            mtrace('Found '. count($files) . ' files to scan');
+        }
+
+        foreach ($files as $file) {
+            try {
+
+                mtrace("Scanning $file->fileid");
+
+                $tmpfile = self::create_tmp_file($file->fileid);
+                $results = \local_a11y_check\pdf_scanner::scan($tmpfile);
+                $record = [
+                    'scanid' => $file->scanid,
+                    'hastext' => $results->hastext,
+                    'hastitle' => $results->hastitle,
+                    'haslanguage' => $results->haslanguage,
+                    'hasbookmarks' => $results->hasbookmarks,
+                    'istagged' => $results->istagged,
+                    'pagecount' => $results->pagecount
+                ];
+                // Create the results record that will be inserted into the PDF results table.
+                // Insert the results into the PDF results table.
+                $DB->insert_record('local_a11y_check_type_pdf', $record);
+                // Update the scan status in the queue table.
+                $DB->update_record('local_a11y_check_queue', (object) [
+                    'id' => $file->scanid,
+                    'status' => 1,
+                    'lastchecked' => time()
+                ]);
+                // Make sure to delete tmpfile!
+                unlink($tmpfile);
+            } catch (Exception | Throwable $e) {
+                // If there's an error, get the message and update the queue table.
+                $DB->update_record('local_a11y_check_queue', (object) [
+                    'id' => $file->scanid,
+                    'status' => 4,
+                    'statustext' => $e->getMessage(),
+                    'lastchecked' => time()
+                ]);
             }
+
         }
+
     }
 
     /**
-     * Get the scan status of a file.
-     * @param int $scanid The scanid of the file.
-     * @param int $limit The limit of records to return. Optional.
-     * @return int
+     * Create a tmp file in the Moodle temp file storage area and return the path.
+     * @param $fileid int
+     * @return string
      */
-    public static function get_scan_status($scanid, $limit = 5) {
-        global $DB;
-        $sql = "SELECT c.status, c.statustext
-            FROM {local_a11y_check} c
-            WHERE c.id = {$scanid}
-        ";
-        $records = $DB->get_records_sql($sql, null, 0, $limit);
-        if (!$records) {
-            return LOCAL_A11Y_CHECK_STATUS_UNCHECKED;
-        } else {
-            // Get the first value in the array.
-            $record = reset($records);
-            return $record->status;
-        }
-    }
-
-    /**
-     * Takes the result object and returns the accessibility status.
-     * @param \result $result The result object
-     * @return int
-     */
-    public static function eval_a11y_status($result) {
-        if (
-            boolval($result->hastext)
-            && boolval($result->istagged)
-            && boolval($result->hastitle)
-            && boolval($result->haslanguage)
-        ) {
-            return LOCAL_A11Y_CHECK_STATUS_PASS;
-        } else if (!boolval($result->hastext)) {
-            return LOCAL_A11Y_CHECK_STATUS_CHECK;
-        } else {
-            return LOCAL_A11Y_CHECK_STATUS_FAIL;
-        }
+    private static function create_tmp_file(int $fileid): string {
+        global $CFG;
+        $fs = get_file_storage();
+        $file = $fs->get_file_by_id($fileid);
+        $content = $file->get_content();
+        // Copy the file to a temp directory so that it can be scanned.
+        $tmpfile = $CFG->dataroot . '/temp/filestorage/' . $file->get_pathnamehash() . '.pdf';
+        file_put_contents($tmpfile, $content);
+        return $tmpfile;
     }
 
 }
