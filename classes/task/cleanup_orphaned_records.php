@@ -18,7 +18,7 @@
  * Removes deleted records from plugin tables.
  *
  * @package   local_a11y_check
- * @copyright 2021 Swarthmore College
+ * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * Scheduled task to find scan plugin tables for deleted files.
  *
  * @package   local_a11y_check
- * @copyright 2021 Swarthmore College
+ * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class cleanup_orphaned_records extends \core\task\scheduled_task {

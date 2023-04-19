@@ -92,10 +92,10 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
         $this->task->execute();
 
         // After the task executes, there should be 0 unscanned files.
-        //$this->assert_unscanned_files_count(0);
+        $this->assert_unscanned_files_count(0);
 
         // There should be 12 records total.
-        //$this->assert_custom_record_count(9);
+        $this->assert_custom_record_count(9);
 
     }
 
@@ -197,7 +197,7 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
      * @return boolean
      */
     protected function assert_unscanned_files_count($count) {
-        $queryresults = $this->pdfhelper->get_unscanned_pdf_files(100);
+        $queryresults = $this->pdfhelper->get_unscanned_files();
         return $this->assertEquals($count, count($queryresults));
     }
 }

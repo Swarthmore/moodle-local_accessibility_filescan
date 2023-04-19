@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Find PDF files task definition for local_a11y_check
+ * Scan PDF files task definition for local_a11y_check
  *
  * @package   local_a11y_check
- * @copyright 2021 Swarthmore College
+ * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,10 +27,10 @@ namespace local_a11y_check\task;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Scheduled task to find unscanned PDF files.
+ * Scheduled task to scan PDF files for a11y issues.
  *
  * @package   local_a11y_check
- * @copyright 2020 Swarthmore College
+ * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class scan_pdf_files extends \core\task\scheduled_task {
@@ -48,69 +48,70 @@ class scan_pdf_files extends \core\task\scheduled_task {
      */
     public function execute() {
 
-        global $CFG;
+//        global $CFG;
 
         // Get the max amount of files to process from the plugin config.
         $limit = (int) get_config('local_a11y_check', 'files_per_cron');
 
         mtrace("Scanning " . $limit . " PDF files for accessibility issues.");
 
-        // Get the files to scan.
-        $files = \local_a11y_check\pdf::get_pdf_files($limit);
+        // Scan queued files.
+        \local_a11y_check\pdf::scan_queued_files();
 
-        // Get the file storage handler.
-        $fs = get_file_storage();
 
-        if (is_array($files) && count($files) > 0) {
-            foreach ($files as $ref) {
-                mtrace("Scanning $ref->pathnamehash");
-
-                // Get the scan status before actually scanning.
-                $scanstatus = \local_a11y_check\pdf::get_scan_status($ref->scanid);
-
-                // If the file has already been scanned, skip it.
-                if ($scanstatus != LOCAL_A11Y_CHECK_STATUS_UNCHECKED && $scanstatus != LOCAL_A11Y_CHECK_STATUS_IGNORE) {
-                    mtrace("Skipping scan for $ref->pathnamehash because it has a scanstatus of $scanstatus");
-                    continue;
-                }
-
-                $file = $fs->get_file_by_hash($ref->pathnamehash);
-                $fh = $file->get_content_file_handle();
-                $content = $file->get_content();
-
-                // Moodle intentionally does not provide an API to get a file's path on disk, so we must create one.
-                // The temp filepath of the pdf.
-                $tmp = $CFG->dataroot . '/temp/filestorage/' . $ref->pathnamehash . '.pdf';
-                file_put_contents($tmp, $content);
-
-                // Use the scanner to scan the file.
-                try {
-                    $results = \local_a11y_check\pdf_scanner::scan($tmp);
-                    $updatedrecord = \local_a11y_check\pdf::update_scan_record($ref->contenthash, $results);
-                    $a11ystatus = \local_a11y_check\pdf::eval_a11y_status($results);
-                    // Update the record with the $a11ystatus.
-                    \local_a11y_check\pdf::update_scan_status($ref->scanid, $a11ystatus);
-                } catch (\Throwable $e) {
-                    mtrace("Error scanning $ref->pathnamehash");
-                    $errormessage = $e->getMessage();
-                    // If there is an error scanning the file, set the status appropriately so the file does not get scanned again.
-                    $newstatus = new \local_a11y_check\pdf_a11y_results();
-                    \local_a11y_check\pdf::update_scan_status($ref->scanid, LOCAL_A11Y_CHECK_STATUS_ERROR, $errormessage);
-                    \local_a11y_check\pdf::update_scan_record($ref->contenthash, $newstatus);
-                    continue;
-                } catch (\Exception $e) {
-                    mtrace("Error scanning $ref->pathnamehash");
-                    $errormessage = $e->getMessage();
-                    // If there is an error scanning the file, set the status appropriately so the file does not get scanned again.
-                    $newstatus = new \local_a11y_check\pdf_a11y_results();
-                    \local_a11y_check\pdf::update_scan_status($ref->scanid, LOCAL_A11Y_CHECK_STATUS_ERROR, $errormessage);
-                    \local_a11y_check\pdf::update_scan_record($ref->contenthash, $newstatus);
-                    continue;
-                } finally {
-                    // Delete the tmp file.
-                    unlink($tmp);
-                }
-            }
-        }
+//        // Get the file storage handler.
+//        $fs = get_file_storage();
+//
+//        if (is_array($files) && count($files) > 0) {
+//            foreach ($files as $ref) {
+//                mtrace("Scanning $ref->pathnamehash");
+//
+//                // Get the scan status before actually scanning.
+//                $scanstatus = \local_a11y_check\pdf::get_scan_status($ref->scanid);
+//
+//                // If the file has already been scanned, skip it.
+//                if ($scanstatus != LOCAL_A11Y_CHECK_STATUS_UNCHECKED && $scanstatus != LOCAL_A11Y_CHECK_STATUS_IGNORE) {
+//                    mtrace("Skipping scan for $ref->pathnamehash because it has a scanstatus of $scanstatus");
+//                    continue;
+//                }
+//
+//                $file = $fs->get_file_by_hash($ref->pathnamehash);
+//                $fh = $file->get_content_file_handle();
+//                $content = $file->get_content();
+//
+//                // Moodle intentionally does not provide an API to get a file's path on disk, so we must create one.
+//                // The temp filepath of the pdf.
+//                $tmp = $CFG->dataroot . '/temp/filestorage/' . $ref->pathnamehash . '.pdf';
+//                file_put_contents($tmp, $content);
+//
+//                // Use the scanner to scan the file.
+//                try {
+//                    $results = \local_a11y_check\pdf_scanner::scan($tmp);
+//                    $updatedrecord = \local_a11y_check\pdf::update_scan_record($ref->contenthash, $results);
+//                    $a11ystatus = \local_a11y_check\pdf::eval_a11y_status($results);
+//                    // Update the record with the $a11ystatus.
+//                    \local_a11y_check\pdf::update_scan_status($ref->scanid, $a11ystatus);
+//                } catch (\Throwable $e) {
+//                    mtrace("Error scanning $ref->pathnamehash");
+//                    $errormessage = $e->getMessage();
+//                    // If there is an error scanning the file, set the status appropriately so the file does not get scanned again.
+//                    $newstatus = new \local_a11y_check\pdf_a11y_results();
+//                    \local_a11y_check\pdf::update_scan_status($ref->scanid, LOCAL_A11Y_CHECK_STATUS_ERROR, $errormessage);
+//                    \local_a11y_check\pdf::update_scan_record($ref->contenthash, $newstatus);
+//                    continue;
+//                } catch (\Exception $e) {
+//                    mtrace("Error scanning $ref->pathnamehash");
+//                    $errormessage = $e->getMessage();
+//                    // If there is an error scanning the file, set the status appropriately so the file does not get scanned again.
+//                    $newstatus = new \local_a11y_check\pdf_a11y_results();
+//                    \local_a11y_check\pdf::update_scan_status($ref->scanid, LOCAL_A11Y_CHECK_STATUS_ERROR, $errormessage);
+//                    \local_a11y_check\pdf::update_scan_record($ref->contenthash, $newstatus);
+//                    continue;
+//                } finally {
+//                    // Delete the tmp file.
+//                    unlink($tmp);
+//                }
+//            }
+//        }
     }
 }
