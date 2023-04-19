@@ -109,7 +109,7 @@ class pdf {
             'inner join {files} f on f.id = lacp.fileid '.
             'where lacq.status = 0  '.
             "and f.mimetype = 'application/pdf' ".
-            'limit 5';
+            'limit 25';
 
         $files = [];
         $recordset = $DB->get_recordset_sql($sql);
