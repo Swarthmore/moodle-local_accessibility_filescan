@@ -122,7 +122,7 @@ class pdf {
 
     /**
      * Create a queue record a single PDF.
-     * @param mixed $file The file object. (Must have file_filesize, course_id, and file_id).
+     * @param mixed $file The file object. (Must have filesize, courseid, and fileid).
      * @return void
      * @throws \dml_exception
      */
