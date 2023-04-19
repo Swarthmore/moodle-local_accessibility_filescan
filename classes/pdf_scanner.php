@@ -45,11 +45,11 @@ class pdf_scanner {
 
         // Iterate through the output lines and assign a11y results.
         foreach ($info as $line) {
-            if (substr($line, 0, strlen("Title:")) === "Title:") {
+            if (str_starts_with($line, "Title:")) {
                 $results->hastitle = (strlen(trim(explode(":", $line, 2)[1])) > 0) ? 1 : 0;
-            } else if (substr($line, 0, strlen("Pages:")) === "Pages:") {
+            } else if (str_starts_with($line, "Pages:")) {
                 $results->pagecount = trim(explode(":", $line, 2)[1]);
-            } else if (substr($line, 0, strlen("Tagged:")) === "Tagged:") {
+            } else if (str_starts_with($line, "Tagged:")) {
                 $results->istagged = (trim(explode(":", $line, 2)[1]) === "yes") ? 1 : 0;
             }
         }
