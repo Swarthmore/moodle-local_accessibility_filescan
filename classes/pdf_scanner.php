@@ -45,13 +45,15 @@ class pdf_scanner {
 
         // Iterate through the output lines and assign a11y results.
         foreach ($info as $line) {
-            if (str_starts_with($line, "Title:")) {
-                $results->hastitle = (strlen(trim(explode(":", $line, 2)[1])) > 0) ? 1 : 0;
-            } else if (str_starts_with($line, "Pages:")) {
-                $results->pagecount = trim(explode(":", $line, 2)[1]);
-            } else if (str_starts_with($line, "Tagged:")) {
-                $results->istagged = (trim(explode(":", $line, 2)[1]) === "yes") ? 1 : 0;
-            }
+
+           if (strpos($line, 'Title:') === 0) {
+               $results->hastitle = (strlen(trim(explode(":", $line, 2)[1])) > 0) ? 1 : 0;
+           } else if (strpos($line, 'Pages:') === 0) {
+               $results->pagecount = trim(explode(":", $line, 2)[1]);
+           } else if (strpos($line, 'Tagged:') === 0) {
+               $results->istagged = (trim(explode(":", $line, 2)[1]) === "yes") ? 1 : 0;
+           }
+
         }
 
         // Get the hastext status.
