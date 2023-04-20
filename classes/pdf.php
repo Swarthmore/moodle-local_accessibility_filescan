@@ -126,7 +126,7 @@ class pdf {
      * @return void
      * @throws \dml_exception
      */
-    public static function put_file_in_queue(mixed $file): void {
+    public static function put_file_in_queue($file): void {
         global $DB;
 
         // Check if the file exceeds the max filesize set in the config.
