@@ -64,10 +64,10 @@ class find_pdf_files extends \core\task\scheduled_task {
                 $lockkey = "fileid: {$file->fileid}";
                 if ($lock = $lockfactory->get_lock($lockkey, $timeout)) {
                     \local_a11y_check\pdf::put_file_in_queue($file);
-                    $lock->release();
                 } else {
                     throw new \moodle_exception('locktimeout');
                 }
+                $lock->release();
             }
         }
     }
