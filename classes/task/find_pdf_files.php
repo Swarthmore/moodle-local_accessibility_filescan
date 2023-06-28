@@ -45,6 +45,7 @@ class find_pdf_files extends \core\task\scheduled_task {
 
     /**
      * Find unscanned PDF files in the Moodle file system.
+     * @throws \dml_exception
      */
     public function execute() {
 
@@ -58,7 +59,8 @@ class find_pdf_files extends \core\task\scheduled_task {
         $files = \local_a11y_check\pdf::get_unqueued_files();
 
         // Only process if there are files to process.
-        if (is_array($files) && count($files) > 0) {
+        if (count($files) > 0) {
+
 //            $lockfactory = \core\lock\lock_config::get_lock_factory('local_a11y_check_find_pdf_files_task');
             foreach ($files as $file) {
 //                $lockkey = "contenthash: {$file->contenthash}";

@@ -144,12 +144,18 @@ class pdf {
             'statustext' => $canprocess ? null : 'File exceeds max filesize'
         ]);
 
+        $DB->execute('INSERT INTO {local_a11y_check_pivot} (courseid, scanid, fileid) VALUES (?,?,?)', [
+            $file->courseid,
+            $scanid,
+            $file->fileid
+        ]);
+
         // Insert the record into the pivot table.
-        $DB->insert_record('local_a11y_check_pivot', [
-            'courseid' => $file->courseid,
-            'fileid' => $file->fileid,
-            'scanid' => $scanid
-        ], false);
+//        $DB->insert_record('local_a11y_check_pivot', [
+//            'courseid' => $file->courseid,
+//            'fileid' => $file->fileid,
+//            'scanid' => $scanid
+//        ], false);
 
     }
 

@@ -41,9 +41,9 @@
     </TABLE>
     <TABLE NAME="local_a11y_check_pivot" COMMENT="Reference table to relate a scan with a file and course">
       <FIELDS>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" />
-        <FIELD NAME="scanid" TYPE="int" LENGTH="10" NOTNULL="true" />
-        <FIELD NAME="fileid" TYPE="int" LENGTH="10" NOTNULL="true" />
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="scanid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
+        <FIELD NAME="fileid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" />
       </FIELDS>
       <KEYS>
         <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id" />
