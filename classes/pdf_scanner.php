@@ -24,6 +24,8 @@
 
 namespace local_a11y_check;
 
+use Exception;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . "/../lib/smalot/pdfparser-2.6.0/alt_autoload.php-dist");
@@ -36,9 +38,11 @@ class pdf_scanner {
     /**
      * Scan a pdf for a11y
      * @param string $file The filepath to the pdf
-     * @return
+     * @return pdf_a11y_results
+     * @throws Exception
      */
-    public static function scan($file) {
+    public static function scan($file): pdf_a11y_results
+    {
         // Initiate the new results object.
         $results = new \local_a11y_check\pdf_a11y_results();
         $info = self::get_pdfinfo($file);
@@ -75,8 +79,10 @@ class pdf_scanner {
      * Extract bookmarks (outline) from a pdf
      * @param string $file The filepath to the pdf
      * @return array
+     * @throws Exception
      */
-    private static function extract_bookmarks(string $file) {
+    private static function extract_bookmarks(string $file): array 
+    {
 
         try {
             $contents = file_get_contents($file);
@@ -109,7 +115,8 @@ class pdf_scanner {
      * @param string $file The filepath to the pdf
      * @return array
      */
-    private static function get_pdf_lang(string $file) {
+    private static function get_pdf_lang(string $file): array
+    {
         $contents = file_get_contents($file);
         preg_match('/\/Lang\((.*)\)/mU', $contents, $matches);
         return $matches;
@@ -119,13 +126,15 @@ class pdf_scanner {
      * Extract text from a pdf
      * @param string $file The filepath to the pdf
      * @param int $pagecount How many pages are in the pdf
-     * @return string
+     * @return array
+     * @throws Exception
      */
-    private static function get_pdftext(string $file, int $pagecount) {
+    private static function get_pdftext(string $file, int $pagecount): array
+    {
         $cmd = self::get_pdftotext_command_for_file($file, $pagecount);
         $text = exec($cmd, $output, $exitcode);
         if ($exitcode <> 0) {
-            throw new \Exception("Error getting PDF text. " . $exitcode);
+            throw new Exception("Error getting PDF text. " . $exitcode);
         }
         return $output;
     }
@@ -133,14 +142,16 @@ class pdf_scanner {
     /**
      * Extract info from a pdf
      * @param string $file The filepath to the pdf
-     * @return string
+     * @return array
+     * @throws Exception
      */
-    private static function get_pdfinfo(string $file) {
+    private static function get_pdfinfo(string $file): array
+    {
         $cmd = self::get_pdfinfo_command_for_file($file);
         exec($cmd, $output, $exitcode);
         // If a non-standard exit code is returned, throw an error.
         if ($exitcode <> 0) {
-            throw new \Exception("Error getting PDF info. " . $exitcode);
+            throw new Exception("Error getting PDF info. " . $exitcode);
         }
         return $output;
     }
@@ -150,7 +161,8 @@ class pdf_scanner {
      * @param string $pdffile The filepath to the pdf
      * @return string
      */
-    private static function get_pdfinfo_command_for_file(string $pdffile) {
+    private static function get_pdfinfo_command_for_file(string $pdffile): string
+    {
         $pdftotextexec = \escapeshellarg('pdfinfo');
         $pdffilearg = \escapeshellarg($pdffile);
         return "$pdftotextexec $pdffilearg";
@@ -162,7 +174,8 @@ class pdf_scanner {
      * @param int $pdfpagecount How many pages are in the pdf
      * @return string
      */
-    private static function get_pdftotext_command_for_file(string $pdffile, int $pdfpagecount) {
+    private static function get_pdftotext_command_for_file(string $pdffile, int $pdfpagecount): string
+    {
         $pdftotextexec = \escapeshellarg('pdftotext');
         $pdffilearg = \escapeshellarg($pdffile);
         $lastpage = \escapeshellarg(min($pdfpagecount, 50));
