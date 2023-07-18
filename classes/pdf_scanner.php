@@ -26,7 +26,7 @@ namespace local_a11y_check;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . "/../lib/smalot/pdfparser-2.3.0/alt_autoload.php-dist");
+require_once(dirname(__FILE__) . "/../lib/smalot/pdfparser-2.6.0/alt_autoload.php-dist");
 require_once(dirname(__FILE__) . "/pdf_a11y_results.php");
 
 /**
@@ -77,25 +77,31 @@ class pdf_scanner {
      * @return array
      */
     private static function extract_bookmarks(string $file) {
-        $contents = file_get_contents($file);
-        $parser = new \Smalot\PdfParser\Parser();
-        $pdf = $parser->parseContent($contents);
-        $outline = array();
-        foreach ($pdf->getObjects() as $obj) {
-            $details = $obj->getHeader()->getDetails();
-            if (isset($details["Title"])) {
-                if (isset($details["A"])) {
-                    $outline[] = $details;
-                } else if (isset($details["Dest"])) {
-                    $outline[] = $details;
-                } else if (isset($details["First"]) && isset($details["Last"])) {
-                    $outline[] = $details;
-                } else if (isset($details["Next"])) {
-                    $outline[] = $details;
+
+        try {
+            $contents = file_get_contents($file);
+            $parser = new \Smalot\PdfParser\Parser();
+            $pdf = $parser->parseContent($contents);
+            $outline = array();
+            foreach ($pdf->getObjects() as $obj) {
+                $details = $obj->getHeader()->getDetails();
+                if (isset($details["Title"])) {
+                    if (isset($details["A"])) {
+                        $outline[] = $details;
+                    } else if (isset($details["Dest"])) {
+                        $outline[] = $details;
+                    } else if (isset($details["First"]) && isset($details["Last"])) {
+                        $outline[] = $details;
+                    } else if (isset($details["Next"])) {
+                        $outline[] = $details;
+                    }
                 }
             }
+            return $outline;
+        } catch (\Exception $e) {
+            error_log($e);
+            return $outline;
         }
-        return $outline;
     }
 
     /**
