@@ -18,7 +18,7 @@
  * local_a11y_check task definitions
  *
  * @package   local_a11y_check
- * @copyright 2020 Swarthmore College
+ * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -45,14 +45,14 @@ $tasks = array(
         'dayofweek' => '*',
         'disabled' => 0
     ),
-//    array(
-//        'classname' => 'local_a11y_check\task\remove_deleted_files',
-//        'blocking' => 0,
-//        'minute' => '0',
-//        'hour' => '*/2',
-//        'day' => '*',
-//        'month' => '*',
-//        'dayofweek' => '*',
-//        'disabled' => 0
-//    )
+    array(
+        'classname' => 'local_a11y_check\task\cleanup_orphaned_records',
+        'blocking' => 0,
+        'minute' => '*/5',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0
+    )
 );
