@@ -84,11 +84,12 @@ class pdf_scanner {
     private static function extract_bookmarks(string $file): array 
     {
 
+      $outline = array();
+
         try {
             $contents = file_get_contents($file);
             $parser = new \Smalot\PdfParser\Parser();
             $pdf = $parser->parseContent($contents);
-            $outline = array();
             foreach ($pdf->getObjects() as $obj) {
                 $details = $obj->getHeader()->getDetails();
                 if (isset($details["Title"])) {
