@@ -52,23 +52,13 @@ class find_pdf_files extends \core\task\scheduled_task {
         // Set the timeout in seconds.
         $timeout = 10;
 
-        // Get the max amount of files to process from the plugin config.
-        $limit = (int) get_config('local_a11y_check', 'files_per_cron');
-
         // Get the unscanned PDF files.
         $files = \local_a11y_check\pdf::get_unqueued_files();
 
         // Only process if there are files to process.
         if (count($files) > 0) {
-
-//            $lockfactory = \core\lock\lock_config::get_lock_factory('local_a11y_check_find_pdf_files_task');
             foreach ($files as $file) {
-//                $lockkey = "contenthash: {$file->contenthash}";
-//                if ($lock = $lockfactory->get_lock($lockkey, $timeout)) {
                 \local_a11y_check\pdf::put_file_in_queue($file);
-//                    $lock->release();
-//                } else {
-//                    throw new \moodle_exception('locktimeout');
             }
         }
     }

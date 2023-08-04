@@ -66,7 +66,7 @@ class pdf {
     }
 
     /**
-     * Find all PDF files that do not have a record in the queue.
+     * Find all PDF files across Moodle instance that do not have a record in the queue.
      * @throws \dml_exception
      */
     public static function get_unqueued_files(): array {
@@ -93,14 +93,16 @@ class pdf {
             }
         }
 
+        mtrace('Found ' . count($files) . ' PDFs');
+
         $recordset->close();
         return $files;
     }
 
     /**
-     * Return the ids of all PDF files in the queue, but have not been scanned for accessibility.
+     * Return the ids of PDF files (within $limit) in the queue, but have not been scanned for accessibility.
      */
-    public static function get_unscanned_files(): array {
+    public static function get_unscanned_files($limit = 1): array {
         global $DB;
 
         $sql = 'select lacp.fileid as "fileid", lacq.id as "scanid" '.
@@ -109,7 +111,7 @@ class pdf {
             'inner join {files} f on f.id = lacp.fileid '.
             'where lacq.status = 0  '.
             "and f.mimetype = 'application/pdf' ".
-            'limit 25';
+            'limit ' . $limit;
 
         $files = [];
         $recordset = $DB->get_recordset_sql($sql);
@@ -144,18 +146,12 @@ class pdf {
             'statustext' => $canprocess ? null : 'File exceeds max filesize'
         ]);
 
+        // Insert the record into the pivot table.
         $DB->execute('INSERT INTO {local_a11y_check_pivot} (courseid, scanid, fileid) VALUES (?,?,?)', [
             $file->courseid,
             $scanid,
             $file->fileid
         ]);
-
-        // Insert the record into the pivot table.
-//        $DB->insert_record('local_a11y_check_pivot', [
-//            'courseid' => $file->courseid,
-//            'fileid' => $file->fileid,
-//            'scanid' => $scanid
-//        ], false);
 
     }
 
@@ -164,11 +160,11 @@ class pdf {
      * @return void
      * @throws \dml_exception
      */
-    public static function scan_queued_files(): void {
+    public static function scan_queued_files($limit = 1): void {
 
         global $DB;
 
-        $files = self::get_unscanned_files();
+        $files = self::get_unscanned_files($limit);
 
         if (count($files) == 0) {
             mtrace('No files found');
@@ -176,6 +172,8 @@ class pdf {
         } else {
             mtrace('Found '. count($files) . ' files to scan');
         }
+
+        mtrace("Scanning " . count($files) . " PDF files for accessibility issues.");
 
         foreach ($files as $file) {
             try {
