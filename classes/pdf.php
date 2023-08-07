@@ -133,7 +133,7 @@ class pdf {
 
         // Check if the file exceeds the max filesize set in the config.
         $maxfilesize = (int) get_config('local_a11y_check', 'max_file_size_mb');
-        $canprocess = (bool) $file->filesize <= $maxfilesize;
+        $canprocess = (bool) ($file->filesize / pow(1024, 2)) <= $maxfilesize;
 
         $now = time();
 
@@ -188,9 +188,9 @@ class pdf {
                 $filesizebytes = $file->filesize;
                 $filesizemb = $filesizebytes / pow(1024, 2);
 
-                if (($filesizebytes / pow(1024, 2)) > $maxfilesize) {
+                if ($filesizemb > $maxfilesize) {
 
-                  mtrace('File ' . $file->filename . 'is too large to scan');
+                  mtrace('File ' . $file->filename . ' is too large to scan');
 
                   // Make sure the file doesn't get scanned again.
                   $msg = "File is larger than" . round($maxfilesize) . "MB.";
