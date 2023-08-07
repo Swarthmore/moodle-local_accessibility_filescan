@@ -53,6 +53,8 @@ class pdf {
 
         mtrace('Found ' . count($records) . ' orphaned records');
 
+        mtrace(print_r($records));
+
         foreach ($records as $record) {
             // Remove record from the PDF results table.
             $DB->delete_records('local_a11y_check_type_pdf', ['scanid' => $record->scanid]);
@@ -105,7 +107,7 @@ class pdf {
     public static function get_unscanned_files($limit = 1): array {
         global $DB;
 
-        $sql = 'select lacp.fileid as "fileid", lacq.id as "scanid" '.
+        $sql = 'select lacp.fileid as "fileid", lacq.id as "scanid", f.filesize as "filesize", f.filename as "filename" '.
             'from {local_a11y_check_queue} lacq '.
             'inner join {local_a11y_check_pivot} lacp on lacp.scanid = lacq.id '.
             'inner join {files} f on f.id = lacp.fileid '.
@@ -175,19 +177,33 @@ class pdf {
 
         mtrace("Scanning " . count($files) . " PDF files for accessibility issues.");
 
+        // User setting to not scan giant PDFs.
+        $maxfilesize = (int) get_config('local_a11y_check', 'max_file_size_mb');
+
         foreach ($files as $file) {
             try {
 
                 mtrace("Scanning $file->fileid");
 
-                $tmpfile = self::create_tmp_file($file->fileid);
+                // Check and see if the file exceeds max filesize.
+                // Get the filesize
+                $filesizebytes = $file->filesize;
+                $filesizemb = $filesizebytes / pow(1024, 2);
+
+                mtrace('File is ' . $filesizebytes . ' bytes or ' . $filesizemb);
+
+                if ($filesizebytes / pow(1024, 2) > $maxfilesize) {
+                  mtrace('File ' . $file->filename . 'is too large to scan');
+                  continue;
+                }
+
+              $tmpfile = self::create_tmp_file($file->fileid);
                 $results = \local_a11y_check\pdf_scanner::scan($tmpfile);
                 $record = [
                     'scanid' => $file->scanid,
                     'hastext' => $results->hastext,
                     'hastitle' => $results->hastitle,
                     'haslanguage' => $results->haslanguage,
-                    'hasbookmarks' => $results->hasbookmarks,
                     'istagged' => $results->istagged,
                     'pagecount' => $results->pagecount
                 ];

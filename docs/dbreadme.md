@@ -33,7 +33,6 @@ This table holds information about the a11y results for a specific scan.
 * hastext
 * hastitle
 * haslanguage
-* hasbookmarks
 * istagged
 * pagecount
 

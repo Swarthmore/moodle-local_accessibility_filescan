@@ -27,7 +27,6 @@
         <FIELD NAME="hastext" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="hastitle" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="haslanguage" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="hasbookmarks" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="istagged" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" />
         <FIELD NAME="pagecount" TYPE="int" LENGTH="5" NOTNULL="false" SEQUENCE="false" />
       </FIELDS>

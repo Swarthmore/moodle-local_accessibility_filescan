@@ -6,21 +6,28 @@ This plugin consists of a scheduled task that looks for PDFs within courses, eva
 
 ## Dependencies
 
-* Moodle 3.11+
+* Moodle 4.00+
 
 ## Installation
 
 ### Dependencies
+
 `poppler-utils`
 
 ### From the command line 
 
 ```bash
-git clone https://github.com/Swarthmore/moodle-local_a11y_check /moodle/root/dir/local/a11y_check
+git clone https://github.com/Swarthmore/moodle-local_a11y_check $MOODLE_WWW_ROOT/local/a11y_check
 ```
 
-### A11y Report
+### How Does it Work?
 
-This plugin adds an `A11y Report` link to a course's settings tree. It also adds a system-wide report in **System Administration -> Reports**
+This plugin will find PDFs across your Moodle instance, then scan them for accessibility. The plugin scans for the following: 
 
-The course report displays scanned 
+1. Does the PDF has OCR'd text?
+2. Is the PDF tagged? 
+3. Does the PDF have a language?
+4. Does the PDF have a title?
+5. Page count
+
+PDFs are scanned at intervals in accordance to Moodle's cron system and results are stored in the plugin's database table. As such, to pull results, you will need to query the database, or use the [block_a11y_check](https://github.com/aweed1/moodle-block_a11y_check) plugin (which is recommended).

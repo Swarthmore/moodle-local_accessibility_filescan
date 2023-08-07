@@ -51,3 +51,4 @@ $settings->add(new admin_setting_configtext('local_a11y_check/max_retries',
     3,
     PARAM_INT
 ));
+

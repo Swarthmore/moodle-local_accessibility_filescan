@@ -28,7 +28,6 @@ use Exception;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . "/../lib/smalot/pdfparser-2.6.0/alt_autoload.php-dist");
 require_once(dirname(__FILE__) . "/pdf_a11y_results.php");
 
 /**
@@ -68,47 +67,7 @@ class pdf_scanner {
         $lang = self::get_pdf_lang($file);
         $results->haslanguage = count($lang) > 1 ? 1 : 0;
 
-        // Get any bookmarks in the pdf.
-        $bookmarks = self::extract_bookmarks($file);
-        $results->hasbookmarks = empty($bookmarks) ? 0 : 1;
-
         return $results;
-    }
-
-    /**
-     * Extract bookmarks (outline) from a pdf
-     * @param string $file The filepath to the pdf
-     * @return array
-     * @throws Exception
-     */
-    private static function extract_bookmarks(string $file): array 
-    {
-
-      $outline = array();
-
-        try {
-            $contents = file_get_contents($file);
-            $parser = new \Smalot\PdfParser\Parser();
-            $pdf = $parser->parseContent($contents);
-            foreach ($pdf->getObjects() as $obj) {
-                $details = $obj->getHeader()->getDetails();
-                if (isset($details["Title"])) {
-                    if (isset($details["A"])) {
-                        $outline[] = $details;
-                    } else if (isset($details["Dest"])) {
-                        $outline[] = $details;
-                    } else if (isset($details["First"]) && isset($details["Last"])) {
-                        $outline[] = $details;
-                    } else if (isset($details["Next"])) {
-                        $outline[] = $details;
-                    }
-                }
-            }
-            return $outline;
-        } catch (\Exception $e) {
-            error_log($e);
-            return $outline;
-        }
     }
 
     /**
