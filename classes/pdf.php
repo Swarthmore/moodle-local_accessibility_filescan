@@ -53,8 +53,6 @@ class pdf {
 
         mtrace('Found ' . count($records) . ' orphaned records');
 
-        mtrace(print_r($records));
-
         foreach ($records as $record) {
             // Remove record from the PDF results table.
             $DB->delete_records('local_a11y_check_type_pdf', ['scanid' => $record->scanid]);
@@ -190,10 +188,20 @@ class pdf {
                 $filesizebytes = $file->filesize;
                 $filesizemb = $filesizebytes / pow(1024, 2);
 
-                mtrace('File is ' . $filesizebytes . ' bytes or ' . $filesizemb);
+                if (($filesizebytes / pow(1024, 2)) > $maxfilesize) {
 
-                if ($filesizebytes / pow(1024, 2) > $maxfilesize) {
                   mtrace('File ' . $file->filename . 'is too large to scan');
+
+                  // Make sure the file doesn't get scanned again.
+                  $msg = "File is larger than" . round($maxfilesize) . "MB.";
+
+                  $DB->update_record('local_a11y_check_queue', (object) [
+                    'id' => $file->scanid,
+                    'status' => 5,
+                    'statusText' =>  $msg,
+                    'lastchecked' => time()
+                  ]);
+
                   continue;
                 }
 
