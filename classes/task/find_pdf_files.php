@@ -15,21 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Find PDF files task definition for local_a11y_check
+ * Find PDF files task definition for local_accessibility_filescan
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2020 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_a11y_check\task;
+namespace local_accessibility_filescan\task;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Scheduled task to find unscanned PDF files.
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2020 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -40,7 +40,7 @@ class find_pdf_files extends \core\task\scheduled_task {
      * @return string the name of the task
      */
     public function get_name() {
-        return get_string('pdf:find_files_task', 'local_a11y_check');
+        return get_string('pdf:find_files_task', 'local_accessibility_filescan');
     }
 
     /**
@@ -53,12 +53,12 @@ class find_pdf_files extends \core\task\scheduled_task {
         $timeout = 10;
 
         // Get the unscanned PDF files.
-        $files = \local_a11y_check\pdf::get_unqueued_files();
+        $files = \local_accessibility_filescan\pdf::get_unqueued_files();
 
         // Only process if there are files to process.
         if (count($files) > 0) {
             foreach ($files as $file) {
-                \local_a11y_check\pdf::put_file_in_queue($file);
+                \local_accessibility_filescan\pdf::put_file_in_queue($file);
             }
         }
     }

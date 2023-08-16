@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * PDF helper functions local_a11y_check
+ * PDF helper functions local_accessibility_filescan
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_a11y_check;
+namespace local_accessibility_filescan;
 
 use Exception;
 use Throwable;
@@ -44,8 +44,8 @@ class pdf {
         global $DB;
 
         $sql = 'select lacp.scanid as "scanid", lacp.fileid as "fileid", lacp.courseid as "courseid" '.
-            'from {local_a11y_check_queue} lacq ' .
-            'inner join {local_a11y_check_pivot} lacp on lacq.id = lacp.scanid '.
+            'from {local_a11y_filescan_queue} lacq ' .
+            'inner join {local_a11y_filescan_pivot} lacp on lacq.id = lacp.scanid '.
             'left outer join {files} f on f.id = lacp.fileid '.
             'where f.id is null';
 
@@ -55,11 +55,11 @@ class pdf {
 
         foreach ($records as $record) {
             // Remove record from the PDF results table.
-            $DB->delete_records('local_a11y_check_type_pdf', ['scanid' => $record->scanid]);
+            $DB->delete_records('local_a11y_filescan_type_pdf', ['scanid' => $record->scanid]);
             // Remove record from the queue table.
-            $DB->delete_records('local_a11y_check_queue', ['id' => $record->scanid]);
+            $DB->delete_records('local_a11y_filescan_queue', ['id' => $record->scanid]);
             // Remove record from the pivot table.
-            $DB->delete_records('local_a11y_check_pivot',
+            $DB->delete_records('local_a11y_filescan_pivot',
                 ['scanid' => $record->scanid, 'fileid' => $record->fileid, 'courseid' => $record->courseid]);
         }
 
@@ -78,8 +78,8 @@ class pdf {
             'inner join {context} ctx on ctx.id = f.contextid  '.
             'inner join {course_modules} cm on cm.id = ctx.instanceid '.
             'inner join {course} c on c.id = cm.course '.
-            'left outer join {local_a11y_check_pivot} lacp on lacp.fileid = f.id and lacp.courseid = c.id '.
-            'left outer join {local_a11y_check_queue} lacq on lacq.id = lacp.scanid '.
+            'left outer join {local_a11y_filescan_pivot} lacp on lacp.fileid = f.id and lacp.courseid = c.id '.
+            'left outer join {local_a11y_filescan_queue} lacq on lacq.id = lacp.scanid '.
             'where ctx.contextlevel = 70 '.
             'and lacq.id is null '.
             "and f.mimetype = 'application/pdf'";
@@ -106,8 +106,8 @@ class pdf {
         global $DB;
 
         $sql = 'select lacp.fileid as "fileid", lacq.id as "scanid", f.filesize as "filesize", f.filename as "filename" '.
-            'from {local_a11y_check_queue} lacq '.
-            'inner join {local_a11y_check_pivot} lacp on lacp.scanid = lacq.id '.
+            'from {local_a11y_filescan_queue} lacq '.
+            'inner join {local_a11y_filescan_pivot} lacp on lacp.scanid = lacq.id '.
             'inner join {files} f on f.id = lacp.fileid '.
             'where lacq.status = 0  '.
             "and f.mimetype = 'application/pdf' ".
@@ -128,26 +128,27 @@ class pdf {
      * @return void
      * @throws \dml_exception
      */
+
     public static function put_file_in_queue($file): void {
         global $DB;
 
         // Check if the file exceeds the max filesize set in the config.
-        $maxfilesize = (int) get_config('local_a11y_check', 'max_file_size_mb');
+        $maxfilesize = (int) get_config('local_accessibility_filescan', 'max_file_size_mb');
         $canprocess = (bool) ($file->filesize / pow(1024, 2)) <= $maxfilesize;
 
         $now = time();
 
         // Insert the record into the queue table.
-        $scanid = $DB->insert_record('local_a11y_check_queue', [
-            'checktype' => LOCAL_A11Y_CHECK_TYPE_PDF,
+        $scanid = $DB->insert_record('local_a11y_filescan_queue', [
+            'checktype' => LOCAL_ACCESSIBILITY_FILESCAN_TYPE_PDF,
             'faildelay' => $now + 120,
             'lastchecked' => $now,
-            'status' => $canprocess ? LOCAL_A11Y_CHECK_STATUS_UNCHECKED : LOCAL_A11Y_CHECK_STATUS_IGNORE,
+            'status' => $canprocess ? LOCAL_ACCESSIBILITY_FILESCAN_STATUS_UNCHECKED : LOCAL_ACCESSIBILITY_FILESCAN_STATUS_IGNORE,
             'statustext' => $canprocess ? null : 'File exceeds max filesize'
         ]);
 
         // Insert the record into the pivot table.
-        $DB->execute('INSERT INTO {local_a11y_check_pivot} (courseid, scanid, fileid) VALUES (?,?,?)', [
+        $DB->execute('INSERT INTO {local_a11y_filescan_pivot} (courseid, scanid, fileid) VALUES (?,?,?)', [
             $file->courseid,
             $scanid,
             $file->fileid
@@ -176,7 +177,7 @@ class pdf {
         mtrace("Scanning " . count($files) . " PDF files for accessibility issues.");
 
         // User setting to not scan giant PDFs.
-        $maxfilesize = (int) get_config('local_a11y_check', 'max_file_size_mb');
+        $maxfilesize = (int) get_config('local_accessibility_filescan', 'max_file_size_mb');
 
         foreach ($files as $file) {
             try {
@@ -195,7 +196,7 @@ class pdf {
                   // Make sure the file doesn't get scanned again.
                   $msg = "File is larger than" . round($maxfilesize) . "MB.";
 
-                  $DB->update_record('local_a11y_check_queue', (object) [
+                  $DB->update_record('local_a11y_filescan_queue', (object) [
                     'id' => $file->scanid,
                     'status' => 5,
                     'statusText' =>  $msg,
@@ -206,7 +207,7 @@ class pdf {
                 }
 
               $tmpfile = self::create_tmp_file($file->fileid);
-                $results = \local_a11y_check\pdf_scanner::scan($tmpfile);
+                $results = \local_accessibility_filescan\pdf_scanner::scan($tmpfile);
                 $record = [
                     'scanid' => $file->scanid,
                     'hastext' => $results->hastext,
@@ -217,9 +218,9 @@ class pdf {
                 ];
                 // Create the results record that will be inserted into the PDF results table.
                 // Insert the results into the PDF results table.
-                $DB->insert_record('local_a11y_check_type_pdf', $record);
+                $DB->insert_record('local_a11y_filescan_type_pdf', $record);
                 // Update the scan status in the queue table.
-                $DB->update_record('local_a11y_check_queue', (object) [
+                $DB->update_record('local_a11y_filescan_queue', (object) [
                     'id' => $file->scanid,
                     'status' => 1,
                     'lastchecked' => time()
@@ -228,7 +229,7 @@ class pdf {
                 unlink($tmpfile);
             } catch (Exception | Throwable $e) {
                 // If there's an error, get the message and update the queue table.
-                $DB->update_record('local_a11y_check_queue', (object) [
+                $DB->update_record('local_a11y_filescan_queue', (object) [
                     'id' => $file->scanid,
                     'status' => 4,
                     'statustext' => $e->getMessage(),

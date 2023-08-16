@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * local_a11y_check task definitions
+ * local_accessibility_filescan task definitions
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $tasks = array(
     array(
-        'classname' => 'local_a11y_check\task\find_pdf_files',
+        'classname' => 'local_accessibility_filescan\task\find_pdf_files',
         'blocking' => 0,
         'minute' => '*/5',
         'hour' => '*',
@@ -36,7 +36,7 @@ $tasks = array(
         'disabled' => 0
     ),
     array(
-        'classname' => 'local_a11y_check\task\scan_pdf_files',
+        'classname' => 'local_accessibility_filescan\task\scan_pdf_files',
         'blocking' => 0,
         'minute' => '*/5',
         'hour' => '*',
@@ -46,7 +46,7 @@ $tasks = array(
         'disabled' => 0
     ),
     array(
-        'classname' => 'local_a11y_check\task\cleanup_orphaned_records',
+        'classname' => 'local_accessibility_filescan\task\cleanup_orphaned_records',
         'blocking' => 0,
         'minute' => '*/5',
         'hour' => '*',

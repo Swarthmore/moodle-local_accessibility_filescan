@@ -15,21 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Scan PDF files task definition for local_a11y_check
+ * Scan PDF files task definition for local_accessibility_filescan
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_a11y_check\task;
+namespace local_accessibility_filescan\task;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Scheduled task to scan PDF files for a11y issues.
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -40,7 +40,7 @@ class scan_pdf_files extends \core\task\scheduled_task {
      * @return string the name of the task
      */
     public function get_name() {
-        return get_string('pdf:scan_files_task', 'local_a11y_check');
+        return get_string('pdf:scan_files_task', 'local_accessibility_filescan');
     }
 
     /**
@@ -48,9 +48,9 @@ class scan_pdf_files extends \core\task\scheduled_task {
      */
     public function execute() {
         // Get the max amount of files to process from the plugin config.
-        $limit = (int) get_config('local_a11y_check', 'files_per_cron');
+        $limit = (int) get_config('local_accessibility_filescan', 'files_per_cron');
 
         // Scan queued files.
-        \local_a11y_check\pdf::scan_queued_files($limit);
+        \local_accessibility_filescan\pdf::scan_queued_files($limit);
     }
 }

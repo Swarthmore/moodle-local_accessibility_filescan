@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * local_a11y_check unit tests
+ * local_accessibility_filescan unit tests
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Scan validity unit test.
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -71,13 +71,13 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
 
                 // Create a blank results object.
                 // This will be filled with the results.
-                $a11ycheck = new \local_a11y_check\pdf_a11y_results();
+                $a11ycheck = new \local_accessibility_filescan\pdf_a11y_results();
 
                 // Get the file contents of the PDF.
                 $contents = file_get_contents($pdf);
 
                 // Scan the PDF.
-                $results = \local_a11y_check\pdf_scanner::scan($pdf);
+                $results = \local_accessibility_filescan\pdf_scanner::scan($pdf);
 
                 // Set the results based on the filename tokens.
                 if (in_array('TI', $a11ytokens)) {

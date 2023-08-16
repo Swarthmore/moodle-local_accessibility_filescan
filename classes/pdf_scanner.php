@@ -17,12 +17,12 @@
 /**
  * Scan local pdfs for a11y
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_a11y_check;
+namespace local_accessibility_filescan;
 
 use Exception;
 
@@ -43,7 +43,7 @@ class pdf_scanner {
     public static function scan($file): pdf_a11y_results
     {
         // Initiate the new results object.
-        $results = new \local_a11y_check\pdf_a11y_results();
+        $results = new \local_accessibility_filescan\pdf_a11y_results();
         $info = self::get_pdfinfo($file);
 
         // Iterate through the output lines and assign a11y results.

@@ -17,19 +17,19 @@
 /**
  * Removes deleted records from plugin tables.
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_a11y_check\task;
+namespace local_accessibility_filescan\task;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Scheduled task to find scan plugin tables for deleted files.
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -40,7 +40,7 @@ class cleanup_orphaned_records extends \core\task\scheduled_task {
      * @return string the name of the task
      */
     public function get_name() {
-        return get_string('clean_task', 'local_a11y_check');
+        return get_string('clean_task', 'local_accessibility_filescan');
     }
 
     /**
@@ -48,6 +48,6 @@ class cleanup_orphaned_records extends \core\task\scheduled_task {
      * @throws \dml_exception
      */
     public function execute() {
-        \local_a11y_check\pdf::cleanup_orphaned_records();
+        \local_accessibility_filescan\pdf::cleanup_orphaned_records();
     }
 }

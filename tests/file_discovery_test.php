@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * local_a11y_check unit tests
+ * local_accessibility_filescan unit tests
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2020 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,13 +27,13 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * File discovery unit test.
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2020 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
-    /** @var \local_a11y_check\pdf The pdf helper object */
+class local_accessibility_filescan_assert_file_discovery_testcase extends advanced_testcase {
+    /** @var \local_accessibility_filescan\pdf The pdf helper object */
     public $pdfhelper;
 
     /** @var \local\a11y_check\task\find_pdf_files The task object */
@@ -53,8 +53,8 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
          */
 
         $this->resetAfterTest(true);
-        $this->pdfhelper = new \local_a11y_check\pdf();
-        $this->task = new \local_a11y_check\task\find_pdf_files();
+        $this->pdfhelper = new \local_accessibility_filescan\pdf();
+        $this->task = new \local_accessibility_filescan\task\find_pdf_files();
         $this->course = $this->getDataGenerator()->create_course(array('shortname' => 'testcourse'));
         $this->page = $this->getDataGenerator()->create_module('page', array('course' => $this->course->id));
 
@@ -132,11 +132,11 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
         foreach ($garbage as $i => $record) {
             $uniquetext = (string) time() . (string) $this->filesadded;
             $record->contextid = $record->contextid ?? context_module::instance($this->page->cmid)->id;
-            $record->component = $record->component ?? 'local_a11y_check';
-            $record->filearea = $record->filearea ?? 'local_a11y_check_test_files';
+            $record->component = $record->component ?? 'local_accessibility_filescan';
+            $record->filearea = $record->filearea ?? 'local_accessibility_filescan_test_files';
             $record->itemid = $record->itemid ?? $i;
             $record->filepath = $record->filepath ?? '/';
-            $record->filename = $record->filename ?? 'local_a11y_check_test_file_' . $uniquetext . '.pdf';
+            $record->filename = $record->filename ?? 'local_accessibility_filescan_test_file_' . $uniquetext . '.pdf';
             $record->mimetype = $record->mimetype ?? 'application/pdf';
             $fs->create_file_from_string($record, $uniquetext);
             $this->filesadded++;
@@ -144,11 +144,11 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
 
         $record = (object) array(
             'contextid' => context_module::instance($this->page->cmid)->id,
-            'component' => 'local_a11y_check',
-            'filearea' => 'local_a11y_check_test_files',
+            'component' => 'local_accessibility_filescan',
+            'filearea' => 'local_accessibility_filescan_test_files',
             'itemid' => $i,
             'filepath' => '/',
-            'filename' => 'local_a11y_check_test_file_empty.pdf',
+            'filename' => 'local_accessibility_filescan_test_file_empty.pdf',
             'mimetype' => 'application/pdf',
         );
         $fs->create_file_from_string($record, '');
@@ -166,11 +166,11 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
             $uniquetext = (string) time() . (string) $this->filesadded . (string) $i;
             $record = (object) array(
                 'contextid' => context_module::instance($this->page->cmid)->id,
-                'component' => 'local_a11y_check',
-                'filearea' => 'local_a11y_check_test_files',
+                'component' => 'local_accessibility_filescan',
+                'filearea' => 'local_accessibility_filescan_test_files',
                 'itemid' => $i,
                 'filepath' => '/',
-                'filename' => 'local_a11y_check_test_file_' . $uniquetext . '.pdf',
+                'filename' => 'local_accessibility_filescan_test_file_' . $uniquetext . '.pdf',
                 'mimetype' => 'application/pdf',
             );
             $fs->create_file_from_string($record, $uniquetext);
@@ -179,14 +179,14 @@ class local_a11y_assert_file_discovery_testcase extends advanced_testcase {
     }
 
     /**
-     * Wrapper for assertEquals against the local_a11y_check table.
+     * Wrapper for assertEquals against the local_accessibility_filescan table.
      * @param int $count the expected number of records.
      *
      * @return boolean
      */
     protected function assert_custom_record_count($count) {
         global $DB;
-        $records = $DB->count_records('local_a11y_check');
+        $records = $DB->count_records('local_accessibility_filescan');
         return $this->assertEquals($count, $records);
     }
 
