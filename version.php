@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 /** @var mixed $plugin */
-$plugin->version   = 2023082200;
+$plugin->version   = 2023082201;
 $plugin->requires  = 2022041909.08;
 $plugin->component = 'local_accessibility_filescan';
 $plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = 'v0.0.1';
+$plugin->release   = 'v1.0.0-rc'

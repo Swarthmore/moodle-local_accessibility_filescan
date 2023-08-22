@@ -18,7 +18,7 @@
  * Language file for local_accessibility_filescan
  *
  * @package   local_accessibility_filescan
- * @copyright 2020 Swarthmore College
+ * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
