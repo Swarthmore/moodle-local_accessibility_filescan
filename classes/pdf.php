@@ -196,6 +196,7 @@ class pdf {
                   // Make sure the file doesn't get scanned again.
                   $msg = "File is larger than" . round($maxfilesize) . "MB.";
 
+                  // Update the status. 5 = do not scan again.
                   $DB->update_record('local_a11y_filescan_queue', (object) [
                     'id' => $file->scanid,
                     'status' => 5,
@@ -203,10 +204,12 @@ class pdf {
                     'lastchecked' => time()
                   ]);
 
+                  // no need to proces rest of iteration.
                   continue;
                 }
 
-              $tmpfile = self::create_tmp_file($file->fileid);
+                // Create a tmp file handle to scan.
+                $tmpfile = self::create_tmp_file($file->fileid);
                 $results = \local_accessibility_filescan\pdf_scanner::scan($tmpfile);
                 $record = [
                     'scanid' => $file->scanid,
