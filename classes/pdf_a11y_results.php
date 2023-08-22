@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_a11y_check;
+namespace local_accessibility_filescan;
 
 defined('MOODLE_INTERNAL') || die();
 

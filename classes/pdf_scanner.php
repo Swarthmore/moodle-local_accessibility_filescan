@@ -23,12 +23,11 @@
  */
 
 namespace local_accessibility_filescan;
-
 use Exception;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . "/pdf_a11y_results.php");
+//require_once(dirname(__FILE__) . "/pdf_a11y_results.php");
 
 /**
  * A class to orchestrate the scanning of a pdf for a11y
@@ -43,7 +42,7 @@ class pdf_scanner {
     public static function scan($file): pdf_a11y_results
     {
         // Initiate the new results object.
-        $results = new \local_accessibility_filescan\pdf_a11y_results();
+        $results = new pdf_a11y_results();
         $info = self::get_pdfinfo($file);
 
         // Iterate through the output lines and assign a11y results.
