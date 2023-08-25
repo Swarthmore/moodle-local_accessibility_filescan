@@ -69,23 +69,31 @@ class pdf {
      * Find all PDF files across Moodle instance that do not have a record in the queue.
      * @throws \dml_exception
      */
-    public static function get_unqueued_files(): array {
+    public static function get_unqueued_files($limit = 1): array {
         global $DB;
 
-        $sql = 'select f.id as "fileid", f.filesize as "filesize", f.filename as "filename", '.
-            'c.id as "courseid", c.shortname as "courseshortname", c.fullname as "coursefullname" '.
-            'from {files} f '.
-            'inner join {context} ctx on ctx.id = f.contextid  '.
-            'inner join {course_modules} cm on cm.id = ctx.instanceid '.
-            'inner join {course} c on c.id = cm.course '.
-            'left outer join {local_a11y_filescan_pivot} lacp on lacp.fileid = f.id and lacp.courseid = c.id '.
-            'left outer join {local_a11y_filescan_queue} lacq on lacq.id = lacp.scanid '.
-            'where ctx.contextlevel = 70 '.
-            'and lacq.id is null '.
-            "and f.mimetype = 'application/pdf'";
+        // These are the components the scanner will look for files in.
+        $components = ["course", "block_html", "mod_assign", "mod_book", "mod_data", "mod_folder", "mod_forum", "mod_glossary","mod_label", "mod_lesson", "mod_page", "mod_publication", "mod_questionnaire", "mod_quiz", "mod_resource", "mod_scorm", "mod_url", "mod_workshop", "qtype_essay", "question"];
+
+        // Create the IN part of the statement, along with its params.
+        [$insql, $inparams] = $DB->get_in_or_equal($components);
+
+        $sql = 'select f.id as "fileid", f.filesize as "filesize", f.filename as "filename", c.id as "courseid", c.shortname as "courseshortname", c.fullname as "coursefullname" '.
+        'from {files} f '.
+        'inner join {context} ctx on ctx.id = f.contextid '.
+        'inner join {course_modules} cm on cm.id = ctx.instanceid '.
+        'inner join {course} c on c.id = cm.course '.
+        'left outer join {local_a11y_filescan_pivot} lacp on lacp.fileid = f.id and lacp.courseid = c.id '.
+        'left outer join {local_a11y_filescan_queue} lacq on lacq.id = lacp.scanid '.
+        'where ctx.contextlevel = 70 '.
+        'and lacq.id is null '.
+        "and f.mimetype = 'application/pdf' ".
+        "and f.component $insql ".
+        'order by f.timemodified desc '.
+        'limit ' . $limit;
 
         $files = [];
-        $recordset = $DB->get_recordset_sql($sql);
+        $recordset = $DB->get_recordset_sql($sql, $inparams);
 
         if ($recordset->valid()) {
             foreach ($recordset as $record) {

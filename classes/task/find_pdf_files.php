@@ -51,9 +51,11 @@ class find_pdf_files extends \core\task\scheduled_task {
 
         // Set the timeout in seconds.
         $timeout = 10;
+        // TODO: Make this a setting.
+        $limit = 100;
 
         // Get the unscanned PDF files.
-        $files = \local_accessibility_filescan\pdf::get_unqueued_files();
+        $files = \local_accessibility_filescan\pdf::get_unqueued_files($limit);
 
         // Only process if there are files to process.
         if (count($files) > 0) {
