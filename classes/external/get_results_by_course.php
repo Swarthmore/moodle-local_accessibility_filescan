@@ -25,7 +25,7 @@ class get_results_by_course extends \core_external\external_api {
       //$transaction = $DB->start_delegated_transaction(); //If an exception is thrown in the below code, all DB queries in this code will be rollback.
 
       $sql = 'select f.id as "fileid", f.filename as "filename", laftp.hastext as "hastext", laftp.hastitle as "hastitle", laftp.haslanguage as "haslanguage",  laftp.istagged as "istagged" '.
-          'from {local_a11y_filescan_type_pdf} laftp'.
+          'from {local_a11y_filescan_type_pdf} laftp '.
           'inner join {local_a11y_filescan_pivot} lafp on laftp.scanid = lafp.scanid '.
           'inner join {files} f on f.id = lafp.fileid '.
           'where lafp.courseid = '. $params['courseid'];
@@ -47,7 +47,7 @@ class get_results_by_course extends \core_external\external_api {
       return new external_multiple_structure(
           new external_single_structure([
               'fileid' => new external_value(PARAM_INT, 'file id'),
-              'filename' => new external_value(PARAM_INT, 'name of the file'),
+              'filename' => new external_value(PARAM_TEXT, 'name of the file'),
               'hastext' => new external_value(PARAM_INT, 'does the file have readable text?'),
               'hastitle' => new external_value(PARAM_INT, 'does the file has a title?'),
               'haslanguage' => new external_value(PARAM_INT, 'does the file have a language?'),
