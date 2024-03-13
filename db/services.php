@@ -24,6 +24,6 @@ $functions = [
             // Specifying this service means that your function will be available for
             // use in the Moodle Mobile App.
             MOODLE_OFFICIAL_MOBILE_SERVICE,
-        ]
+        ],
     ],
 ];

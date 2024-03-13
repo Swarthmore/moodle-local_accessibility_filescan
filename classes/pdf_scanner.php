@@ -27,7 +27,7 @@ use Exception;
 
 defined('MOODLE_INTERNAL') || die();
 
-//require_once(dirname(__FILE__) . "/pdf_a11y_results.php");
+// require_once(dirname(__FILE__) . "/pdf_a11y_results.php");
 
 /**
  * A class to orchestrate the scanning of a pdf for a11y
@@ -39,23 +39,20 @@ class pdf_scanner {
      * @return pdf_a11y_results
      * @throws Exception
      */
-    public static function scan($file): pdf_a11y_results
-    {
+    public static function scan($file): pdf_a11y_results {
         // Initiate the new results object.
         $results = new pdf_a11y_results();
         $info = self::get_pdfinfo($file);
 
         // Iterate through the output lines and assign a11y results.
         foreach ($info as $line) {
-
-           if (strpos($line, 'Title:') === 0) {
-               $results->hastitle = (strlen(trim(explode(":", $line, 2)[1])) > 0) ? 1 : 0;
-           } else if (strpos($line, 'Pages:') === 0) {
-               $results->pagecount = trim(explode(":", $line, 2)[1]);
-           } else if (strpos($line, 'Tagged:') === 0) {
-               $results->istagged = (trim(explode(":", $line, 2)[1]) === "yes") ? 1 : 0;
-           }
-
+            if (strpos($line, 'Title:') === 0) {
+                $results->hastitle = (strlen(trim(explode(":", $line, 2)[1])) > 0) ? 1 : 0;
+            } else if (strpos($line, 'Pages:') === 0) {
+                $results->pagecount = trim(explode(":", $line, 2)[1]);
+            } else if (strpos($line, 'Tagged:') === 0) {
+                $results->istagged = (trim(explode(":", $line, 2)[1]) === "yes") ? 1 : 0;
+            }
         }
 
         // Get the hastext status.
@@ -74,8 +71,7 @@ class pdf_scanner {
      * @param string $file The filepath to the pdf
      * @return array
      */
-    private static function get_pdf_lang(string $file): array
-    {
+    private static function get_pdf_lang(string $file): array {
         $contents = file_get_contents($file);
         preg_match('/\/Lang\((.*)\)/mU', $contents, $matches);
         return $matches;
@@ -88,8 +84,7 @@ class pdf_scanner {
      * @return array
      * @throws Exception
      */
-    private static function get_pdftext(string $file, int $pagecount): array
-    {
+    private static function get_pdftext(string $file, int $pagecount): array {
         $cmd = self::get_pdftotext_command_for_file($file, $pagecount);
         $text = exec($cmd, $output, $exitcode);
         if ($exitcode <> 0) {
@@ -104,8 +99,7 @@ class pdf_scanner {
      * @return array
      * @throws Exception
      */
-    private static function get_pdfinfo(string $file): array
-    {
+    private static function get_pdfinfo(string $file): array {
         $cmd = self::get_pdfinfo_command_for_file($file);
         exec($cmd, $output, $exitcode);
         // If a non-standard exit code is returned, throw an error.
@@ -120,8 +114,7 @@ class pdf_scanner {
      * @param string $pdffile The filepath to the pdf
      * @return string
      */
-    private static function get_pdfinfo_command_for_file(string $pdffile): string
-    {
+    private static function get_pdfinfo_command_for_file(string $pdffile): string {
         $pdftotextexec = \escapeshellarg('pdfinfo');
         $pdffilearg = \escapeshellarg($pdffile);
         return "$pdftotextexec $pdffilearg";
@@ -133,8 +126,7 @@ class pdf_scanner {
      * @param int $pdfpagecount How many pages are in the pdf
      * @return string
      */
-    private static function get_pdftotext_command_for_file(string $pdffile, int $pdfpagecount): string
-    {
+    private static function get_pdftotext_command_for_file(string $pdffile, int $pdfpagecount): string {
         $pdftotextexec = \escapeshellarg('pdftotext');
         $pdffilearg = \escapeshellarg($pdffile);
         $lastpage = \escapeshellarg(min($pdfpagecount, 50));

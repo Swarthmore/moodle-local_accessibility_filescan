@@ -31,8 +31,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
-
+class scan_validity_test extends advanced_testcase {
     public function test_scan_validity() {
 
         // Get the directory where all of the PDFs are stored.
@@ -43,10 +42,10 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
         }
 
         // Create an arry to store the pdfs.
-        $pdfs = array();
+        $pdfs = [];
 
         // Get all of the PDFs in the directory.
-        $files = array_diff(scandir($pdfdir), array('.', '..'));
+        $files = array_diff(scandir($pdfdir), ['.', '..']);
 
         // Iterate through the files, and if the file is a PDF, add it to $pdfs.
         foreach ($files as $file) {
@@ -65,7 +64,6 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
             mtrace("Scanning" . $filename);
 
             if (strpos($filename, '-') !== false) {
-
                 // Extract the a11y tokens from the filename.
                 $a11ytokens = explode('-', explode('_', $filename)[1]);
 
@@ -104,5 +102,4 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
             }
         }
     }
-
 }

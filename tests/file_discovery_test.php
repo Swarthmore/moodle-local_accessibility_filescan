@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-class local_accessibility_filescan_assert_file_discovery_testcase extends advanced_testcase {
+class file_discovery_test extends advanced_testcase {
     /** @var \local_accessibility_filescan\pdf The pdf helper object */
     public $pdfhelper;
 
@@ -55,8 +55,8 @@ class local_accessibility_filescan_assert_file_discovery_testcase extends advanc
         $this->resetAfterTest(true);
         $this->pdfhelper = new \local_accessibility_filescan\pdf();
         $this->task = new \local_accessibility_filescan\task\find_pdf_files();
-        $this->course = $this->getDataGenerator()->create_course(array('shortname' => 'testcourse'));
-        $this->page = $this->getDataGenerator()->create_module('page', array('course' => $this->course->id));
+        $this->course = $this->getDataGenerator()->create_course(['shortname' => 'testcourse']);
+        $this->page = $this->getDataGenerator()->create_module('page', ['course' => $this->course->id]);
 
         // Add files that should be excluded from the scan.
         $this->add_garbage_files();
@@ -96,7 +96,6 @@ class local_accessibility_filescan_assert_file_discovery_testcase extends advanc
 
         // There should be 12 records total.
         $this->assert_custom_record_count(9);
-
     }
 
     /**
@@ -105,29 +104,29 @@ class local_accessibility_filescan_assert_file_discovery_testcase extends advanc
     protected function add_garbage_files() {
         $fs = get_file_storage();
 
-        $garbage = array(
-            (object) array(
+        $garbage = [
+            (object) [
                 'contextid' => context_system::instance()->id,
-            ),
-            (object) array(
+            ],
+            (object) [
                 'contextid' => context_user::instance(1)->id,
-            ),
-            (object) array(
+            ],
+            (object) [
                 'contextid' => context_coursecat::instance(1)->id,
-            ),
-            (object) array(
+            ],
+            (object) [
                 'contextid' => context_course::instance($this->course->id)->id,
-            ),
-            (object) array(
+            ],
+            (object) [
                 'mimetype'  => 'application/json',
-            ),
-            (object) array(
+            ],
+            (object) [
                 'component'  => 'assignfeedback_editpdf',
-            ),
-            (object) array(
+            ],
+            (object) [
                 'filearea'  => 'stamps',
-            ),
-        );
+            ],
+        ];
 
         foreach ($garbage as $i => $record) {
             $uniquetext = (string) time() . (string) $this->filesadded;
@@ -142,7 +141,7 @@ class local_accessibility_filescan_assert_file_discovery_testcase extends advanc
             $this->filesadded++;
         }
 
-        $record = (object) array(
+        $record = (object) [
             'contextid' => context_module::instance($this->page->cmid)->id,
             'component' => 'local_accessibility_filescan',
             'filearea' => 'local_accessibility_filescan_test_files',
@@ -150,7 +149,7 @@ class local_accessibility_filescan_assert_file_discovery_testcase extends advanc
             'filepath' => '/',
             'filename' => 'local_accessibility_filescan_test_file_empty.pdf',
             'mimetype' => 'application/pdf',
-        );
+        ];
         $fs->create_file_from_string($record, '');
         $this->filesadded++;
     }
@@ -164,7 +163,7 @@ class local_accessibility_filescan_assert_file_discovery_testcase extends advanc
 
         for ($i = 0; $i < $count; $i++) {
             $uniquetext = (string) time() . (string) $this->filesadded . (string) $i;
-            $record = (object) array(
+            $record = (object) [
                 'contextid' => context_module::instance($this->page->cmid)->id,
                 'component' => 'local_accessibility_filescan',
                 'filearea' => 'local_accessibility_filescan_test_files',
@@ -172,7 +171,7 @@ class local_accessibility_filescan_assert_file_discovery_testcase extends advanc
                 'filepath' => '/',
                 'filename' => 'local_accessibility_filescan_test_file_' . $uniquetext . '.pdf',
                 'mimetype' => 'application/pdf',
-            );
+            ];
             $fs->create_file_from_string($record, $uniquetext);
             $this->filesadded++;
         }

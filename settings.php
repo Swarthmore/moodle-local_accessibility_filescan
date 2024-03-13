@@ -31,24 +31,26 @@ global $CFG;
 $settings = new admin_settingpage('local_accessibility_filescan', get_string('pluginname', 'local_accessibility_filescan'));
 $ADMIN->add('localplugins', $settings);
 
-$settings->add(new admin_setting_configtext('local_accessibility_filescan/files_per_cron',
+$settings->add(new admin_setting_configtext(
+    'local_accessibility_filescan/files_per_cron',
     get_string('settings:files_per_cron', 'local_accessibility_filescan'),
     get_string('settings:files_per_cron_desc', 'local_accessibility_filescan'),
     5,
     PARAM_INT
 ));
 
-$settings->add(new admin_setting_configtext('local_accessibility_filescan/max_file_size_mb',
+$settings->add(new admin_setting_configtext(
+    'local_accessibility_filescan/max_file_size_mb',
     get_string('settings:max_file_size_mb', 'local_accessibility_filescan'),
     get_string('settings:max_file_size_mb_desc', 'local_accessibility_filescan'),
     100,
     PARAM_INT
 ));
 
-$settings->add(new admin_setting_configtext('local_accessibility_filescan/max_retries',
+$settings->add(new admin_setting_configtext(
+    'local_accessibility_filescan/max_retries',
     get_string('settings:max_retries', 'local_accessibility_filescan'),
     get_string('settings:max_retries_desc', 'local_accessibility_filescan'),
     3,
     PARAM_INT
 ));
-

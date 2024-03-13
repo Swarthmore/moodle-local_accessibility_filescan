@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$tasks = array(
-    array(
+$tasks = [
+    [
         'classname' => 'local_accessibility_filescan\task\find_pdf_files',
         'blocking' => 0,
         'minute' => '*/5',
@@ -33,9 +33,9 @@ $tasks = array(
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
-        'disabled' => 0
-    ),
-    array(
+        'disabled' => 0,
+    ],
+    [
         'classname' => 'local_accessibility_filescan\task\scan_pdf_files',
         'blocking' => 0,
         'minute' => '*/5',
@@ -43,9 +43,9 @@ $tasks = array(
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
-        'disabled' => 0
-    ),
-    array(
+        'disabled' => 0,
+    ],
+    [
         'classname' => 'local_accessibility_filescan\task\cleanup_orphaned_records',
         'blocking' => 0,
         'minute' => '*/5',
@@ -53,6 +53,6 @@ $tasks = array(
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',
-        'disabled' => 0
-    )
-);
+        'disabled' => 0,
+    ],
+];
