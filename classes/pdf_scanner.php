@@ -17,17 +17,17 @@
 /**
  * Scan local pdfs for a11y
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_a11y_check;
+namespace local_accessibility_filescan;
+use Exception;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . "/../lib/smalot/pdfparser-2.2.0/alt_autoload.php-dist");
-require_once(dirname(__FILE__) . "/pdf_a11y_results.php");
+// require_once(dirname(__FILE__) . "/pdf_a11y_results.php");
 
 /**
  * A class to orchestrate the scanning of a pdf for a11y
@@ -36,20 +36,21 @@ class pdf_scanner {
     /**
      * Scan a pdf for a11y
      * @param string $file The filepath to the pdf
-     * @return \pdf_a11y_results
+     * @return pdf_a11y_results
+     * @throws Exception
      */
-    public static function scan($file) {
+    public static function scan($file): pdf_a11y_results {
         // Initiate the new results object.
-        $results = new \local_a11y_check\pdf_a11y_results();
+        $results = new pdf_a11y_results();
         $info = self::get_pdfinfo($file);
 
         // Iterate through the output lines and assign a11y results.
         foreach ($info as $line) {
-            if (substr($line, 0, strlen("Title:")) === "Title:") {
+            if (strpos($line, 'Title:') === 0) {
                 $results->hastitle = (strlen(trim(explode(":", $line, 2)[1])) > 0) ? 1 : 0;
-            } else if (substr($line, 0, strlen("Pages:")) === "Pages:") {
+            } else if (strpos($line, 'Pages:') === 0) {
                 $results->pagecount = trim(explode(":", $line, 2)[1]);
-            } else if (substr($line, 0, strlen("Tagged:")) === "Tagged:") {
+            } else if (strpos($line, 'Tagged:') === 0) {
                 $results->istagged = (trim(explode(":", $line, 2)[1]) === "yes") ? 1 : 0;
             }
         }
@@ -62,38 +63,7 @@ class pdf_scanner {
         $lang = self::get_pdf_lang($file);
         $results->haslanguage = count($lang) > 1 ? 1 : 0;
 
-        // Get any bookmarks in the pdf.
-        $bookmarks = self::extract_bookmarks($file);
-        $results->hasbookmarks = empty($bookmarks) ? 0 : 1;
-
         return $results;
-    }
-
-    /**
-     * Extract bookmarks (outline) from a pdf
-     * @param string $file The filepath to the pdf
-     * @return array
-     */
-    private static function extract_bookmarks(string $file) {
-        $contents = file_get_contents($file);
-        $parser = new \Smalot\PdfParser\Parser();
-        $pdf = $parser->parseContent($contents);
-        $outline = array();
-        foreach ($pdf->getObjects() as $obj) {
-            $details = $obj->getHeader()->getDetails();
-            if (isset($details["Title"])) {
-                if (isset($details["A"])) {
-                    $outline[] = $details;
-                } else if (isset($details["Dest"])) {
-                    $outline[] = $details;
-                } else if (isset($details["First"]) && isset($details["Last"])) {
-                    $outline[] = $details;
-                } else if (isset($details["Next"])) {
-                    $outline[] = $details;
-                }
-            }
-        }
-        return $outline;
     }
 
     /**
@@ -101,7 +71,7 @@ class pdf_scanner {
      * @param string $file The filepath to the pdf
      * @return array
      */
-    private static function get_pdf_lang(string $file) {
+    private static function get_pdf_lang(string $file): array {
         $contents = file_get_contents($file);
         preg_match('/\/Lang\((.*)\)/mU', $contents, $matches);
         return $matches;
@@ -111,13 +81,14 @@ class pdf_scanner {
      * Extract text from a pdf
      * @param string $file The filepath to the pdf
      * @param int $pagecount How many pages are in the pdf
-     * @return string
+     * @return array
+     * @throws Exception
      */
-    private static function get_pdftext(string $file, int $pagecount) {
+    private static function get_pdftext(string $file, int $pagecount): array {
         $cmd = self::get_pdftotext_command_for_file($file, $pagecount);
         $text = exec($cmd, $output, $exitcode);
         if ($exitcode <> 0) {
-            throw new \Exception("Error getting PDF text. " . $exitcode);
+            throw new Exception("Error getting PDF text. " . $exitcode);
         }
         return $output;
     }
@@ -125,24 +96,25 @@ class pdf_scanner {
     /**
      * Extract info from a pdf
      * @param string $file The filepath to the pdf
-     * @return string
+     * @return array
+     * @throws Exception
      */
-    private static function get_pdfinfo(string $file) {
+    private static function get_pdfinfo(string $file): array {
         $cmd = self::get_pdfinfo_command_for_file($file);
         exec($cmd, $output, $exitcode);
         // If a non-standard exit code is returned, throw an error.
         if ($exitcode <> 0) {
-            throw new \Exception("Error getting PDF info. " . $exitcode);
+            throw new Exception("Error getting PDF info. " . $exitcode);
         }
         return $output;
     }
 
     /**
-     * Get the pdfino command
+     * Get the pdfinfo command
      * @param string $pdffile The filepath to the pdf
      * @return string
      */
-    private static function get_pdfinfo_command_for_file(string $pdffile) {
+    private static function get_pdfinfo_command_for_file(string $pdffile): string {
         $pdftotextexec = \escapeshellarg('pdfinfo');
         $pdffilearg = \escapeshellarg($pdffile);
         return "$pdftotextexec $pdffilearg";
@@ -154,7 +126,7 @@ class pdf_scanner {
      * @param int $pdfpagecount How many pages are in the pdf
      * @return string
      */
-    private static function get_pdftotext_command_for_file(string $pdffile, int $pdfpagecount) {
+    private static function get_pdftotext_command_for_file(string $pdffile, int $pdfpagecount): string {
         $pdftotextexec = \escapeshellarg('pdftotext');
         $pdffilearg = \escapeshellarg($pdffile);
         $lastpage = \escapeshellarg(min($pdfpagecount, 50));

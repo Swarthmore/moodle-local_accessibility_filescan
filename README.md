@@ -1,26 +1,32 @@
-# moodle-local_a11y_check
+# moodle-local_accessibility_filescan
 
-## A Moodle plugin that scans your course files for accessibility.
-
-This plugin consists of a scheduled task that looks for PDFs within courses, evaluates their a11y, then saves the results to the Moodle database
+This plugin is a scheduled task that scans your Moodle instance for PDFs, and performs accessibility checks on them. Results can be viewed from the plugin table in your Moodle database, or through your Moodle site using the [block_accessibility_filescan](https://github.com/swarthmore/moodle-block_accessibility_filescan) plugin.
 
 ## Dependencies
 
-* Moodle 3.11+
+* Moodle 4.00+
 
 ## Installation
 
 ### Dependencies
+
 `poppler-utils`
 
-### From the command line 
+### From the command line
 
-```bash
-git clone https://github.com/Swarthmore/moodle-local_a11y_check /moodle/root/dir/local/a11y_check
+```sh
+MOODLE_WWW_ROOT=/path/to/your/moodle
+git clone https://github.com/Swarthmore/moodle-local_accessibility_filescan $MOODLE_WWW_ROOT/local/accessibility_filescan
 ```
 
-### A11y Report
+### How Does it Work?
 
-This plugin adds an `A11y Report` link to a course's settings tree. It also adds a system-wide report in **System Administration -> Reports**
+This plugin will find PDFs across your Moodle instance, then scan them for accessibility. The plugin scans for the following:
 
-The course report displays scanned 
+1. Does the PDF has OCR'd text?
+2. Is the PDF tagged?
+3. Does the PDF have a language?
+4. Does the PDF have a title?
+5. Page count
+
+PDFs are scanned at intervals in accordance to Moodle's cron system and results are stored in the plugin's database table.

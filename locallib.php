@@ -15,25 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * local library functions local_a11y_check
+ * local library functions local_accessibility_filescan
  *
- * @package   local_a11y_check
- * @copyright 2020 Swarthmore College
+ * @package   local_accessibility_filescan
+ * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 // Types of checks.
-define('LOCAL_A11Y_CHECK_TYPE_UNDEFINED', 0);
-define('LOCAL_A11Y_CHECK_TYPE_PDF', 1);
+define('LOCAL_ACCESSIBILITY_FILESCAN_TYPE_UNDEFINED', 0);
+define('LOCAL_ACCESSIBILITY_FILESCAN_TYPE_PDF', 1);
 
 // Status types for scan checks.
-define('LOCAL_A11Y_CHECK_STATUS_UNCHECKED', 0); // File has not been checked.
-define('LOCAL_A11Y_CHECK_STATUS_PASS', 1);      // File passes all a11y checks.
-define('LOCAL_A11Y_CHECK_STATUS_CHECK', 2);     // File passes some a11y checks.
-define('LOCAL_A11Y_CHECK_STATUS_FAIL', 3);      // File fails all a11y checks.
-define('LOCAL_A11Y_CHECK_STATUS_ERROR', 4);     // Encountered an error on the last check.
+define('LOCAL_ACCESSIBILITY_FILESCAN_STATUS_UNCHECKED', 0);
+define('LOCAL_ACCESSIBILITY_FILESCAN_STATUS_PASS', 1);
+define('LOCAL_ACCESSIBILITY_FILESCAN_STATUS_CHECK', 2);
+define('LOCAL_ACCESSIBILITY_FILESCAN_STATUS_FAIL', 3);
+define('LOCAL_ACCESSIBILITY_FILESCAN_STATUS_ERROR', 4);
 
 // File is intentionally skipped, either from multiple errors, oversize, or some other issue.
-define('LOCAL_A11Y_CHECK_STATUS_IGNORE', 5);
+define('LOCAL_ACCESSIBILITY_FILESCAN_STATUS_IGNORE', 5);

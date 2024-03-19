@@ -15,75 +15,42 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Language file for local_a11y_check
+ * Language file for local_accessibility_filescan
  *
- * @package   local_a11y_check
- * @copyright 2020 Swarthmore College
+ * @package   local_accessibility_filescan
+ * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+/** @var admin_root $ADMIN */
 
 defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 
-if ($hassiteconfig) {
-    $settings = new admin_settingpage('local_a11y_check', get_string('pluginname', 'local_a11y_check'));
-    $ADMIN->add('localplugins', $settings);
+$settings = new admin_settingpage('local_accessibility_filescan', get_string('pluginname', 'local_accessibility_filescan'));
+$ADMIN->add('localplugins', $settings);
 
-    $settings->add(new admin_setting_configtext('local_a11y_check/files_per_cron',
-        get_string('settings:files_per_cron', 'local_a11y_check'),
-        get_string('settings:files_per_cron_desc', 'local_a11y_check'),
-        5,
-        PARAM_INT
-    ));
+$settings->add(new admin_setting_configtext(
+    'local_accessibility_filescan/files_per_cron',
+    get_string('settings:files_per_cron', 'local_accessibility_filescan'),
+    get_string('settings:files_per_cron_desc', 'local_accessibility_filescan'),
+    5,
+    PARAM_INT
+));
 
-    $settings->add(new admin_setting_configtext('local_a11y_check/max_file_size_mb',
-        get_string('settings:max_file_size_mb', 'local_a11y_check'),
-        get_string('settings:max_file_size_mb_desc', 'local_a11y_check'),
-        100,
-        PARAM_INT
-    ));
+$settings->add(new admin_setting_configtext(
+    'local_accessibility_filescan/max_file_size_mb',
+    get_string('settings:max_file_size_mb', 'local_accessibility_filescan'),
+    get_string('settings:max_file_size_mb_desc', 'local_accessibility_filescan'),
+    100,
+    PARAM_INT
+));
 
-    $settings->add(new admin_setting_configtext('local_a11y_check/max_retries',
-        get_string('settings:max_retries', 'local_a11y_check'),
-        get_string('settings:max_retries_desc', 'local_a11y_check'),
-        3,
-        PARAM_INT
-    ));
-
-    $settings->add(new admin_setting_configtext('local_a11y_check/text_check_help',
-        get_string('settings:text_check_help', 'local_a11y_check'),
-        get_string('settings:text_check_help_desc', 'local_a11y_check'),
-        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-        PARAM_URL,
-        60
-    ));
-
-    $settings->add(new admin_setting_configtext('local_a11y_check/title_check_help',
-        get_string('settings:title_check_help', 'local_a11y_check'),
-        get_string('settings:title_check_help_desc', 'local_a11y_check'),
-        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-        PARAM_URL,
-        60
-    ));
-
-    $settings->add(new admin_setting_configtext('local_a11y_check/lang_check_help',
-        get_string('settings:lang_check_help', 'local_a11y_check'),
-        get_string('settings:lang_check_help_desc', 'local_a11y_check'),
-        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-        PARAM_URL,
-        60
-    ));
-
-    $settings->add(new admin_setting_configtext('local_a11y_check/outline_check_help',
-        get_string('settings:outline_check_help', 'local_a11y_check'),
-        get_string('settings:outline_check_help_desc', 'local_a11y_check'),
-        'https://www.adobe.com/accessibility/pdf/pdf-accessibility-overview.html',
-        PARAM_URL,
-        60
-    ));
-
-    // Add a link to the report to Site administration -> Reports
-    $ADMIN->add('reports', new admin_externalpage('reporta11ycheck', get_string('pluginname', 'local_a11y_check'),
-        "$CFG->wwwroot/local/a11y_check/reports/admin.php"));
-}
+$settings->add(new admin_setting_configtext(
+    'local_accessibility_filescan/max_retries',
+    get_string('settings:max_retries', 'local_accessibility_filescan'),
+    get_string('settings:max_retries_desc', 'local_accessibility_filescan'),
+    3,
+    PARAM_INT
+));

@@ -15,17 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for local_a11y_check
+ * Version information for local_accessibility_filescan
  *
- * @package   local_a11y_check
- * @copyright 2021 Swarthmore College
+ * @package   local_accessibility_filescan
+ * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2022041405;
-$plugin->requires  = 2020110906;
-$plugin->component = 'local_a11y_check';
+/** @var mixed $plugin */
+$plugin->version   = 2024031100;
+$plugin->requires  = 2022041909.08;
+$plugin->component = 'local_accessibility_filescan';
 $plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = 'v0.0.1';
+$plugin->release   = '1.0.0';

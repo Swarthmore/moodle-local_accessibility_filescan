@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * local_a11y_check unit tests
+ * local_accessibility_filescan unit tests
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,12 +27,11 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Scan validity unit test.
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2021 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
-
+class scan_validity_test extends advanced_testcase {
     public function test_scan_validity() {
 
         // Get the directory where all of the PDFs are stored.
@@ -43,10 +42,10 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
         }
 
         // Create an arry to store the pdfs.
-        $pdfs = array();
+        $pdfs = [];
 
         // Get all of the PDFs in the directory.
-        $files = array_diff(scandir($pdfdir), array('.', '..'));
+        $files = array_diff(scandir($pdfdir), ['.', '..']);
 
         // Iterate through the files, and if the file is a PDF, add it to $pdfs.
         foreach ($files as $file) {
@@ -65,19 +64,18 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
             mtrace("Scanning" . $filename);
 
             if (strpos($filename, '-') !== false) {
-
                 // Extract the a11y tokens from the filename.
                 $a11ytokens = explode('-', explode('_', $filename)[1]);
 
                 // Create a blank results object.
                 // This will be filled with the results.
-                $a11ycheck = new \local_a11y_check\pdf_a11y_results();
+                $a11ycheck = new \local_accessibility_filescan\pdf_a11y_results();
 
                 // Get the file contents of the PDF.
                 $contents = file_get_contents($pdf);
 
                 // Scan the PDF.
-                $results = \local_a11y_check\pdf_scanner::scan($pdf);
+                $results = \local_accessibility_filescan\pdf_scanner::scan($pdf);
 
                 // Set the results based on the filename tokens.
                 if (in_array('TI', $a11ytokens)) {
@@ -85,7 +83,7 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
                 }
 
                 if (in_array('OL', $a11ytokens)) {
-                    $a11ycheck->hasbookmarks = 1;
+                    $a11ycheck->istagged = 1;
                 }
 
                 if (in_array('LN', $a11ytokens)) {
@@ -98,11 +96,10 @@ class local_a11y_assert_scan_validity_testcase extends advanced_testcase {
 
                 // Assert that the results match the expected results.
                 $this->assertEquals($a11ycheck->hastitle, $results->hastitle);
-                $this->assertEquals($a11ycheck->hasbookmarks, $results->hasbookmarks);
+                $this->assertEquals($a11ycheck->istagged, $results->istagged);
                 $this->assertEquals($a11ycheck->haslanguage, $results->haslanguage);
                 $this->assertEquals($a11ycheck->hastext, $results->hastext);
             }
         }
     }
-
 }

@@ -15,19 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Language file for local_a11y_check
+ * Language file for local_accessibility_filescan
  *
- * @package   local_a11y_check
- * @copyright 2020 Swarthmore College
+ * @package   local_accessibility_filescan
+ * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
+$string['pluginname'] = 'Accessibility Filescan';
+
+$string['clean_task'] = 'Clean local_accessibility_filescan tables';
+
 $string['pdf:find_files_task'] = 'Find unscanned PDF files';
 $string['pdf:scan_files_task'] = 'Scan PDF files';
-$string['clean_task'] = 'Clean a11y_check tables';
-$string['pluginname'] = 'A11y Check';
 
 $string['settings:files_per_cron'] = 'Batch size';
 $string['settings:files_per_cron_desc'] = 'Maximum number of files to scan per cron job';
@@ -37,15 +39,3 @@ $string['settings:max_file_size_mb_desc'] = 'The max file size to scan, in megab
 
 $string['settings:max_retries'] = 'Maximum retries';
 $string['settings:max_retries_desc'] = 'Maximum number of times to try scanning a file before giving up';
-
-$string['settings:text_check_help'] = 'Text check help link';
-$string['settings:text_check_help_desc'] = 'Link to help documentation for the text check';
-
-$string['settings:title_check_help'] = 'Title check help link';
-$string['settings:title_check_help_desc'] = 'Link to help documentation for the title check';
-
-$string['settings:lang_check_help'] = 'Language check help link';
-$string['settings:lang_check_help_desc'] = 'Link to help documentation for the language check';
-
-$string['settings:outline_check_help'] = 'Outline check help link';
-$string['settings:outline_check_help_desc'] = 'Link to help documentation for the outline check';

@@ -1,3 +1,7 @@
+notes.md
+phpcs.xml.dist
+tests/find_unqueued.php
+
 local/
 .DS_Store
 .idea/
