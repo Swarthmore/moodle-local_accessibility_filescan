@@ -16,15 +16,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * External functions and service definitions.
- *
- * @package    local_accessibility_filescan
- * @category   webservice
- * @copyright  2024 Swarthmore College
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 $functions = [
     // The name of your web service function, as discussed above.
     'local_accessibility_filescan_get_results_by_course' => [
