@@ -1,11 +1,11 @@
 <?php
 
+namespace local_accessibility_filescan\external;
+
 use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-
-namespace local_accessibility_filescan\external;
 
 /**
  * External endpoint provides api to pdf scan results.
