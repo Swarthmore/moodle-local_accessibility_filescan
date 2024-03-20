@@ -3,26 +3,36 @@ name: moodle-local_a11y_check-ci
 on: [push, pull_request]
 
 jobs:
-  test:
+  ci:
     runs-on: ubuntu-latest
 
     services:
+    
       postgres:
         image: postgres:latest
-        env:
-          POSTGRES_USER: 'postgres'
-          POSTGRES_HOST_AUTH_METHOD: 'trust'
         ports:
           - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
+        env:
+          POSTGRES_USER: 'postgres'
+          POSTGRES_HOST_AUTH_METHOD: 'trust'  
+        options: >-
+          --health-cmd pg_isready 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 3
+        
       mariadb:
         image: mariadb:latest
-        env:
-          MYSQL_USER: 'root'
-          MYSQL_ALLOW_EMPTY_PASSWORD: "true"
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
+        env:
+          MARIADB_USER: root
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized" 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 3
 
     strategy:
       fail-fast: false
