@@ -73,12 +73,34 @@ class pdf {
         global $DB;
 
         // These are the components the scanner will look for files in.
-        $components = ["course", "block_html", "mod_assign", "mod_book", "mod_data", "mod_folder", "mod_forum", "mod_glossary", "mod_label", "mod_lesson", "mod_page", "mod_publication", "mod_questionnaire", "mod_quiz", "mod_resource", "mod_scorm", "mod_url", "mod_workshop", "qtype_essay", "question"];
+        $components = [
+            "course",
+            "block_html",
+            "mod_assign",
+            "mod_book",
+            "mod_data",
+            "mod_folder",
+            "mod_forum",
+            "mod_glossary",
+            "mod_label",
+            "mod_lesson",
+            "mod_page",
+            "mod_publication",
+            "mod_questionnaire",
+            "mod_quiz",
+            "mod_resource",
+            "mod_scorm",
+            "mod_url",
+            "mod_workshop",
+            "qtype_essay",
+            "question"
+        ];
 
         // Create the IN part of the statement, along with its params.
         [$insql, $inparams] = $DB->get_in_or_equal($components);
 
-        $sql = 'select f.id as "fileid", f.filesize as "filesize", f.filename as "filename", c.id as "courseid", c.shortname as "courseshortname", c.fullname as "coursefullname" ' .
+        $sql = 'select f.id as "fileid", f.filesize as "filesize", f.filename as "filename", ' .
+        'c.id as "courseid", c.shortname as "courseshortname", c.fullname as "coursefullname" ' .
         'from {files} f ' .
         'inner join {context} ctx on ctx.id = f.contextid ' .
         'inner join {course_modules} cm on cm.id = ctx.instanceid ' .
@@ -198,10 +220,10 @@ class pdf {
                 if ($filesizemb > $maxfilesize) {
                     mtrace('File ' . $file->filename . ' is too large to scan');
 
-                  // Make sure the file doesn't get scanned again.
+                    // Make sure the file doesn't get scanned again.
                     $msg = "File is larger than" . round($maxfilesize) . "MB.";
 
-                  // Update the status. 5 = do not scan again.
+                    // Update the status. 5 = do not scan again.
                     $DB->update_record('local_a11y_filescan_queue', (object) [
                     'id' => $file->scanid,
                     'status' => 5,
@@ -209,7 +231,7 @@ class pdf {
                     'lastchecked' => time(),
                     ]);
 
-                  // no need to proces rest of iteration.
+                    // no need to proces rest of iteration.
                     continue;
                 }
 

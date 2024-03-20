@@ -24,8 +24,6 @@
 
 namespace local_accessibility_filescan\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Scheduled task to find scan plugin tables for deleted files.
  *

@@ -17,7 +17,7 @@
 /**
  * Result class for local_a11y_check
  *
- * @package   local_a11y_check
+ * @package   local_accessibility_filescan
  * @copyright 2023 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

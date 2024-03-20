@@ -25,10 +25,6 @@
 namespace local_accessibility_filescan;
 use Exception;
 
-defined('MOODLE_INTERNAL') || die();
-
-// require_once(dirname(__FILE__) . "/pdf_a11y_results.php");
-
 /**
  * A class to orchestrate the scanning of a pdf for a11y
  */

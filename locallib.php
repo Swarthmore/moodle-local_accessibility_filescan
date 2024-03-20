@@ -22,8 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 // Types of checks.
 define('LOCAL_ACCESSIBILITY_FILESCAN_TYPE_UNDEFINED', 0);
 define('LOCAL_ACCESSIBILITY_FILESCAN_TYPE_PDF', 1);

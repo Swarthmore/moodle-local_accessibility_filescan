@@ -1,7 +1,5 @@
 <?php
 
-defined('MOODLE_INTERNAL') || die;
-
 $functions = [
     // The name of your web service function, as discussed above.
     'local_accessibility_filescan_get_results_by_course' => [
