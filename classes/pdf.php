@@ -93,7 +93,7 @@ class pdf {
             "mod_url",
             "mod_workshop",
             "qtype_essay",
-            "question"
+            "question",
         ];
 
         // Create the IN part of the statement, along with its params.
