@@ -16,6 +16,34 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Defines web service functions for the local_accessibility_filescan plugin.
+ *
+ * This file specifies the external web service functions available in the
+ * local_accessibility_filescan Moodle plugin. The functions are designed
+ * to be consumed by web services, including Moodle's official mobile service.
+ * The primary function detailed here allows for the retrieval of accessibility
+ * file scan results by course ID, supporting both server processing and AJAX
+ * calls from the web.
+ *
+ * @package local_accessibility_filescan
+ *
+ * The array maps web service function names to their respective handler classes,
+ * descriptions, access types, AJAX support, and inclusion in specific services.
+ * This setup facilitates the integration of the plugin's functionalities with
+ * Moodle's web service infrastructure, enabling external applications and
+ * Moodle's mobile app to interact with the plugin.
+ *
+ * @example Usage:
+ * To call this web service function, a client would typically use a web service
+ * token along with the specific function name ('local_accessibility_filescan_get_results_by_course')
+ * and required parameters (e.g., 'courseid'). The response will include accessibility
+ * scan results for the specified course, subject to the user's permissions and
+ * the function's implementation logic.
+ *
+ * @see For further information on developing web service functions in Moodle,
+ * refer to Moodle's official documentation on web services.
+ */
 $functions = [
     // The name of your web service function, as discussed above.
     'local_accessibility_filescan_get_results_by_course' => [
