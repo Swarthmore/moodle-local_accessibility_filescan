@@ -24,8 +24,6 @@
 
 namespace local_accessibility_filescan;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A class to standardize a11y results for pdfs
  */

@@ -213,7 +213,7 @@ class pdf {
                 mtrace("Scanning $file->fileid");
 
                 // Check and see if the file exceeds max filesize.
-                // Get the filesize
+                // Get the filesize.
                 $filesizebytes = $file->filesize;
                 $filesizemb = $filesizebytes / pow(1024, 2);
 
@@ -231,7 +231,7 @@ class pdf {
                     'lastchecked' => time(),
                     ]);
 
-                    // no need to proces rest of iteration.
+                    // No need to proces rest of iteration.
                     continue;
                 }
 
