@@ -29,7 +29,6 @@
  * @copyright 2020 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 class file_discovery_test extends advanced_testcase {
     /** @var \local_accessibility_filescan\pdf The pdf helper object */
     public $pdfhelper;

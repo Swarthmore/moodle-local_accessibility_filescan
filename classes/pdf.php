@@ -37,6 +37,7 @@ require_once(dirname(__FILE__) . '/../locallib.php');
 class pdf {
     /**
      * Remove all rows that don't have a record in mdl_files (draft context is ignored).
+     * @return void
      * @throws \dml_exception
      */
     public static function cleanup_orphaned_records(): void {
@@ -67,6 +68,8 @@ class pdf {
 
     /**
      * Find all PDF files across Moodle instance that do not have a record in the queue.
+     * @param int $limit - Limit on how many records to return.
+     * @return array
      * @throws \dml_exception
      */
     public static function get_unqueued_files($limit = 1): array {
@@ -131,6 +134,9 @@ class pdf {
 
     /**
      * Return the ids of PDF files (within $limit) in the queue, but have not been scanned for accessibility.
+     * @param int $limit - Limit on how many records to return.
+     * @return array
+     * @throws \dml_exception
      */
     public static function get_unscanned_files($limit = 1): array {
         global $DB;
@@ -158,7 +164,6 @@ class pdf {
      * @return void
      * @throws \dml_exception
      */
-
     public static function put_file_in_queue($file): void {
         global $DB;
 
@@ -187,6 +192,7 @@ class pdf {
 
     /**
      * Scan queued files (at random) and returns its accessibility results.
+     * @param int $limit - Limit the amount of files scanned.
      * @return void
      * @throws \dml_exception
      */
@@ -271,7 +277,7 @@ class pdf {
 
     /**
      * Create a tmp file in the Moodle temp file storage area and return the path.
-     * @param $fileid int
+     * @param int $fileid - The id of the file in Moodle database.
      * @return string
      */
     private static function create_tmp_file(int $fileid): string {

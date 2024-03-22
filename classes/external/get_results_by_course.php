@@ -36,6 +36,12 @@ class get_results_by_course extends \core_external\external_api {
         ]);
     }
 
+    /**
+     * Get the files that have been scanned by course id.
+     *
+     * @param int $courseid - The id of the course in the Moodle database.
+     * @return array - Returns an array of files.
+     */
     public static function execute(int $courseid) {
         global $DB;
         $params = self::validate_parameters(self::execute_parameters(), ['courseid' => $courseid]);
@@ -60,6 +66,10 @@ class get_results_by_course extends \core_external\external_api {
         return $files;
     }
 
+    /**
+     * Define the data returned from webservice.
+     * @return object - returns the requested information.
+     */
     public static function execute_returns() {
         return new external_multiple_structure(
             new external_single_structure([
