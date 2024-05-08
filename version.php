@@ -18,15 +18,15 @@
  * Version information for local_accessibility_filescan
  *
  * @package   local_accessibility_filescan
- * @copyright 2023 Swarthmore College
+ * @copyright 2024 Swarthmore College
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 /** @var mixed $plugin */
-$plugin->version   = 2024031100;
+$plugin->version   = 2024050800;
 $plugin->requires  = 2022041909.08;
 $plugin->component = 'local_accessibility_filescan';
 $plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = '1.0.0';
+$plugin->release   = '1.0.1';
