@@ -29,4 +29,4 @@ $plugin->version   = 2024050800;
 $plugin->requires  = 2022041909.08;
 $plugin->component = 'local_accessibility_filescan';
 $plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = '1.0.1';
+$plugin->release   = '1.0.0';
