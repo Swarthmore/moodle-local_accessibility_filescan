@@ -40,28 +40,55 @@ class pdf_scanner {
         $results = new pdf_a11y_results();
         $info = self::get_pdfinfo($file);
 
-        // Iterate through the output lines and assign a11y results.
         foreach ($info as $line) {
-            if (strpos($line, 'Title:') === 0) {
-                $results->hastitle = (strlen(trim(explode(":", $line, 2)[1])) > 0) ? 1 : 0;
-            } else if (strpos($line, 'Pages:') === 0) {
+            if (strpos($line, 'Pages:') === 0) {
                 $results->pagecount = trim(explode(":", $line, 2)[1]);
             } else if (strpos($line, 'Tagged:') === 0) {
                 $results->istagged = (trim(explode(":", $line, 2)[1]) === "yes") ? 1 : 0;
             }
         }
-
-        // Get the hastext status.
+    
+        $title = self::get_pdf_title($file, $info);
+        $results->hastitle = (strlen($title) > 0) ? 1 : 0;
+    
         $text = self::get_pdftext($file, $results->pagecount === 0 ? 1 : $results->pagecount);
         $results->hastext = intval($text && count($text) > 1);
-
-        // Get the haslanguage status.
+    
         $lang = self::get_pdf_lang($file);
         $results->haslanguage = count($lang) > 1 ? 1 : 0;
+
 
         return $results;
     }
 
+    /**
+     * Extract the title from a pdf, checking both the classic Info dictionary
+     * and XMP metadata (PDF 2.0 may only populate XMP, per spec).
+     * @param string $file The filepath to the pdf
+     * @param array $info The pdfinfo output lines
+     * @return string
+     */
+    private static function get_pdf_title(string $file, array $info): string {
+        // First, check the classic Info dictionary Title: line.
+        foreach ($info as $line) {
+            if (strpos($line, 'Title:') === 0) {
+                $title = trim(explode(":", $line, 2)[1]);
+                if (strlen($title) > 0) {
+                    return $title;
+                }
+            }
+        }
+    
+        // Fall back to XMP dc:title, which is what PDF 2.0 files use.
+        $contents = file_get_contents($file);
+        if (preg_match('/<dc:title>.*?<rdf:li[^>]*>(.*?)<\/rdf:li>.*?<\/dc:title>/s', $contents, $matches)) {
+            return trim($matches[1]);
+        }
+    
+        return '';
+    }
+
+    
     /**
      * Extract the language from a pdf
      * @param string $file The filepath to the pdf
