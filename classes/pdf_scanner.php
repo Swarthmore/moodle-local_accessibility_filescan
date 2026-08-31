@@ -69,7 +69,7 @@ class pdf_scanner {
      */
     private static function get_pdf_lang(string $file): array {
         $contents = file_get_contents($file);
-        preg_match('/\/Lang\((.*)\)/mU', $contents, $matches);
+        preg_match('/\/Lang\s*\((.*)\)/mU', $contents, $matches);
         return $matches;
     }
 
